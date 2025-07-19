@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 const UnprotectedHeader = () => {
   return (
@@ -10,50 +10,6 @@ const UnprotectedHeader = () => {
         >
           <span className="fs-4">Roomly</span>
         </NavLink>
-
-        <ul className="nav nav-pills">
-          <li className="nav-item">
-            <NavLink
-              to="/"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-              end // ensures exact match for "/"
-            >
-              Home
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/about"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              About
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/contact-us"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              Contact Us
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/login"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              Login
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/signup"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              Sign Up
-            </NavLink>
-          </li>
-        </ul>
       </header>
     </div>
   );

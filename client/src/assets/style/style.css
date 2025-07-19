@@ -172,3 +172,26 @@
   text-decoration: line-through;
   color: #888;
 }
+
+:root {
+  --primary: #ff5a5f;
+  --accent: #00a699;
+  --bg: #fafafa;
+  --text: #333333;
+  --muted: #767676;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Poppins", sans-serif;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #e0484d;
+}

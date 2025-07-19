@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "../../assets/style/card.css";
-import { useNavigate } from "react-router-dom";
 import RoomCard from "../Card/RoomCard";
 
 const RoomGrid = ({ options }) => {
@@ -138,7 +137,6 @@ const RoomGrid = ({ options }) => {
         "https://s7ap1.scene7.com/is/image/incredibleindia/albert-hall-jaipur-rajasthan-2-attr-hero?qlt=82&ts=1742161239064",
     },
   ]);
-
   return (
     <>
       <div className="container">
