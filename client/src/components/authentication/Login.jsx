@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import SignUp from "./Signup";
 const Login = () => {
   const [loginData, setLoginData] = useState({
     email: "coderstone01@gmail.com",
@@ -13,9 +13,15 @@ const Login = () => {
     }
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const closeSignup = () => {
+    console.log("Closing");
+    setShowModal(false);
+  };
+
   return (
     <>
-      {" "}
       <div className="mb-4">
         <h5 className="mb-3">Login to continue</h5>
         <form onSubmit={handleLogin}>
@@ -47,7 +53,18 @@ const Login = () => {
             Login
           </button>
         </form>
+        <p>
+          Don't have an account?
+          <span
+            onClick={() => setShowModal(true)}
+            className="text-primary ms-1 text-decoration-underline"
+            role="button"
+          >
+            Click here
+          </span>
+        </p>
       </div>
+      <SignUp showModal={showModal} onClose={() => closeSignup()}></SignUp>
     </>
   );
 };
