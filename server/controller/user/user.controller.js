@@ -6,7 +6,7 @@ class UserController {
     try {
       const { email } = req.body;
 
-      //Generating
+      //Generating Otp
       const otpService = new OTPService();
       const otp = await otpService.generateOtp();
       const expiredTime = await otpService.expiredTime();
