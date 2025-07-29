@@ -195,3 +195,41 @@ body {
 .btn-primary:hover {
   background-color: #e0484d;
 }
+
+.razorpay-container {
+  padding: 5px 0;
+}
+
+.razorpay-logo {
+  height: 16.5px;
+  vertical-align: middle;
+}
+
+.razorpay-text {
+  font-size: 14px;
+}
+
+.razorpay-brand {
+  display: flex;
+  align-items: center;
+}
+
+.razorpay-logo {
+  height: 16px;
+}
+
+.custom-checkout-btn {
+  width: 150px; /* Decrease width */
+  height: 50px; /* Increase height */
+  font-size: 18px; /* Optional for bigger text */
+}
+
+.term-conditions {
+   font-size: 12px;
+}
+
+.profile{
+  position: "absolute";
+  top: "100%";
+  right: 0
+}

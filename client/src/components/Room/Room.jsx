@@ -153,7 +153,7 @@ const Room = () => {
                 <button
                   type="button"
                   className="btn btn-primary w-100"
-                  onClick={() => handleNavigate("/checkout/1")}
+                  onClick={() => handleNavigate("/reservation/1")}
                 >
                   Reserve
                 </button>

@@ -5,7 +5,7 @@ class EmailService extends SmtpService {
     super();
   }
 
-  async sendMail(to, subject, html, text) {
+  async sendMail({ to, subject, html, text }) {
     return await super.sendMail({ to, subject, html, text });
   }
 }

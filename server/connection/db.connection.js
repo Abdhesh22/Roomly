@@ -2,32 +2,42 @@ const mongoose = require("mongoose");
 
 class DBConnection {
   constructor() {
-    this.connected = false;
+    this._connectionPromise = null;
+    this._uri = process.env.MONGO_DB_CONNECTION_URL;
   }
 
-  async connect(uri) {
-    if (this.connected) {
+  async getMongoose() {
+    if (mongoose.connection.readyState === 1) {
       console.log("[DB] Already connected");
-      return;
+      return mongoose;
     }
 
+    if (!this._connectionPromise) {
+      this._connectionPromise = this._connect();
+    }
+
+    return this._connectionPromise;
+  }
+
+  async _connect() {
     try {
-      mongoose.connect(process.env.MONGO_DB_CONNECTION_URL);
-      this.connected = true;
+      await mongoose.connect(this._uri);
       console.log("[DB] Connection established");
+      return mongoose;
     } catch (error) {
       console.error("[DB] Connection failed:", error.message);
       throw error;
     }
   }
 
-  disconnect() {
-    if (this.connected) {
-      mongoose.disconnect();
-      this.connected = false;
+  async disconnect() {
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
+      this._connectionPromise = null;
       console.log("[DB] Disconnected");
     }
   }
 }
 
-module.exports = new DBConnection(); // Singleton instance
+// Export a singleton instance
+module.exports = new DBConnection();

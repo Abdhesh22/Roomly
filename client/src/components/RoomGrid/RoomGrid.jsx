@@ -3,6 +3,9 @@ import "../../assets/style/card.css";
 import RoomCard from "../Card/RoomCard";
 
 const RoomGrid = ({ options }) => {
+
+  console.log("calling rooms");
+
   const [rooms, setRooms] = useState([
     {
       id: 1,
@@ -141,8 +144,8 @@ const RoomGrid = ({ options }) => {
     <>
       <div className="container">
         <div className="row">
-          {rooms.map((room) => (
-            <RoomCard options={room}></RoomCard>
+          {rooms.map((room, index) => (
+            <RoomCard options={room} key={index}></RoomCard>
           ))}
         </div>
       </div>

@@ -1,152 +1,162 @@
-import { useEffect, useRef } from "react";
-import { Modal } from "bootstrap";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import apiService from "../../utils/request/api.util";
+import CustomModal from "../../utils/modal/CustomModal";
+import OTPModal from "./Otp";
+import { toast } from 'react-toastify';
+import { handleCatch } from "../../utils/common";
 
-const SignUp = ({ showModal, onClose }) => {
-  const modalRef = useRef(null);
-  const modalInstance = useRef(null);
+const SignUp = ({ showModal, onClose, userType }) => {
+  const [showOtp, setShowOtp] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors }, getValues, watch, setValue, reset } = useForm();
 
-  useEffect(() => {
-    const modalEl = modalRef.current;
-    if (!modalEl) return;
-
-    if (!modalInstance.current) {
-      modalInstance.current = new Modal(modalEl, {
-        backdrop: "static",
-        keyboard: false,
-      });
-      modalEl.addEventListener("hidden.bs.modal", onClose);
+  const onSubmit = async (payload) => {
+    try {
+      const { data } = await apiService.post("/api/authentication/send-otp", payload);
+      if (data.status) {
+        onClose();
+        toast.success(data.message);
+        setShowOtp(true);
+      }
+    } catch (error) {
+      handleCatch(error);
     }
-
-    showModal ? modalInstance.current.show() : modalInstance.current.hide();
-
-    return () => {
-      modalInstance.current?.dispose();
-      modalInstance.current = null;
-      modalEl.removeEventListener("hidden.bs.modal", onClose);
-    };
-  }, [showModal, onClose]);
-
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
-    // TODO: handle backend API call or validation
   };
 
+  const handleOtpSubmit = async (otp) => {
+    try {
+      const values = getValues();
+      console.log("values: ", values);
+      const { data } = await apiService.post("/api/authentication/verify-otp", { email: values.email, otp });
+      if (data.status) {
+        toast.success(data.message);
+        values.userType = userType;
+        const response = await apiService.post("/api/authentication/register/user", values);
+        if (response.data.status) {
+          toast.success(response.data.message);
+          setShowOtp(false);
+        }
+      }
+    } catch (error) {
+      handleCatch(error);
+    }
+  }
+
+  const checkEmailExist = async () => {
+    try {
+      const email = getValues('email');
+      console.log(email);
+      const res = await apiService.get(`/api/user/check-email/${email}`, { userType });
+      console.log("res: ", res);
+    } catch (error) {
+      setValue("email", "");
+      handleCatch(error);
+      return true;
+    }
+  }
+
+  useEffect(() => {
+    if (showModal) {
+      console.log("calling reset");
+      reset();
+    }
+  }, [showModal]);
+
+
   return (
-    <div className="modal fade" tabIndex="-1" aria-hidden="true" ref={modalRef}>
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Sign Up</h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
+    <>
+      <CustomModal show={showModal} onClose={onClose} title="Sign Up">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {/* First Name */}
+          <div className="mb-3">
+            <label className="form-label">First Name</label>
+            <input
+              className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
+              {...register("firstName", { required: "First name is required" })}
             />
+            {errors.firstName && (
+              <div className="invalid-feedback">{errors.firstName.message}</div>
+            )}
           </div>
-          <div className="modal-body">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-3">
-                <label className="form-label">First Name</label>
-                <input
-                  className="form-control"
-                  {...register("firstName", {
-                    required: "First name is required",
-                  })}
-                />
-                {errors.firstName && (
-                  <small className="text-danger">
-                    {errors.firstName.message}
-                  </small>
-                )}
-              </div>
 
-              <div className="mb-3">
-                <label className="form-label">Last Name</label>
-                <input
-                  className="form-control"
-                  {...register("lastName", {
-                    required: "Last name is required",
-                  })}
-                />
-                {errors.lastName && (
-                  <small className="text-danger">
-                    {errors.lastName.message}
-                  </small>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
-                />
-                {errors.email && (
-                  <small className="text-danger">{errors.email.message}</small>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
-                />
-                {errors.password && (
-                  <small className="text-danger">
-                    {errors.password.message}
-                  </small>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Confirm Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  {...register("confirmPassword", {
-                    required: "Confirm password is required",
-                    validate: (value, formValues) =>
-                      value === formValues.password || "Passwords do not match",
-                  })}
-                />
-                {errors.confirmPassword && (
-                  <small className="text-danger">
-                    {errors.confirmPassword.message}
-                  </small>
-                )}
-              </div>
-
-              <button type="submit" className="btn btn-primary w-100">
-                Verify Email
-              </button>
-            </form>
+          {/* Last Name */}
+          <div className="mb-3">
+            <label className="form-label">Last Name</label>
+            <input
+              className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
+              {...register("lastName", { required: "Last name is required" })}
+            />
+            {errors.lastName && (
+              <div className="invalid-feedback">{errors.lastName.message}</div>
+            )}
           </div>
-        </div>
-      </div>
-    </div>
+
+          {/* Email */}
+          <div className="mb-3">
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              className={`form-control ${errors.email ? "is-invalid" : ""}`}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: "Invalid email address",
+                },
+              })}
+              onBlur={checkEmailExist}
+            />
+            {errors.email && (
+              <div className="invalid-feedback">{errors.email.message}</div>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="mb-3">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              className={`form-control ${errors.password ? "is-invalid" : ""}`}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+              })}
+            />
+            {errors.password && (
+              <div className="invalid-feedback">{errors.password.message}</div>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="mb-3">
+            <label className="form-label">Confirm Password</label>
+            <input
+              type="password"
+              className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
+              {...register("confirmPassword", {
+                required: "Confirm password is required",
+                validate: (value) =>
+                  value === watch("password") || "Passwords do not match",
+              })}
+            />
+            {errors.confirmPassword && (
+              <div className="invalid-feedback">{errors.confirmPassword.message}</div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button type="submit" className="btn btn-primary w-100">
+            Verify Email
+          </button>
+        </form>
+      </CustomModal>
+
+      <OTPModal showModal={showOtp} onClose={() => setShowOtp(false)} onSubmit={handleOtpSubmit} />
+    </>
   );
 };
 
