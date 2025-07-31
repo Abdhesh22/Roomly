@@ -2,7 +2,7 @@ import { useState } from "react";
 import SignUp from "./Signup";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
-import apiService from "../../utils/request/api.util";
+import api from "../../utils/request/api.util";
 import { toast } from 'react-toastify';
 import { handleCatch } from "../../utils/common";
 
@@ -24,7 +24,7 @@ const Login = ({ onClose, userType }) => {
 
       if (loginData.email && loginData.password) {
 
-        const { data } = await apiService.get('/api/authentication/login', {
+        const { data } = await api.get('/api/authentication/login', {
           email: loginData.email,
           password: loginData.password,
           userType: userType

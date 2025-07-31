@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controller/user/user.controller");
-const AuthenticationController = require("../controller/authentication/authentication.controller");
+const AuthenticationMiddleware = require("../middleware/authentication.middleware");
 
 router.get("/check-email/:email", userController.checkEmail);
-router.post("/checkout", AuthenticationController.verify, userController.checkout);
+router.post("/checkout", AuthenticationMiddleware.verify, userController.checkout);
 
 module.exports = router;

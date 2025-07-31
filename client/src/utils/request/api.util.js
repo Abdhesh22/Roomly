@@ -1,13 +1,17 @@
-import axiosInstance from "./axiosInstance";
+import { axiosJSON, axiosMultipart } from "./axiosInstance";
 
-const apiService = {
-  get: (url, params = {}) => axiosInstance.get(url, { params }),
+const api = {
+  get: (url, params = {}) => axiosJSON.get(url, { params }),
 
-  post: (url, data = {}) => axiosInstance.post(url, data),
+  post: (url, data = {}) => axiosJSON.post(url, data),
 
-  put: (url, data = {}) => axiosInstance.put(url, data),
+  put: (url, data = {}) => axiosJSON.put(url, data),
 
-  delete: (url, params = {}) => axiosInstance.delete(url, { params }),
+  delete: (url, params = {}) => axiosJSON.delete(url, { params }),
+
+  postMultipart: (url, formData) => axiosMultipart.post(url, formData),
+
+  putMultipart: (url, formData) => axiosMultipart.put(url, formData),
 };
 
-export default apiService;
+export default api;

@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const AuthenticationController = require("../controller/authentication/authentication.controller");
+const AuthenticationMiddleware = require("../middleware/authentication.middleware");
+const MulterMiddleware = require("../middleware/multer.middleware");
 const RoomController = require("../controller/room/room.controller");
 
-router.post("/:roomId/booking", AuthenticationController.verify, RoomController.booking);
+router.post('/', AuthenticationMiddleware.verify, MulterMiddleware.multiple('images'), RoomController.create);
+router.post("/:roomId/booking", AuthenticationMiddleware.verify, RoomController.book);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import apiService from "../../utils/request/api.util";
+import api from "../../utils/request/api.util";
 import CustomModal from "../../utils/modal/CustomModal";
 import OTPModal from "./Otp";
 import { toast } from 'react-toastify';
@@ -13,7 +13,7 @@ const SignUp = ({ showModal, onClose, userType }) => {
 
   const onSubmit = async (payload) => {
     try {
-      const { data } = await apiService.post("/api/authentication/send-otp", payload);
+      const { data } = await api.post("/api/authentication/send-otp", payload);
       if (data.status) {
         onClose();
         toast.success(data.message);
@@ -28,11 +28,11 @@ const SignUp = ({ showModal, onClose, userType }) => {
     try {
       const values = getValues();
       console.log("values: ", values);
-      const { data } = await apiService.post("/api/authentication/verify-otp", { email: values.email, otp });
+      const { data } = await api.post("/api/authentication/verify-otp", { email: values.email, otp });
       if (data.status) {
         toast.success(data.message);
         values.userType = userType;
-        const response = await apiService.post("/api/authentication/register/user", values);
+        const response = await api.post("/api/authentication/register/user", values);
         if (response.data.status) {
           toast.success(response.data.message);
           setShowOtp(false);
@@ -47,7 +47,7 @@ const SignUp = ({ showModal, onClose, userType }) => {
     try {
       const email = getValues('email');
       console.log(email);
-      const res = await apiService.get(`/api/user/check-email/${email}`, { userType });
+      const res = await api.get(`/api/user/check-email/${email}`, { userType });
       console.log("res: ", res);
     } catch (error) {
       setValue("email", "");

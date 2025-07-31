@@ -1,7 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import MultiSelectDropdown from "../../../utils/multi-select/MultiSelectDropDown";
 import FileUploader from "../../../utils/FileUploader/FileUploader";
-import apiService from "../../../utils/request/api.util";
+import api from "../../../utils/request/api.util";
 import LocationPicker from "../../../utils/LocationPicker/LocationPicker";
 import { cities } from "../../../utils/constants/cities.constant";
 import { states } from "../../../utils/constants/states.constant";
@@ -47,7 +47,7 @@ const AddRoom = () => {
         formState: { errors },
     } = useForm();
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         console.log("data: ", data);
         const formData = new FormData();
         ["pincode", "about", "maxGuests", "maxAdults", "maxTeens", "basePrice", "pricePerGuest", "pricePerAdult", "pricePerTeen"].forEach(key => {
@@ -57,6 +57,7 @@ const AddRoom = () => {
         // Append images (ensure they are File objects)
         data.images.forEach((file, index) => {
             if (file instanceof File) {
+                console.log(file);
                 formData.append("images", file); // 'images' as an array
             }
         });
@@ -72,7 +73,8 @@ const AddRoom = () => {
         formData.append("latitude", data.latitude);
         formData.append("longitude", data.longitude);
 
-
+        const res = await api.postMultipart('/api/rooms', formData);
+        console.log("res: ", res);
     };
 
     const addressOptions = (address, key) => {
@@ -91,8 +93,9 @@ const AddRoom = () => {
 
 
     const handlePlace = (place) => {
+        console.log('place: ', place)
         setValue("latitude", place.latitude);
-        setValue("longitude", place.longitudes);
+        setValue("longitude", place.longitude);
         setValue("state", addressOptions(place.address, 'state'));
         setValue("city", addressOptions(place.address, 'city'));
         if (place.address.postcode) {
@@ -103,7 +106,7 @@ const AddRoom = () => {
     return (
         <div className="container mt-4">
             <h2>Add Room</h2>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} id="room">
 
 
                 <LocationPicker
@@ -298,7 +301,7 @@ const AddRoom = () => {
 
                 {/* Submit */}
                 <button type="submit" className="btn btn-success">
-                    Submit Room
+                    Submit
                 </button>
             </form>
         </div>

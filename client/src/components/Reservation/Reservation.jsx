@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Login from "../authentication/Login";
-import apiService from "../../utils/request/api.util";
+import api from "../../utils/request/api.util";
 import { loadRazorpayScript } from "../../utils/razorpay/razorpay";
 import { toast } from "react-toastify";
 import { handleCatch } from "../../utils/common";
@@ -42,7 +42,7 @@ const Reservation = ({ checkinDate, checkoutDate }) => {
 
       }
 
-      const { data } = await apiService.post("/api/rooms/1/booking", payload);
+      const { data } = await api.post("/api/rooms/1/booking", payload);
       if (data.status) {
         toast.success(data.message);
       }
@@ -92,7 +92,7 @@ const Reservation = ({ checkinDate, checkoutDate }) => {
   }
 
   const handleCheckout = async () => {
-    const { data } = await apiService.post('/api/user/checkout', {});
+    const { data } = await api.post('/api/user/checkout', {});
     if (data.status) {
       openRazorpay(data);
     }

@@ -1,36 +1,54 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-// Create an Axios instance
-const axiosInstance = axios.create({
-  baseURL: "/",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// 🔧 Shared config values
+const BASE_URL = "/";
+const TIMEOUT = 10000;
 
-// Request interceptor to add authorization headers
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+// 🔐 Auth + Error Interceptors
+const applyInterceptors = (instance) => {
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+      return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
+  );
+
+  return instance;
+};
+
+// 📦 For JSON APIs
+const axiosJSON = applyInterceptors(
+  axios.create({
+    baseURL: BASE_URL,
+    timeout: TIMEOUT,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
 );
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.clear();
-      window.location.href = "/";
-    }
-    return Promise.reject(error);
-  }
+// 📁 For FormData/file upload (Content-Type set automatically)
+const axiosMultipart = applyInterceptors(
+  axios.create({
+    baseURL: BASE_URL,
+    timeout: TIMEOUT,
+    // ⚠️ Don't set 'Content-Type', axios will set it when FormData is passed
+  })
 );
 
-export default axiosInstance;
+export { axiosJSON, axiosMultipart };
