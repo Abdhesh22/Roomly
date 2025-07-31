@@ -1,6 +1,7 @@
 import AppRoutes from './routes/AppRoutes.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'leaflet/dist/leaflet.css';
 
 const App = () => {
   return (
