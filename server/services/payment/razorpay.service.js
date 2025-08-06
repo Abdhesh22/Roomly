@@ -1,5 +1,5 @@
 const Razorpay = require("razorpay");
-const DateTime = require("../date-time/date-time.service");
+const DateTimeService = require("../date-time/date-time.service");
 
 class RazorPayService {
     #razorpayInstance;
@@ -18,7 +18,7 @@ class RazorPayService {
     }
 
     makeOrder = async (amount, customerId, currency) => {
-        const dateTime = new DateTime();
+        const dateTime = new DateTimeService();
         const options = {
             amount: amount * 100,
             currency: currency,

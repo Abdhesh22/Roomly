@@ -50,7 +50,6 @@ class MulterMiddleware {
      * Use this for multiple image uploads: field name must be 'images'
      */
     multiple(fieldName = "images", maxCount = 10) {
-        console.log("runnig");
         return this.#multerInstance.array(fieldName, maxCount);
     }
 }

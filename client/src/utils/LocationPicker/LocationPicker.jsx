@@ -34,10 +34,10 @@ const SetMapRef = ({ onReady }) => {
 };
 
 
-const LocationPicker = ({ onChange }) => {
+const LocationPicker = ({ onChange, latitude, longitude, title = "Pick a Location", disable = false }) => {
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
-    const [position, setPosition] = useState([28.6139, 77.2090]); // Default to Delhi
+    const [position, setPosition] = useState([latitude, longitude]);
     const mapRef = useRef(null);
 
     const handleSearch = async (e) => {
@@ -71,7 +71,7 @@ const LocationPicker = ({ onChange }) => {
         onChange({ latitude: lat, longitude: lon, address: place.address });
     };
 
-    // 🔁 Move map when position changes
+
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.flyTo(position, 14);
@@ -101,6 +101,7 @@ const LocationPicker = ({ onChange }) => {
     const LocationMarker = () => {
         useMapEvents({
             click(e) {
+                if (disable) return;
                 const { lat, lng } = e.latlng;
                 setPosition([lat, lng]);
                 setQuery(`Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`);
@@ -114,10 +115,9 @@ const LocationPicker = ({ onChange }) => {
 
     return (
         <div className="mb-3">
-            <label className="form-label">Pick a Location</label>
+            <label className="form-label">{title}</label>
             <div style={{ position: "relative" }}>
-                {/* 🔍 Search Input */}
-                <div
+                {!disable && (<div
                     style={{
                         position: "absolute",
                         top: 10,
@@ -161,13 +161,12 @@ const LocationPicker = ({ onChange }) => {
                             ))}
                         </ul>
                     )}
-                </div>
-
+                </div>)}
                 {/* 🗺️ Map */}
                 <MapContainer
                     center={position}
                     zoom={13}
-                    style={{ height: "300px", marginTop: "10px", position: "relative" }}
+                    style={{ height: "700px", marginTop: "10px", position: "relative" }}
                 >
                     <SetMapRef onReady={(map) => (mapRef.current = map)} />
                     <TileLayer

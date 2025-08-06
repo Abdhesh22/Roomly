@@ -12,7 +12,7 @@ const Sidebar = () => {
         <div className="d-flex flex-column flex-shrink-0 p-3 bg-light border-end vh-100">
             <ul className="nav nav-pills flex-column mb-auto">
                 <li className="nav-item" onClick={() => goto("/host/rooms")}>
-                    <a className={`nav-link ${location.pathname === "/host/rooms" ? "active" : "link-dark"}`}>
+                    <a className={`nav-link ${location.pathname.includes('/host/rooms') ? "active" : "link-dark"}`}>
                         Rooms
                     </a>
                 </li>

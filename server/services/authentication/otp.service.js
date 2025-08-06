@@ -1,4 +1,4 @@
-const DateTime = require("../date-time/date-time.service");
+const DateTimeService = require("../date-time/date-time.service");
 
 class Otp {
   generateOtp = () => {
@@ -6,7 +6,7 @@ class Otp {
   };
 
   expiredTime = () => {
-    const dateTime = new DateTime();
+    const dateTime = new DateTimeService();
     return dateTime.getFormattedTimeAfterMinutes(10);
   };
 }

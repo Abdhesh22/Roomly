@@ -1,6 +1,6 @@
 const { addMinutes: addMinutesToDate, format } = require("date-fns");
 
-class DateTime {
+class DateTimeService {
   getCurrentTime() {
     return new Date();
   }
@@ -13,6 +13,11 @@ class DateTime {
     const expiry = addMinutesToDate(date, minutes);
     return format(expiry, "yyyy-MM-dd HH:mm:ss");
   }
+
+  convertHourToSeconds(hour) {
+    return 3600 * hour;
+  }
+
 }
 
-module.exports = DateTime;
+module.exports = DateTimeService;

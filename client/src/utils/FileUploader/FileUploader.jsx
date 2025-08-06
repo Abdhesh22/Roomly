@@ -1,32 +1,34 @@
 import { useRef } from "react";
+import { toast } from "react-toastify";
 
 const FileUploader = ({
     label = "Upload Files",
     maxFiles = 5,
     accept = "image/*",
     value = [],
-    onChange,
+    onFileAdd,
+    onFileRemove,
     error
 }) => {
     const fileInputRef = useRef();
 
     const handleFiles = (e) => {
+
         const selectedFiles = Array.from(e.target.files);
         const newFiles = [...value, ...selectedFiles];
 
         if (newFiles.length > maxFiles) {
-            alert(`You can only upload up to ${maxFiles} files`);
-            return;
+            return toast.error(`You can only upload up to ${maxFiles} files`);
         }
-
-        onChange(newFiles); // update form value
-        e.target.value = ""; // reset file input
+        selectedFiles.toUpload = true;
+        onFileAdd(selectedFiles, "ADD");
+        e.target.value = "";
     };
 
     const handleRemove = (index) => {
         const updated = [...value];
-        updated.splice(index, 1);
-        onChange(updated); // update form value
+        const file = updated[index];
+        onFileRemove(file, "REMOVE", index);
     };
 
     return (

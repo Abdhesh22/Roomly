@@ -5,8 +5,8 @@ import Room from "../components/Room/Room.jsx";
 import Reservation from "../components/Reservation/Reservation.jsx";
 import ProtectedRoute from './ProtectedRoute.jsx';
 import HostBooking from "../components/host/Booking.jsx";
-import HostRoomGrid from "../components/Host/RoomGrid/Room.jsx";
-import AddRoom from "../components/Host/AddRoom/AddRoom.jsx";
+import RoomList from "../components/Host/RoomList/RoomList.jsx";
+import CreateEditRoom from "../components/Host/CreateEditRoom/CreateEditRoom.jsx";
 
 const routes = [
   {
@@ -14,11 +14,11 @@ const routes = [
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "/room/:id", element: <Room /> },
+      { path: "/room/:roomId", element: <Room showReservation={true} /> },
       { path: "/reservation/:roomid", element: <Reservation /> },
       {
         path: "/host/rooms", element: <ProtectedRoute>
-          <HostRoomGrid />
+          <RoomList />
         </ProtectedRoute>
       },
       {
@@ -27,7 +27,13 @@ const routes = [
         </ProtectedRoute>
       },
       {
-        path: "/host/rooms/add", element: <ProtectedRoute><AddRoom></AddRoom></ProtectedRoute>
+        path: "/host/rooms/add", element: <ProtectedRoute><CreateEditRoom></CreateEditRoom></ProtectedRoute>
+      },
+      {
+        path: "/host/rooms/edit/:roomId", element: <ProtectedRoute><CreateEditRoom></CreateEditRoom></ProtectedRoute>
+      },
+      {
+        path: "host/rooms/view/:roomId", element: <ProtectedRoute><Room showReservation={false}></Room></ProtectedRoute>
       }
     ],
   },

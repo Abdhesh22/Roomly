@@ -1,6 +1,6 @@
 const OtpVerificationDAO = require("../../dao/otp-verification.dao");
 const EmailTemplate = require("../../helper/email-template.helper");
-const DateTime = require("../../services/date-time/date-time.service");
+const DateTimeService = require("../../services/date-time/date-time.service");
 const EmailService = require("../../services/email/email.service");
 const OTPService = require("../../services/authentication/otp.service");
 const { EMAIL_TEMPLATE } = require("../../utilities/constants/email-template.constant");
@@ -42,9 +42,9 @@ class AuthenticationController {
     try {
 
       const { email, otp } = req.body;
-      console.log("email: ", email);
+
       const otpVerificationDAO = await OtpVerificationDAO.init();
-      const dateTime = new DateTime();
+      const dateTime = new DateTimeService();
 
       const validOtp = await otpVerificationDAO.findValidOtp(email, otp, dateTime.getCurrentTime());
       if (!validOtp) {

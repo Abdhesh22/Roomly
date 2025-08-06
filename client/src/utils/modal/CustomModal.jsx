@@ -1,46 +1,51 @@
 import { useRef, useEffect } from "react";
 import { Modal } from "bootstrap";
 
-const CustomModal = ({
-    title = "Modal Title",
-    children,
-    show,
-    onClose,
-    onSubmit,
-    submitText = "Submit",
-    closeText = "Close",
-    showSubmit = false,
-    showClose = false,
+const ConfirmationModal = ({
+    show = false,
+    title = "Are you sure?",
+    message = "This action cannot be undone.",
+    onConfirm,
+    onCancel,
+    confirmText = "Yes, Confirm",
+    cancelText = "Cancel",
 }) => {
     const modalRef = useRef(null);
-    const modalInstance = useRef(null);
+    const bsModal = useRef(null);
 
+    // Initialize modal once
     useEffect(() => {
-        if (modalRef.current) {
-            modalInstance.current = new Modal(modalRef.current, {
+        if (modalRef.current && !bsModal.current) {
+            bsModal.current = new Modal(modalRef.current, {
                 backdrop: "static",
-                keyboard: false,
+                keyboard: true,
             });
-            if (show) {
-                modalInstance.current.show();
-            }
+
+            // Ensure onCancel is called when closed manually
+            modalRef.current.addEventListener("hidden.bs.modal", () => {
+                onCancel?.();
+            });
         }
     }, []);
 
+    // Show/hide modal based on `show`
     useEffect(() => {
-        if (modalInstance.current) {
-            show ? modalInstance.current.show() : modalInstance.current.hide();
+        if (!bsModal.current) return;
+
+        if (show) {
+            bsModal.current.show();
+        } else {
+            bsModal.current.hide();
         }
     }, [show]);
 
-    const handleClose = () => {
-        modalInstance.current?.hide();
-        onClose?.();
+    const handleConfirm = () => {
+        onConfirm?.();
+        bsModal.current?.hide();
     };
 
-    const handleSubmit = () => {
-        onSubmit?.();
-        modalInstance.current?.hide();
+    const handleCancel = () => {
+        bsModal.current?.hide();
     };
 
     return (
@@ -49,25 +54,18 @@ const CustomModal = ({
                 <div className="modal-content p-3">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={handleClose}
-                            aria-label="Close"
-                        ></button>
+                        <button type="button" className="btn-close" onClick={handleCancel} />
                     </div>
-                    <div className="modal-body">{children}</div>
+                    <div className="modal-body">
+                        <p>{message}</p>
+                    </div>
                     <div className="modal-footer">
-                        {showClose && (
-                            <button className="btn btn-secondary" onClick={handleClose}>
-                                {closeText}
-                            </button>
-                        )}
-                        {showSubmit && (
-                            <button className="btn btn-primary" onClick={handleSubmit}>
-                                {submitText}
-                            </button>
-                        )}
+                        <button className="btn btn-secondary" onClick={handleCancel}>
+                            {cancelText}
+                        </button>
+                        <button className="btn btn-danger" onClick={handleConfirm}>
+                            {confirmText}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -75,4 +73,4 @@ const CustomModal = ({
     );
 };
 
-export default CustomModal;
+export default ConfirmationModal;

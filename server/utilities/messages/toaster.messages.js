@@ -14,5 +14,9 @@ module.exports.toaster = {
     LOGIN_SUCCESSFULLY: "You’ve logged in successfully!",
     INVALID_CREDENTIAL: "Invalid email or password.Please try again.",
     BOOKING_SUCCESS: " Congratulations! Your booking is confirmed.",
-    INTERNAL_SERVER_ERROR: "Something went wrong on our end. Please try again later."
+    INTERNAL_SERVER_ERROR: "Something went wrong on our end. Please try again later.",
+    ROOM_CREATED: "Room has been successfully created.",
+    ROOM_DELETED: "Room has been successfully deleted.",
+    ROOM_ACTIVE: "Room is now active and available for booking.",
+    ROOM_MAINTENANCE: "Room has been marked as under maintenance.",
 };
