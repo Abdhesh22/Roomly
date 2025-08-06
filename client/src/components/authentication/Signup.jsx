@@ -27,7 +27,6 @@ const SignUp = ({ showModal, onClose, userType }) => {
   const handleOtpSubmit = async (otp) => {
     try {
       const values = getValues();
-      console.log("values: ", values);
       const { data } = await api.post("/api/authentication/verify-otp", { email: values.email, otp });
       if (data.status) {
         toast.success(data.message);
@@ -46,9 +45,7 @@ const SignUp = ({ showModal, onClose, userType }) => {
   const checkEmailExist = async () => {
     try {
       const email = getValues('email');
-      console.log(email);
       const res = await api.get(`/api/user/check-email/${email}`, { userType });
-      console.log("res: ", res);
     } catch (error) {
       setValue("email", "");
       handleCatch(error);
@@ -58,7 +55,6 @@ const SignUp = ({ showModal, onClose, userType }) => {
 
   useEffect(() => {
     if (showModal) {
-      console.log("calling reset");
       reset();
     }
   }, [showModal]);

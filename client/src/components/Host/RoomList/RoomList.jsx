@@ -76,7 +76,6 @@ const RoomList = () => {
                 order: sortOrder,
                 searchKey
             });
-            console.log(data.length);
             if (data.status) {
                 setTotal(data.length || 0);
                 setRooms(data.list || []);

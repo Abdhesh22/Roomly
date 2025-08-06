@@ -4,8 +4,6 @@ import RoomCard from "../Card/RoomCard";
 
 const RoomGrid = ({ options }) => {
 
-  console.log("calling rooms");
-
   const [rooms, setRooms] = useState([
     {
       id: 1,

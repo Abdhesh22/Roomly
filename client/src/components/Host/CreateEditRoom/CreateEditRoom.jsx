@@ -56,7 +56,6 @@ const CreateEditRoom = () => {
             const images = [];
             files.forEach((file) => {
                 if (file instanceof File) {
-                    console.log(file);
                     if (file.toUpload) {
                         images.push(file);
                         formData.append("images", file);
@@ -64,13 +63,11 @@ const CreateEditRoom = () => {
                 }
             });
 
-            console.log("removeAttachments.length: ", removeAttachments.length);
             if (removeAttachments.length > 0) {
                 const filesToRemove = removeAttachments.map(file => file.remoteId);
-                console.log("filestoRemove: ", filesToRemove);
                 formData.append("removeAttachments", JSON.stringify(filesToRemove));
             }
-            console.log("DS: ", images);
+
 
 
             // Location
@@ -83,7 +80,7 @@ const CreateEditRoom = () => {
             // Size & Price
             formData.append("occupancy", JSON.stringify(payload.occupancy));
             formData.append("price", JSON.stringify(payload.price));
-            // return;
+
             let data;
             if (roomId) {
                 const res = await api.putMultipart(`/api/rooms/${roomId}`, formData);
@@ -173,7 +170,7 @@ const CreateEditRoom = () => {
     const fetchInitialData = async () => {
         const amenitiesData = await fetchAmenities();
         const statesData = await fetchStates();
-        console.log("amenitiesData: ", amenitiesData.length);
+
         setAmenities(amenitiesData);
         setStates(statesData);
 
@@ -206,7 +203,6 @@ const CreateEditRoom = () => {
             updatedFiles = [...updatedFiles, ...file];
         }
         setFiles(updatedFiles);
-        console.log(updatedFiles.length);
     };
 
 

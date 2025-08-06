@@ -1,15 +1,15 @@
 import { useState } from "react";
 import MiniCustomModal from "../../utils/modal/MiniCustomModal";
+import { toast } from "react-toastify";
 
 const OTPModal = ({ showModal, onClose, onSubmit }) => {
     const [otp, setOtp] = useState("");
 
     const handleSubmit = () => {
         if (otp.trim() === "") {
-            alert("Please enter OTP");
+            toast.error("Please Enter OTP")
             return;
         }
-        console.log("otp: ", otp);
         onSubmit(otp);
     };
 
