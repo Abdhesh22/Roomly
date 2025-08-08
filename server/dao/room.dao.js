@@ -17,7 +17,7 @@ class RoomDao extends BaseDAO {
         return new RoomDao(mongoose);
     }
 
-    myRoomsList = async (hostId, params = {}) => {
+    hostRoomList = async (hostId, params = {}) => {
         const pagination = [];
         if (params.skip) {
             pagination.push(
@@ -44,9 +44,6 @@ class RoomDao extends BaseDAO {
             };
         }
 
-
-        console.log("[params.sortKey]: params.order == 'asc' ? 1 : -1: ", { [params.sortKey]: params.order == 'asc' ? 1 : -1 });
-
         return await this.model.aggregate([
             {
                 $match: {
@@ -64,7 +61,7 @@ class RoomDao extends BaseDAO {
                     state: "$location.state",
                     pincode: "$location.pincode",
                     price: "$price.base",
-                    guests: "$occupancy.guests",
+                    guests: "$occupancy.guest",
                     status: 1,
                 },
             },
@@ -76,7 +73,7 @@ class RoomDao extends BaseDAO {
         ]);
     };
 
-    myRoomsListCount = async (hostId, params) => {
+    hostRoomListLength = async (hostId, params) => {
 
         let searchCondition = {};
         if (params.searchKey) {
@@ -123,6 +120,75 @@ class RoomDao extends BaseDAO {
             }
         ])
     }
+
+
+    userRoomList = async (params = {}) => {
+        console.log("params: ", params.skip);
+        const pagination = [];
+        if (params.skip) {
+            pagination.push(
+                {
+                    $skip: (parseInt(params.skip) - 1) * parseInt(params.limit),
+                },
+                {
+                    $limit: parseInt(params.limit),
+                },
+            )
+        }
+
+        console.log("pagination: ", pagination);
+
+        let searchCondition = {};
+        if (params.searchKey) {
+            const searchKey = params.searchKey;
+            searchCondition = {
+                $or: [
+                    { title: { $regex: searchKey, $options: 'i' } },
+                    { 'location.city': { $regex: searchKey, $options: 'i' } },
+                    { 'location.state': { $regex: searchKey, $options: 'i' } },
+                    { 'location.pincode': { $regex: searchKey, $options: 'i' } }
+                ]
+            };
+        }
+
+        return await this.model.aggregate([
+            {
+                $match: {
+                    status: { $in: ['ACTIVE'] },
+                    ...searchCondition
+                },
+            },
+            ...pagination,
+            {
+                $lookup: {
+                    from: "users",
+                    let: { hostId: "$hostId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$hostId"] } } },
+                        { $project: { firstName: 1, lastName: 1, email: 1, _id: 0, createdOn: 1 } }
+                    ],
+                    as: "host"
+                }
+            },
+            {
+                $project: {
+                    image: { $arrayElemAt: ["$attachments", 0] },
+                    description: 1,
+                    createdOn: 1,
+                    host: 1,
+                    location: 1,
+                    title: 1,
+                    price: 1,
+                    type: 1
+                }
+            },
+            {
+                $sort: {
+                    _id: -1
+                }
+            }
+        ]);
+    };
 
 }
 

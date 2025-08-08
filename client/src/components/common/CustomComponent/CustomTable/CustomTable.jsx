@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-const Table = ({
+const CustomTable = ({
     columns = [],
     data = [],
     enableSorting = false,
@@ -114,4 +114,4 @@ const Table = ({
     );
 };
 
-export default Table;
+export default CustomTable;

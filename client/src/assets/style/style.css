@@ -15,6 +15,12 @@ body {
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+
 /* === Headings: Elegant Serif === */
 h1, h2, h3 {
   font-family: 'Playfair Display', serif;
@@ -236,10 +242,12 @@ pre, code {
 
 :root {
   --primary: #ff5a5f;
+  --primary-hover: #e0484d;
   --accent: #00a699;
   --bg: #fafafa;
   --text: #333333;
   --muted: #767676;
+  --text-color:#fafafa;
 }
 
 body {
@@ -253,8 +261,18 @@ body {
   border: none;
 }
 
+.btn-outline-primary{
+  background-color: var(--primary);
+  border: none;
+  color: var(--text-color);
+}
+
 .btn-primary:hover {
-  background-color: #e0484d;
+  background-color: var(--primary-hover);
+}
+
+.btn-outline-primary:hover{
+  background-color: var(--primary-hover);
 }
 
 .razorpay-container {
@@ -293,4 +311,40 @@ body {
   position: "absolute";
   top: "100%";
   right: 0
+}
+
+.card-hover {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: scale(1.02);
+}
+
+.room-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-top-left-radius: 0.375rem; /* Bootstrap's rounded-top */
+  border-top-right-radius: 0.375rem;
+}
+
+.room-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.container-fluid,
+.row {
+  height: 100%;
+}
+
+.outlet-scroll {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.color-red {
+  color:  red;
 }

@@ -1,6 +1,6 @@
 import Select from "react-select";
 
-const MultiSelectDropdown = ({
+const CustomMultiSelect = ({
     label,
     options,
     value,
@@ -26,4 +26,4 @@ const MultiSelectDropdown = ({
     );
 };
 
-export default MultiSelectDropdown;
+export default CustomMultiSelect;

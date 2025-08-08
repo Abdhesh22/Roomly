@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Modal } from "bootstrap";
 
-const ConfirmModal = ({
+const CustomConfirmationModal = ({
     show = false,
     title = "Are you sure?",
     message = "This action cannot be undone.",
@@ -76,4 +76,4 @@ const ConfirmModal = ({
     );
 };
 
-export default ConfirmModal;
+export default CustomConfirmationModal;

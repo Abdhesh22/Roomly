@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { toast } from "react-toastify";
 
-const FileUploader = ({
+const CustomFileUploader = ({
     label = "Upload Files",
     maxFiles = 5,
     accept = "image/*",
@@ -11,7 +11,7 @@ const FileUploader = ({
     error
 }) => {
     const fileInputRef = useRef();
-
+    console.log(value);
     const handleFiles = (e) => {
 
         const selectedFiles = Array.from(e.target.files);
@@ -36,7 +36,7 @@ const FileUploader = ({
             <label className="form-label">{label}</label>
 
             <div className="d-flex flex-wrap gap-2">
-                {value.map((file, index) => (
+                {value?.map((file, index) => (
                     <div
                         key={index}
                         className="position-relative border p-2 rounded bg-light"
@@ -61,7 +61,7 @@ const FileUploader = ({
                     </div>
                 ))}
 
-                {value.length < maxFiles && (
+                {value?.length < maxFiles && (
                     <div
                         className="border rounded d-flex justify-content-center align-items-center"
                         style={{ width: "100px", height: "100px", cursor: "pointer" }}
@@ -86,4 +86,4 @@ const FileUploader = ({
     );
 };
 
-export default FileUploader;
+export default CustomFileUploader;

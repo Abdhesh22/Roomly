@@ -36,14 +36,14 @@ class RoomController {
     }
 
 
-    roomList = async (req, res) => {
+    hostRoomList = async (req, res) => {
         try {
 
             const hostId = req.user._id;
             const params = req.query;
 
             const roomService = new RoomService();
-            const { list, length } = await roomService.roomList(hostId, params);
+            const { list, length } = await roomService.hostRoomList(hostId, params);
 
             return res.status(httpStatus.OK).json({ status: true, list, length });
         } catch (error) {
@@ -90,6 +90,21 @@ class RoomController {
             return res.status(httpStatus.OK).json({ status: true });
         } catch (error) {
             console.log("error: ", error);
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
+        }
+    }
+
+    userRoomGrid = async (req, res) => {
+        try {
+
+            const query = req.query;
+
+            const roomService = new RoomService();
+            const list = await roomService.userRoomGrid(query);
+
+            return res.status(httpStatus.OK).json({ status: true, list });
+        } catch (error) {
+            console.log(error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }

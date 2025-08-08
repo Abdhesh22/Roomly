@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MiniCustomModal from "../../utils/modal/MiniCustomModal";
+import MiniCustomModal from "../common/CustomComponent/CustomModal/MiniCustomModal";
 import { toast } from "react-toastify";
 
 const OTPModal = ({ showModal, onClose, onSubmit }) => {

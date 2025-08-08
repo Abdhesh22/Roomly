@@ -1,4 +1,4 @@
-import AppRoutes from './routes/AppRoutes.jsx';
+import AppRoutes from './routes/AppRoute.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'leaflet/dist/leaflet.css';

@@ -9,11 +9,7 @@
   border-radius: 50%;
   object-fit: cover;
 }
-.booking-box {
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 10px;
-}
+
 .review {
   border-bottom: 1px solid #eee;
   padding: 10px 0;

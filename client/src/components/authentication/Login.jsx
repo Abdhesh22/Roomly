@@ -1,57 +1,50 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import SignUp from "./Signup";
-import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import api from "../../utils/request/api.util";
 import { toast } from 'react-toastify';
 import { handleCatch } from "../../utils/common";
+import { useNavigate } from "react-router-dom";
+import { USER_TYPE } from "../../utils/constants/user-type.constant";
 
-const Login = ({ onClose, userType }) => {
+const Login = ({ onClose, userType, title = "Login to continue" }) => {
+  const navigate = useNavigate()
   const { login } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
   const handleLogin = async () => {
     try {
+      const { email, password } = loginData;
 
-      if (!loginData.email) {
-        return toast.error("Email is required");
-      }
+      if (!email) return toast.error("Email is required");
+      if (!password) return toast.error("Password is required");
 
-      if (!loginData.password) {
-        return toast.error("Password is required");
-      }
+      const { data } = await api.post('/api/authentication/login', {
+        email,
+        password,
+        userType
+      });
 
-      if (loginData.email && loginData.password) {
-
-        const { data } = await api.get('/api/authentication/login', {
-          email: loginData.email,
-          password: loginData.password,
-          userType: userType
-        });
-
+      onClose(true);
+      setTimeout(() => {
+        if (userType == USER_TYPE.HOST) {
+          navigate("/host/rooms")
+        }
         login(data);
-        closeLogin(true);
-        toast.success(data.message);
-      }
+      }, 100);
+      toast.success(data.message || "Login successful");
     } catch (error) {
       handleCatch(error);
     }
   };
 
-
-  const closeSignup = () => {
-    setShowModal(false);
-  };
-
-  const closeLogin = (value) => {
-    onClose(value);
-  }
+  const closeSignup = () => setShowModal(false);
 
   return (
     <>
       <div className="mb-4">
-        <h5 className="mb-3">Login to continue</h5>
+        <h5 className="mb-3">{title}</h5>
 
         <div className="mb-3">
           <label>Email</label>
@@ -59,33 +52,39 @@ const Login = ({ onClose, userType }) => {
             type="email"
             className="form-control"
             value={loginData.email}
-            onChange={(e) =>
-              setLoginData({ ...loginData, email: e.target.value })
-            }
+            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
             required
           />
         </div>
+
         <div className="mb-3">
           <label>Password</label>
           <input
             type="password"
             className="form-control"
             value={loginData.password}
-            onChange={(e) =>
-              setLoginData({ ...loginData, password: e.target.value })
-            }
+            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
             required
           />
         </div>
-        <button onClick={() => handleLogin()} className="btn btn-primary w-100">
+
+        <button onClick={handleLogin} className="btn btn-primary w-100">
           Login
         </button>
-        <p>
+
+        <p className="mt-3 text-center">
           Don't have an account?
-          <span onClick={() => setShowModal(true)} className="text-primary ms-1 text-decoration-underline" role="button"> Click here</span>
+          <span
+            onClick={() => setShowModal(true)}
+            className="text-primary ms-1 text-decoration-underline"
+            role="button"
+          >
+            Click here
+          </span>
         </p>
       </div>
-      <SignUp showModal={showModal} onClose={() => closeSignup()} userType={userType}></SignUp>
+
+      <SignUp showModal={showModal} onClose={closeSignup} userType={userType} />
     </>
   );
 };

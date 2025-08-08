@@ -1,10 +1,10 @@
-import "../../assets/style/Room.css";
+import "../../../assets/style/Room.css";
 import { useNavigate, useParams } from "react-router-dom";
 import Amenities from "./Amenities/Amenities";
 import { useEffect, useState } from "react";
-import { handleCatch } from "../../utils/common";
-import api from "../../utils/request/api.util";
-import LocationPicker from "../../utils/LocationPicker/LocationPicker";
+import { handleCatch } from "../../../utils/common";
+import api from "../../../utils/request/api.util";
+import CustomLocationPicker from "../CustomComponent/CustomLocationPicker/CustomLocationPicker";
 
 const Room = ({ showReservation }) => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Room = ({ showReservation }) => {
 
   const fetchRoom = async () => {
     try {
-      const res = await api.get(`/api/rooms/${roomId}`);
+      const res = await api.get(`/api/rooms/detail/${roomId}`);
 
 
       const amenitiesList = [
@@ -57,10 +57,24 @@ const Room = ({ showReservation }) => {
 
   return (
     <div className="container mb-5">
-      {/* Title */}
-      <div className="mb-4 room-title">
-        <h2>{room.title || "Modern Cozy Apartment in Downtown"}</h2>
+      {/* Title + Reservation Button */}
+      <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+        <h2 className="mb-0">{"Modern Cozy Apartment in Downtown"}</h2>
+        {showReservation && (<>
+          <button
+            className="btn btn-outline-primary d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm w-30"
+            onClick={() => handleNavigate(`/reservation/${roomId}`)}
+          >
+            {/* <i className="bi  bi-door-open"></i> */}
+            {/* <i class="bi bi-luggage-fill"></i> */}
+            Go to Reservation
+            <i class="bi bi-arrow-right-square-fill fs-4"></i>
+          </button>
+        </>
+        )}
       </div>
+
+
 
       {/* Image Gallery */}
       {room.attachments?.length > 0 ? (
@@ -125,46 +139,12 @@ const Room = ({ showReservation }) => {
 
         <div className="col-md-6">
           {room.location && (
-            <LocationPicker
+            <CustomLocationPicker
               latitude={room.location.latitude}
               longitude={room.location.longitude}
               title={`Address: ${room.location.state} ${room.location.city}, ${room.location.pincode}`}
               disable={true}
             />
-          )}
-          {(showReservation &&
-            <div className="booking-box shadow-sm">
-              <h4>
-                ${room?.price?.base || 120}{" "}
-                <small className="text-muted">/ night</small>
-              </h4>
-              <form>
-                <div className="mb-2">
-                  <label className="form-label">Check-in</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    aria-label="Check-in Date"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Check-out</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    aria-label="Check-out Date"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-primary w-100"
-                  onClick={() => handleNavigate("/reservation/1")}
-                >
-                  Reserve
-                </button>
-              </form>
-              <p className="mt-2 text-muted small">You won’t be charged yet</p>
-            </div>
           )}
         </div>
       </div>

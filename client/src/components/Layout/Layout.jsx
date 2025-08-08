@@ -1,30 +1,43 @@
 import { useContext } from "react";
 import { AuthContext } from "../authentication/AuthContext";
-import { Outlet } from "react-router-dom";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
-import Sidebar from "../SideBar/SiderBar";
+import { Outlet, useMatches } from "react-router-dom";
+import TopNavigation from "../Navigation/TopNavigation/TopNavigation";
+import Footer from "./Footer/Footer";
+import Sidebar from "../Navigation/Sidebar/Sidebar";
 
 const Layout = () => {
   const { isLoggedIn } = useContext(AuthContext);
+  const matches = useMatches();
+  const currentPath = matches[matches.length - 1]?.handle;
+  console.log(currentPath);
+  // Compute main content class
+  const mainContentClass = [
+    isLoggedIn && currentPath.isSideNav ? "col-10" : "col-12", // column width
+    "p-3",
+    "h-100",
+    "overflow-auto",
+  ].join(" ");
 
   return (
     <>
-      <Header />
-      <div className="container-fluid">
-        <div className="row">
-          {isLoggedIn && (
-            <div className="col-2 p-0 border-end">
-              <Sidebar />
+      {(!isLoggedIn || currentPath.isHeader) && <TopNavigation />}
+
+      <div className="main-layout d-flex flex-column" style={{ height: "80vh" }}>
+        <div className="container-fluid flex-grow-1">
+          <div className="row h-100">
+            {isLoggedIn && currentPath.isSideNav && (
+              <div className="col-2 p-0 border-end h-100">
+                <Sidebar />
+              </div>
+            )}
+            <div className={mainContentClass}>
+              <Outlet />
             </div>
-          )}
-          <div className={isLoggedIn ? "col-10 p-3" : "col-12 p-3"}>
-            <Outlet />
           </div>
         </div>
       </div>
 
-      <Footer />
+      {!isLoggedIn && <Footer />}
     </>
   );
 };

@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import Table from "../../../utils/Table/Table";
+import CustomTable from "../../common/CustomComponent/CustomTable/CustomTable";
 import api from "../../../utils/request/api.util";
 import { debounce, handleCatch } from "../../../utils/common";
-import ConfirmModal from "../../../utils/modal/ConfirmationModal";
+import CustomConfirmationModal from "../../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
 
 const RoomList = () => {
@@ -172,7 +172,7 @@ const RoomList = () => {
                 </div>
             </div>
 
-            <Table
+            <CustomTable
                 columns={columns}
                 data={rooms}
                 enableSorting={true}
@@ -184,7 +184,7 @@ const RoomList = () => {
                 }}
             />
 
-            <ConfirmModal
+            <CustomConfirmationModal
                 show={showConfirm}
                 title={modalData.title}
                 message={modalData.message}

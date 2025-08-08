@@ -25,6 +25,10 @@ module.exports = (mongoose) => {
                 ref: 'users',
                 required: true
             },
+            type: {
+                type: String,
+                required: true,
+            },
             location: {
                 state: { type: String, required: true },
                 city: { type: String, required: true },

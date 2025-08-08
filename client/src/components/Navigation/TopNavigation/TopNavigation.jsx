@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Login from "../authentication/Login";
-import MiniCustomModal from "../../utils/modal/MiniCustomModal";
-import { AuthContext } from "../authentication/AuthContext";
-import { USER_TYPE } from "../../utils/constants/user-type.constant";
+import Login from "../../authentication/Login";
+import MiniCustomModal from "../../common/CustomComponent/CustomModal/MiniCustomModal";
+import { AuthContext } from "../../authentication/AuthContext";
+import { USER_TYPE } from "../../../utils/constants/user-type.constant";
 
-const Header = () => {
+const TopNavigation = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -14,6 +14,7 @@ const Header = () => {
   const [showLogin, setShowLogin] = useState(false);
   const dropdownRef = useRef(null);
 
+  const userName = localStorage.getItem("userName");
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
   };
@@ -50,6 +51,7 @@ const Header = () => {
         >
           <span className="fs-4">Roomly</span>
         </NavLink>
+        {userName && (<span className="m-2">{userName}</span>)}
         <div className="dropdown text-end" style={{ position: "relative" }} ref={dropdownRef}>
           <button
             type="button"
@@ -83,4 +85,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default TopNavigation;

@@ -1,8 +1,8 @@
 import { useForm, Controller } from "react-hook-form";
-import MultiSelectDropdown from "../../../utils/multi-select/MultiSelectDropDown";
-import FileUploader from "../../../utils/FileUploader/FileUploader";
+import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
+import CustomFileUploader from "../../common/CustomComponent/CustomFileUploader/CustomFileUploader";
 import api from "../../../utils/request/api.util";
-import LocationPicker from "../../../utils/LocationPicker/LocationPicker";
+import CustomLocationPicker from "../../common/CustomComponent/CustomLocationPicker/CustomLocationPicker";
 import { fetchAmenities, fetchCities, fetchStates, handleCatch, urlToFile } from "../../../utils/common";
 import { toast } from 'react-toastify';
 import { useParams } from "react-router-dom";
@@ -13,6 +13,7 @@ const CreateEditRoom = () => {
         defaultValues: {
             images: [],
             roomNo: '',
+            type: '',
             title: '',
             state: null,
             city: null,
@@ -38,6 +39,17 @@ const CreateEditRoom = () => {
     const [amenities, setAmenities] = useState([]);
     const [files, setFiles] = useState([]);
     const [removeAttachments, setRemoveAttachments] = useState([]);
+    const type = [
+        { label: "Room", value: "room" },
+        { label: "House", value: "house" },
+        { label: "Apartment", value: "apartment" },
+        { label: "Villa", value: "villa" },
+        { label: "Farmhouse", value: "farmhouse" },
+        { label: "Guesthouse", value: "guesthouse" },
+        { label: "Cottage", value: "cottage" },
+        { label: "Studio", value: "studio" },
+        { label: "Bungalow", value: "bungalow" }
+    ];
 
     const onSubmit = async (payload) => {
 
@@ -73,7 +85,7 @@ const CreateEditRoom = () => {
             // Location
             formData.append("state", JSON.stringify(payload.state));
             formData.append("city", JSON.stringify(payload.city));
-
+            formData.append("type", payload.type.value)
             // Amenities
             formData.append("amenities", JSON.stringify(payload.amenities));
 
@@ -120,10 +132,11 @@ const CreateEditRoom = () => {
     const fetchRoom = async (amenitiesData) => {
         try {
 
-            const { data } = await api.get(`/api/rooms/${roomId}`);
+            const { data } = await api.get(`/api/rooms/detail/${roomId}`);
             if (data.status) {
 
                 const room = data.room;
+                console.log("room: ", room);
 
                 setValue("title", room.title);
                 setValue("roomNo", room.roomNo);
@@ -149,8 +162,11 @@ const CreateEditRoom = () => {
                     const options = amenitiesData.find(item => item.value === room.amenities[i]);
                     selectAmenities.push(options);
                 }
-
+                console.log(selectAmenities);
                 setValue("amenities", selectAmenities || []);
+                console.log("type: ", type);
+                const typeOption = type.find(item => item.value == room.type);
+                setValue("type", [typeOption]);
                 setFiles(imageFiles);
                 setValue("occupancy", room.occupancy || {});
                 setValue("price", room.price || {});
@@ -222,23 +238,13 @@ const CreateEditRoom = () => {
                         />
                         {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
                     </div>
-                    <div className="col-md-6">
-                        <label className="form-label">Room Number</label>
-                        <input
-                            type="number"
-                            className={`form-control ${errors.roomNo ? "is-invalid" : ""}`}
-                            {...register("roomNo", { required: "Room Number is required" })}
-                        />
-                        {errors.roomNo && <div className="invalid-feedback">{errors.roomNo.message}</div>}
-                    </div>
                 </div>
             </section>
 
-            {/* Location */}
             <section className="mb-4">
                 <h5 className="fw-semibold mb-3 text-uppercase text-muted">Location</h5>
 
-                <LocationPicker onChange={handlePlace} latitude={getValues("latitude") || 28.6139} longitude={getValues("longitude") || 77.209} showSearch={true} />
+                <CustomLocationPicker onChange={handlePlace} latitude={getValues("latitude") || 28.6139} longitude={getValues("longitude") || 77.209} showSearch={true} />
 
                 <div className="row g-3 mt-3">
                     <div className="col-md-4">
@@ -247,7 +253,7 @@ const CreateEditRoom = () => {
                             control={control}
                             rules={{ required: "Select State" }}
                             render={({ field }) => (
-                                <MultiSelectDropdown
+                                <CustomMultiSelect
                                     label="State"
                                     options={states}
                                     value={field.value}
@@ -264,7 +270,7 @@ const CreateEditRoom = () => {
                             control={control}
                             rules={{ required: "Select City" }}
                             render={({ field }) => (
-                                <MultiSelectDropdown
+                                <CustomMultiSelect
                                     label="City or Nearby Area"
                                     options={cities}
                                     value={field.value}
@@ -293,6 +299,38 @@ const CreateEditRoom = () => {
                 <input type="hidden" {...register("longitude", { required: true })} />
             </section>
 
+            <section className="mb-4">
+                <div className="row g-3">
+                    <div className="col-md-6">
+                        <Controller
+                            name="type"
+                            control={control}
+                            rules={{ required: "Select Building Type" }}
+                            render={({ field }) => (
+                                <CustomMultiSelect
+                                    label="Building Type"
+                                    options={type}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    error={errors.type}
+                                    isMulti={false}
+                                />
+                            )}
+                        />
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">Room Number</label>
+                        <input
+                            type="number"
+                            className={`form-control ${errors.roomNo ? "is-invalid" : ""}`}
+                            {...register("roomNo", { required: "Room Number is required" })}
+                        />
+                        {errors.roomNo && <div className="invalid-feedback">{errors.roomNo.message}</div>}
+                    </div>
+                </div>
+            </section>
+
             {/* Images */}
             <section className="mb-4">
                 <h5 className="fw-semibold mb-3 text-uppercase text-muted">Images</h5>
@@ -307,7 +345,7 @@ const CreateEditRoom = () => {
                         }
                     }}
                     render={({ }) => (
-                        <FileUploader
+                        <CustomFileUploader
                             label="Upload Images (Equal To 5)"
                             accept="image/*"
                             maxFiles={5}
@@ -339,7 +377,7 @@ const CreateEditRoom = () => {
                         control={control}
                         rules={{ required: "Select at least one amenity" }}
                         render={({ field }) => (
-                            <MultiSelectDropdown
+                            <CustomMultiSelect
                                 label="Amenities"
                                 options={amenities}
                                 value={field.value}

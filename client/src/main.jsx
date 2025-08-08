@@ -4,16 +4,21 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./assets/style/style.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./components/authentication/AuthContext";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AuthProvider, AuthContext } from "./components/authentication/AuthContext";
+import getRoutes from "./routes/AppRoute.jsx";
+import { useContext } from "react";
+
+function RouterWrapper() {
+  const { userType } = useContext(AuthContext);
+  const router = createBrowserRouter(getRoutes(userType || "user")); // default to user
+  return <RouterProvider router={router} />;
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <RouterWrapper />
+    </AuthProvider>
   </React.StrictMode>
 );

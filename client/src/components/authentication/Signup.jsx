@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../utils/request/api.util";
-import CustomModal from "../../utils/modal/CustomModal";
+import CustomModal from "../common/CustomComponent/CustomModal/CustomModal";
 import OTPModal from "./Otp";
 import { toast } from 'react-toastify';
 import { handleCatch } from "../../utils/common";

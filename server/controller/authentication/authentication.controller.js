@@ -85,10 +85,11 @@ class AuthenticationController {
   login = async (req, res) => {
     try {
 
-      const { email, password, userType } = req.query;
+      const { email, password, userType } = req.body;
       const userService = new UserService();
 
       const { token, status, message, httpStatus, user } = await userService.login({ email, password, userType });
+      console.log("user: ", user);
       return res.status(httpStatus).json({ status: status, message: message, token, user: user, userType });
     } catch (error) {
       console.error("Error in registerUser:", error);

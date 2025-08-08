@@ -34,7 +34,7 @@ const SetMapRef = ({ onReady }) => {
 };
 
 
-const LocationPicker = ({ onChange, latitude, longitude, title = "Pick a Location", disable = false }) => {
+const CustomLocationPicker = ({ onChange, latitude, longitude, title = "Pick a Location", disable = false }) => {
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [position, setPosition] = useState([latitude, longitude]);
@@ -180,4 +180,4 @@ const LocationPicker = ({ onChange, latitude, longitude, title = "Pick a Locatio
     );
 };
 
-export default LocationPicker;
+export default CustomLocationPicker;

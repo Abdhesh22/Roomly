@@ -5,6 +5,9 @@ const FileSystemService = require("../file-system/file-system.service");
 
 class RoomService {
 
+    /**
+     * @private 
+     */
 
     #buildRoom = (hostId, data, attachments) => {
 
@@ -19,9 +22,10 @@ class RoomService {
             roomNo: data.roomNo,
             description: data.description,
             hostId: hostId,
+            type: data.type,
             location: {
-                state: state.value,
-                city: city.value,
+                state: state.label,
+                city: city.label,
                 pincode: data.pincode,
                 latitude: data.latitude,
                 longitude: data.longitude
@@ -43,6 +47,36 @@ class RoomService {
         }
     }
 
+    #filterRemoveAttachments = async (attachments, publicIds) => {
+
+        if (publicIds.length == 0) {
+            return {
+                attachmentToKeep: attachments,
+                attachmentToRemove: [],
+            }
+        }
+
+        const attachmentToRemove = [];
+        const attachmentToKeep = [];
+        for (const att of attachments) {
+            if (publicIds.includes(att.remoteId)) {
+                attachmentToRemove.push(att);
+            } else {
+                attachmentToKeep.push(att);
+            }
+        }
+
+        return { attachmentToRemove, attachmentToKeep };
+    }
+
+    /**
+     * 
+     * @param {Id of host} hostId 
+     * @param {data related to room } data 
+     * @param { attachment related to room } files 
+     * @returns created Room Data
+     */
+
     create = async (hostId, data, files) => {
         try {
 
@@ -59,13 +93,18 @@ class RoomService {
         }
     }
 
-    roomList = async (hostId, params) => {
+    /***
+     * @param {userId of host} hostId
+     * @param {pagination and searching details } params
+     */
+
+    hostRoomList = async (hostId, params) => {
         try {
 
             const roomDao = await RoomDao.init();
 
-            const list = await roomDao.myRoomsList(hostId, params);
-            const length = await roomDao.myRoomsListCount(hostId, params);
+            const list = await roomDao.hostRoomList(hostId, params);
+            const length = await roomDao.hostRoomListLength(hostId, params);
 
             return { list, length };
         } catch (error) {
@@ -114,29 +153,6 @@ class RoomService {
 
     }
 
-    #filterRemoveAttachments = async (attachments, publicIds) => {
-
-        if (publicIds.length == 0) {
-            return {
-                attachmentToKeep: attachments,
-                attachmentToRemove: [],
-            }
-        }
-
-        const attachmentToRemove = [];
-        const attachmentToKeep = [];
-        for (const att of attachments) {
-            if (publicIds.includes(att.remoteId)) {
-                attachmentToRemove.push(att);
-            } else {
-                attachmentToKeep.push(att);
-            }
-        }
-
-        return { attachmentToRemove, attachmentToKeep };
-    }
-
-
     update = async (hostId, roomId, data, files) => {
         try {
 
@@ -148,7 +164,6 @@ class RoomService {
 
             const { attachmentToKeep, attachmentToRemove } = await this.#filterRemoveAttachments(room.attachments, removeAttachments);
             if (attachmentToRemove.length) {
-                console.log("DS: ", attachmentToRemove);
                 await fileSystemService.deleteFiles(attachmentToRemove);
             }
 
@@ -158,6 +173,19 @@ class RoomService {
             return await roomDao.updateById(roomId, { $set: { ...updatedRoom } });
         } catch (error) {
             throw error;
+        }
+    }
+
+    /**
+    * @param { pagination and searching data } params 
+    */
+    userRoomGrid = async (params) => {
+        try {
+            const roomDao = await RoomDao.init();
+            const list = await roomDao.userRoomList(params);
+            return list;
+        } catch (error) {
+            throw error
         }
     }
 
