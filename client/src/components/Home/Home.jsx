@@ -1,4 +1,4 @@
-import RoomGrid from "../user/RoomGrid/RoomGrid";
+import RoomGrid from "../user/RoomGrid";
 const Home = () => {
   return (
     <>

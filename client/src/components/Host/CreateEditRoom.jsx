@@ -1,9 +1,9 @@
 import { useForm, Controller } from "react-hook-form";
-import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
-import CustomFileUploader from "../../common/CustomComponent/CustomFileUploader/CustomFileUploader";
-import api from "../../../utils/request/api.util";
-import CustomLocationPicker from "../../common/CustomComponent/CustomLocationPicker/CustomLocationPicker";
-import { fetchAmenities, fetchCities, fetchStates, handleCatch, urlToFile } from "../../../utils/common";
+import CustomMultiSelect from "../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
+import CustomFileUploader from "../common/CustomComponent/CustomFileUploader/CustomFileUploader";
+import api from "../../utils/request/api.util";
+import CustomLocationPicker from "../common/CustomComponent/CustomLocationPicker/CustomLocationPicker";
+import { fetchAmenities, fetchCities, fetchStates, handleCatch, urlToFile } from "../../utils/common";
 import { toast } from 'react-toastify';
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -136,7 +136,6 @@ const CreateEditRoom = () => {
             if (data.status) {
 
                 const room = data.room;
-                console.log("room: ", room);
 
                 setValue("title", room.title);
                 setValue("roomNo", room.roomNo);
@@ -162,9 +161,8 @@ const CreateEditRoom = () => {
                     const options = amenitiesData.find(item => item.value === room.amenities[i]);
                     selectAmenities.push(options);
                 }
-                console.log(selectAmenities);
+
                 setValue("amenities", selectAmenities || []);
-                console.log("type: ", type);
                 const typeOption = type.find(item => item.value == room.type);
                 setValue("type", [typeOption]);
                 setFiles(imageFiles);

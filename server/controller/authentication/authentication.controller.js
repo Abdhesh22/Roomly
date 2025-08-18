@@ -6,8 +6,8 @@ const OTPService = require("../../services/authentication/otp.service");
 const { EMAIL_TEMPLATE } = require("../../utilities/constants/email-template.constant");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
-const UserService = require("../../services/user/user.service");
-const JWTToken = require("../../services/authentication/JwtToken.service");
+const UserService = require("../../services/user.service");
+
 
 class AuthenticationController {
   sendOtp = async (req, res) => {

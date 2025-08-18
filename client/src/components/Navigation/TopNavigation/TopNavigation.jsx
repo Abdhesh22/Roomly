@@ -7,7 +7,8 @@ import { AuthContext } from "../../authentication/AuthContext";
 import { USER_TYPE } from "../../../utils/constants/user-type.constant";
 
 const TopNavigation = () => {
-  const { isLoggedIn, logout } = useContext(AuthContext);
+
+  const { isLoggedIn, logout, userType: loggedUserType } = useContext(AuthContext);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userType, setUserType] = useState('');
@@ -42,6 +43,10 @@ const TopNavigation = () => {
     navigate("/")
   }
 
+  const goto = (path) => {
+    navigate(path)
+  }
+
   return (
     <div className="container">
       <header className="d-flex flex-wrap justify-content-between align-items-center py-3 mb-4 border-bottom">
@@ -72,6 +77,7 @@ const TopNavigation = () => {
                 </li>
               </>)}
               {isLoggedIn && (<li>
+                {loggedUserType == USER_TYPE.USER && (<button className="dropdown-item" onClick={() => goto('/user/booking')}>My Bookings</button>)}
                 <button className="dropdown-item" onClick={() => logOut()}>Sign out</button>
               </li>)}
             </ul>

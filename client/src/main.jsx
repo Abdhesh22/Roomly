@@ -10,8 +10,9 @@ import getRoutes from "./routes/AppRoute.jsx";
 import { useContext } from "react";
 
 function RouterWrapper() {
-  const { userType } = useContext(AuthContext);
-  const router = createBrowserRouter(getRoutes(userType || "user")); // default to user
+  const { userType, loading } = useContext(AuthContext);
+  if (loading) return null;
+  const router = createBrowserRouter(getRoutes(userType));
   return <RouterProvider router={router} />;
 }
 

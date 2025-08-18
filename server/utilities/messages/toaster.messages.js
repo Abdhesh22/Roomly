@@ -19,4 +19,6 @@ module.exports.toaster = {
     ROOM_DELETED: "Room has been successfully deleted.",
     ROOM_ACTIVE: "Room is now active and available for booking.",
     ROOM_MAINTENANCE: "Room has been marked as under maintenance.",
+    ROOM_CONFIRMED: (title, tenantName) => { return `Room "${title}" has been confirmed and an email has been sent to ${tenantName}.` },
+    ROOM_CANCELLED: (title, tenantName) => { return `Room "${title}" has been cancelled and an email has been sent to ${tenantName}.` }
 };

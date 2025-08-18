@@ -1,8 +1,8 @@
-const UserDAO = require("../../dao/user.dao");
-const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
-const { toaster } = require("../../utilities/messages/toaster.messages");
-const HashingService = require("../authentication/hashing.service");
-const JWTToken = require("../authentication/JwtToken.service");
+const UserDAO = require("../dao/user.dao");
+const { httpStatus } = require("../utilities/constants/httpstatus.constant");
+const { toaster } = require("../utilities/messages/toaster.messages");
+const HashingService = require("./authentication/hashing.service");
+const JWTToken = require("./authentication/JwtToken.service");
 
 class UserService {
 

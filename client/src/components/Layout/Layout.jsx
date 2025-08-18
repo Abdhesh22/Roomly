@@ -6,13 +6,14 @@ import Footer from "./Footer/Footer";
 import Sidebar from "../Navigation/Sidebar/Sidebar";
 
 const Layout = () => {
+
   const { isLoggedIn } = useContext(AuthContext);
   const matches = useMatches();
+
   const currentPath = matches[matches.length - 1]?.handle;
-  console.log(currentPath);
-  // Compute main content class
+
   const mainContentClass = [
-    isLoggedIn && currentPath.isSideNav ? "col-10" : "col-12", // column width
+    isLoggedIn && currentPath.isSideNav ? "col-10" : "col-12",
     "p-3",
     "h-100",
     "overflow-auto",
@@ -22,7 +23,7 @@ const Layout = () => {
     <>
       {(!isLoggedIn || currentPath.isHeader) && <TopNavigation />}
 
-      <div className="main-layout d-flex flex-column" style={{ height: "80vh" }}>
+      <div className={`main-layout d-flex flex-column ${(!isLoggedIn || currentPath.isHeader) ? 'h-78vh' : 'vh-100'}`}>
         <div className="container-fluid flex-grow-1">
           <div className="row h-100">
             {isLoggedIn && currentPath.isSideNav && (
@@ -37,7 +38,7 @@ const Layout = () => {
         </div>
       </div>
 
-      {!isLoggedIn && <Footer />}
+      {(!isLoggedIn || currentPath.isHeader) && <Footer />}
     </>
   );
 };

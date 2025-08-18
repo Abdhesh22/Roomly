@@ -123,7 +123,6 @@ class RoomDao extends BaseDAO {
 
 
     userRoomList = async (params = {}) => {
-        console.log("params: ", params.skip);
         const pagination = [];
         if (params.skip) {
             pagination.push(
@@ -135,8 +134,6 @@ class RoomDao extends BaseDAO {
                 },
             )
         }
-
-        console.log("pagination: ", pagination);
 
         let searchCondition = {};
         if (params.searchKey) {

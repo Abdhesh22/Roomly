@@ -11,7 +11,6 @@ const CustomFileUploader = ({
     error
 }) => {
     const fileInputRef = useRef();
-    console.log(value);
     const handleFiles = (e) => {
 
         const selectedFiles = Array.from(e.target.files);

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import CustomDatePicker from "../../../common/CustomComponent/CustomDatePicker/CustomDatePicker";
 
-const TripDetail = ({ onChange }) => {
+const TripDetail = ({ onChange, occupancy }) => {
 
     const [checkin, setCheckin] = useState(null);
     const [checkout, setCheckout] = useState(null);
-    const [adults, setAdults] = useState(1);
+    const [adults, setAdults] = useState(2);
     const [teens, setTeens] = useState(0);
     const [infants, setInfants] = useState(0);
     const [pets, setPets] = useState(0);
@@ -74,10 +74,10 @@ const TripDetail = ({ onChange }) => {
             <div className="mb-3">
                 <label className="form-label fw-semibold mb-2">Guest Breakdown</label>
                 <div className="d-flex flex-column gap-3">
-                    <GuestRow label="Adults" value={adults} setValue={setAdults} min={1} />
-                    <GuestRow label="Teens" value={teens} setValue={setTeens} />
-                    <GuestRow label="Infants" value={infants} setValue={setInfants} />
-                    <GuestRow label="Pets" value={pets} setValue={setPets} />
+                    <GuestRow label="Adults" value={adults} setValue={setAdults} min={0} max={occupancy?.guest} />
+                    <GuestRow label="Teens" value={teens} setValue={setTeens} max={occupancy?.guest} />
+                    <GuestRow label="Infants" value={infants} setValue={setInfants} max={2} />
+                    <GuestRow label="Pets" value={pets} setValue={setPets} max={occupancy?.pet} />
                 </div>
             </div>
         </div>
@@ -85,7 +85,7 @@ const TripDetail = ({ onChange }) => {
 };
 
 // ✅ Reusable guest counter row
-const GuestRow = ({ label, value, setValue, min = 0 }) => (
+const GuestRow = ({ label, value, setValue, min = 0, max = 10000 }) => (
     <div className="d-flex justify-content-between align-items-center border-bottom pb-2">
         <span className="fw-medium">{label}</span>
         <div className="d-flex align-items-center gap-2">
@@ -102,7 +102,7 @@ const GuestRow = ({ label, value, setValue, min = 0 }) => (
                 type="button"
                 className="btn btn-sm btn-outline-secondary rounded-circle"
                 style={{ width: "32px", height: "32px" }}
-                onClick={() => setValue(value + 1)}
+                onClick={() => value < max && setValue(value + 1)}
             >
                 +
             </button>

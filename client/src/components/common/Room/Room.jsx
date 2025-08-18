@@ -65,10 +65,8 @@ const Room = ({ showReservation }) => {
             className="btn btn-outline-primary d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm w-30"
             onClick={() => handleNavigate(`/reservation/${roomId}`)}
           >
-            {/* <i className="bi  bi-door-open"></i> */}
-            {/* <i class="bi bi-luggage-fill"></i> */}
             Go to Reservation
-            <i class="bi bi-arrow-right-square-fill fs-4"></i>
+            <i className="bi bi-arrow-right-square-fill fs-4"></i>
           </button>
         </>
         )}

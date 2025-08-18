@@ -10,10 +10,6 @@ const RoomCard = ({ roomId, title, description, state, city, imageSrc, host, pri
     return result.toFixed(0);
   };
 
-  const cardTitle = () => {
-    return title.length > 40 ? `${title.substring(0, 40)}...` : title;
-  };
-
   const handleCardClick = () => {
     navigate(`/room/${roomId}`);
   };

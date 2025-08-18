@@ -3,12 +3,7 @@ import hostRoutes from "./HostRoute";
 
 const routes = [
   ...userRoutes,
-  {
-    path: "/",
-    children: [
-      ...hostRoutes
-    ]
-  }
+  ...hostRoutes
 ];
 
 export default routes;

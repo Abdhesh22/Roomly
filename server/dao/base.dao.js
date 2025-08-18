@@ -16,7 +16,6 @@ module.exports = class BaseDAO {
     }
 
     create(document) {
-        console.log("document: ", document);
         return this.model.create(document);
     }
 

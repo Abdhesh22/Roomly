@@ -1,17 +1,18 @@
-const OrderSummaryDAO = require("../../dao/order-summary.dao");
-const RoomService = require("../../services/room/room.service");
+const BookingDAO = require("../../dao/billing.dao");
+const RoomService = require("../../services/room.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
-const { Status } = require("../../utilities/constants/status.constant");
+const { BillingStatus } = require("../../utilities/constants/order-status.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
 
 class RoomController {
     book = async (req, res) => {
         try {
 
-            const { orderSummaryId, paymentId } = req.body;
-            const orderSummaryDao = await OrderSummaryDAO.init();
+            const { bookingId, paymentId } = req.body;
 
-            await orderSummaryDao.updateById(orderSummaryId, { status: Status.COMPLETE, paymentId: paymentId });
+            const bookingDao = await BookingDAO.init();
+            await bookingDao.updateById(bookingId, { status: BillingStatus.PENDING, paymentId: paymentId });
+
             return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_SUCCESS });
         } catch (error) {
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
@@ -30,7 +31,6 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, message: toaster.ROOM_CREATED });
         } catch (error) {
-            console.log(error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -72,7 +72,6 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, room });
         } catch (error) {
-            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -89,7 +88,6 @@ class RoomController {
             await roomService.update(hostId, roomId, data, files);
             return res.status(httpStatus.OK).json({ status: true });
         } catch (error) {
-            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -104,7 +102,6 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, list });
         } catch (error) {
-            console.log(error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }

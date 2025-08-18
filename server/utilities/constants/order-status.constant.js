@@ -1,0 +1,35 @@
+module.exports.BillingStatus = {
+    PAYMENT_IN_PROGRESS: 1,
+    PENDING: 2,
+    COMPLETE: 3,
+    CONFIRMED: 4,
+    FAILED: 5,
+    CANCELLED_BY_HOST: 6,
+    CANCELLED_BY_USER: 7,
+
+    // Full refund
+    REFUND_INITIATED: 8,
+    REFUND_COMPLETE: 9,
+    REFUND_BY_HOST_INITIATED: 13,
+    REFUND_BY_HOST_COMPLETE: 14,
+    REFUND_BY_USER_INITIATED: 15,
+    REFUND_BY_USER_COMPLETE: 16,
+
+    // Partial refund
+    REFUND_PARTIAL_INITIATED: 11,
+    REFUND_PARTIAL_COMPLETE: 12,
+    REFUND_PARTIAL_BY_USER_INITIATED: 19,
+    REFUND_PARTIAL_BY_USER_COMPLETE: 20,
+
+    // Booking Cancelled by without refund
+    BOOKING_CANCELLED: 21,
+
+    EXPIRED: 10
+};
+
+
+module.exports.RefundStatus = {
+    FULL_REFUND: 1,
+    PARTIAL_REFUND: 2,
+    NO_REFUND: 3
+}

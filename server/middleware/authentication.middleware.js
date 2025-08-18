@@ -1,5 +1,5 @@
 const JWTToken = require("../services/authentication/JwtToken.service");
-const UserService = require("../services/user/user.service");
+const UserService = require("../services/user.service");
 const { httpStatus } = require("../utilities/constants/httpstatus.constant");
 
 class AuthenticationMiddleware {

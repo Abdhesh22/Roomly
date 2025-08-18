@@ -348,3 +348,67 @@ body {
 .color-red {
   color:  red;
 }
+
+
+.filters-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end; /* Ensures bottoms align */
+    gap: 1rem;
+}
+
+.search-box,
+.status-box {
+    min-width: 200px;
+}
+
+.search-box {
+    max-width: 350px;
+    flex: 1;
+}
+
+.filters-container .form-label {
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+/* Ensure both search input and multiselect have same height */
+.search-box .input-group,
+.status-box .custom-multiselect-container {
+    height: 40px; /* or match your theme */
+}
+
+/* Make react-select inside CustomMultiSelect fill the height */
+.status-box .custom-multiselect-container .react-select__control {
+    height: 100% !important;
+    min-height: 40px !important;
+}
+
+.modal-notes li {
+    font-size: 0.95rem;
+}
+
+.refund-note {
+    color: red;
+    font-weight: 600;
+}
+
+.notification-note {
+    color: #555;
+    font-style: italic;
+}
+
+.rating-note {
+    color: orange;
+    font-weight: 500;
+}
+
+.warning-note {
+    color: #d9534f; /* Bootstrap danger color */
+    font-weight: 600;
+}
+
+.h-78vh {
+  height: 78vh;
+}

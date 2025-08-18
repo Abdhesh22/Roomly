@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import Login from "../../authentication/Login";
 import api from "../../../utils/request/api.util";
 import { loadRazorpayScript } from "../../../utils/razorpay/razorpay";
@@ -6,44 +6,33 @@ import { toast } from "react-toastify";
 import { handleCatch } from "../../../utils/common";
 import { USER_TYPE } from "../../../utils/constants/user-type.constant";
 import TripDetail from "./Trip/TripDetail";
+import BillingDetails from "./BillingDetail.jsx";
+import { AuthContext } from "../../authentication/AuthContext.jsx";
+import { useParams } from "react-router-dom";
+import { format, subDays, differenceInCalendarDays } from 'date-fns';
 
-const Reservation = ({ checkinDate, checkoutDate }) => {
-  const [tripDetails, setTripDetails] = useState({
-    checkin: checkinDate,
-    checkout: checkoutDate,
-    guests: 1,
-  });
+const Reservation = () => {
 
-  const [guests, setGuets] = useState({
-    adults: 1,
-    children: 0,
-    infants: 0,
-    pets: 0,
-  });
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [checkout, setCheckout] = useState(true);
-
-  useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      setIsLoggedIn(true);
-    }
-  }, [])
-
+  const { roomId } = useParams();
+  const { isLoggedIn } = useContext(AuthContext);
+  const [guest, setGuest] = useState({});
+  const [pricing, setPricing] = useState([]);
+  const [room, setRoom] = useState([]);
+  const [occupancy, setOccupancy] = useState([]);
+  const [billing, setBilling] = useState(null);
 
   const booking = async (order, razorpayResponse) => {
     try {
 
       const payload = {
-        orderId: order.id,
-        paymentId: razorpayResponse.paymentId,
-        orderSummaryId: order.orderSummaryId,
+        billingId: order.id,
+        paymentId: razorpayResponse.razorpay_payment_id,
+        bookingId: order.bookingId,
         razorpaySign: razorpayResponse.razorpay_signature,
-
+        hostId: room.hostId
       }
 
-      const { data } = await api.post("/api/rooms/1/booking", payload);
+      const { data } = await api.post(`/api/rooms/${roomId}/booking`, payload);
       if (data.status) {
         toast.success(data.message);
       }
@@ -88,102 +77,119 @@ const Reservation = ({ checkinDate, checkoutDate }) => {
       rzp.open();
 
     } catch (error) {
-      console.error("Checkout Error:", error);
+      handleCatch(error);
     }
   }
 
   const handleCheckout = async () => {
-    const { data } = await api.post('/api/user/checkout', {});
+    const { data } = await api.post(`/api/booking/checkout/`, { roomId: roomId, hostId: room.hostId, billing: { ...billing } });
     if (data.status) {
       openRazorpay(data);
     }
   }
 
   const onChangeTripDetail = (detail) => {
-    console.log("detail: ", detail);
+    setGuest(detail);
   }
+
+  const fetchRoom = async () => {
+    try {
+
+      if (!roomId) return;
+
+      const { data } = await api.get(`/api/rooms/detail/${roomId}`);
+
+      const room = data.room;
+
+      setPricing(room.price);
+      setOccupancy(room.occupancy);
+
+      setRoom({
+        host: `${room.host[0].firstName}`,
+        hostId: `${room.hostId}`,
+        title: room.title,
+        imgSrc: room.attachments[0].remotePath,
+        state: room.location.state,
+        city: room.location.city,
+      })
+
+    } catch (error) {
+      handleCatch(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchRoom();
+  }, [])
+
+  const getCancellationPolicy = () => {
+    const checkinDate = billing.checkin;
+    const today = new Date();
+
+    const daysUntilCheckin = differenceInCalendarDays(checkinDate, today);
+    if (daysUntilCheckin < 5) {
+      return <p>This reservation is <b>non-refundable</b></p>;
+    }
+
+    const freeCancelDate = subDays(checkinDate, 5);
+    const partialRefundDate = subDays(checkinDate, 4);
+
+    return <p><b>Free cancellation before {format(freeCancelDate, 'd MMM')}</b>. Cancel before check-in on <b>{format(partialRefundDate, 'd MMM')}</b> for a partial refund.</p>;
+  };
+
 
   return (
     <div className="container">
       <div className="row">
         {/* Left: Booking Details */}
         <div className="col-md-7">
-          <TripDetail onChange={(value) => onChangeTripDetail(value)}></TripDetail>
+          <TripDetail onChange={(value) => onChangeTripDetail(value)} occupancy={occupancy}></TripDetail>
           {/* Show login form if not logged in */}
           {!isLoggedIn && (
             <>
               <hr />
-              <Login userType={USER_TYPE.USER} onClose={(value) => setIsLoggedIn(true)} title={"Login Before Checkout"}></Login>
+              <Login userType={USER_TYPE.USER} title={"Login Before Checkout"} onClose={() => { }}></Login>
+
             </>
           )}
+          {isLoggedIn && billing?.checkin && billing?.checkout && (<>
+            <hr />
+            <div className="col-md-12">
+              <h2>Cancellation Policy</h2>
+              {(getCancellationPolicy())}
+            </div>
+            <hr />
+            <div className="col-md-12">
+              <h2>Ground rules</h2>
+              <p>We ask every guest to remember a few simple things about what makes a great guest.</p>
+              <ul>
+                <li><span> Follow the house rules</span></li>
+                <li><span>Treat your Host’s home like your own</span></li>
+              </ul>
+            </div>
+            <hr />
+            <div className="col-md-12 razorpay-container">
+              <p className="razorpay-text">
+                <b>Proceed to {" "}</b>
+                <img src="/assets/razorpay.svg" alt="Razorpay" className="razorpay-logo" />
+              </p>
+              <p className="razorpay-text">You will be redirected to Razorpay to complete your payment.</p>
+            </div>
+            <hr />
+            <div className="col-md-12">
+              <p className="term-conditions">
+                By selecting the button below, I agree to the <b>Host's House Rules, Ground rules for guests, Roomly's Rebooking and Refund Policy </b> and that <b>Roomly</b> can <b>charge my payment method</b> if I’m responsible for damage.
+              </p>
+              <button onClick={() => handleCheckout(true)} className="btn btn-primary custom-checkout-btn">
+                Checkout
+              </button>
+            </div>
+          </>)
+          }
         </div>
         {/**Right: Room Details */}
         <div className="col-md-5">
-          <div className="p-3">
-            <img
-              src="https://a0.muscache.com/im/pictures/miso/Hosting-44546056/original/debdcef5-2000-4f9e-baba-bf939effcad6.jpeg?im_w=720"
-              alt="Room"
-              className="img-fluid rounded mb-3"
-            />
-            <h6>Modern Cozy Apartment in Downtown</h6>
-            <p className="text-muted small">Hosted by John · New York, USA</p>
-
-            <hr />
-
-            <div className="d-flex justify-content-between">
-              <span>₹4,500 x 2 nights</span>
-              <span>₹9,000</span>
-            </div>
-            <div className="d-flex justify-content-between">
-              <span>Cleaning fee</span>
-              <span>₹500</span>
-            </div>
-            <div className="d-flex justify-content-between">
-              <span>Service fee</span>
-              <span>₹1,000</span>
-            </div>
-
-            <hr />
-            <div className="d-flex justify-content-between fw-bold">
-              <span>Total (INR)</span>
-              <span>₹10,500</span>
-            </div>
-          </div>
-          {
-            isLoggedIn && (<>
-              <hr />
-              <div className="col-md-12">
-                <h2>Cancellation Policy</h2>
-                <p><b>Free cancellation before 31 Jul</b>. Cancel before check-in on <b>1 Aug</b> for a partial refund.</p>
-              </div>
-              <hr />
-              <div className="col-md-12">
-                <h2>Ground rules</h2>
-                <p>We ask every guest to remember a few simple things about what makes a great guest.</p>
-                <ul>
-                  <li><span> Follow the house rules</span></li>
-                  <li><span>Treat your Host’s home like your own</span></li>
-                </ul>
-              </div>
-              <hr />
-              <div className="col-md-12 razorpay-container">
-                <p className="razorpay-text">
-                  <b>Proceed to {" "}</b>
-                  <img src="/assets/razorpay.svg" alt="Razorpay" className="razorpay-logo" />
-                </p>
-                <p className="razorpay-text">You will be redirected to Razorpay to complete your payment.</p>
-              </div>
-              <hr />
-              <div className="col-md-12">
-                <p className="term-conditions">
-                  By selecting the button below, I agree to the <b>Host's House Rules, Ground rules for guests, Roomly's Rebooking and Refund Policy </b> and that <b>Roomly</b> can <b>charge my payment method</b> if I’m responsible for damage.
-                </p>
-                <button onClick={() => handleCheckout(true)} className="btn btn-primary custom-checkout-btn">
-                  Checkout
-                </button>
-              </div>
-            </>)
-          }
+          <BillingDetails occupancy={guest} pricing={pricing} room={room} billing={billing} setBilling={setBilling} />
         </div>
       </div>
     </div >

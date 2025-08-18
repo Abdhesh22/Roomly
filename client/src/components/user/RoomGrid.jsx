@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import RoomCard from "../Card/RoomCard";
-import api from "../../../utils/request/api.util";
-import { handleCatch } from "../../../utils/common";
+import RoomCard from "./RoomCard";
+import api from "../../utils/request/api.util";
+import { handleCatch } from "../../utils/common";
 
 const RoomGrid = ({ options }) => {
   const [rooms, setRooms] = useState([]);
@@ -28,12 +28,9 @@ const RoomGrid = ({ options }) => {
         searchKey
       });
 
-      console.log(data.list.length);
       if (data.status) {
         const newRooms = data.list || [];
-        console.log(data.list);
         setRooms((prev) => [...prev, ...newRooms]);
-
         if (newRooms.length < limit) setHasMore(false);
       }
     } catch (error) {

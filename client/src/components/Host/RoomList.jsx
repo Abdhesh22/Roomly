@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import CustomTable from "../../common/CustomComponent/CustomTable/CustomTable";
-import api from "../../../utils/request/api.util";
-import { debounce, handleCatch } from "../../../utils/common";
-import CustomConfirmationModal from "../../common/CustomComponent/CustomModal/ConfirmationModal";
+import CustomTable from "../common/CustomComponent/CustomTable/CustomTable";
+import api from "../../utils/request/api.util";
+import { debounce, handleCatch } from "../../utils/common";
+import CustomConfirmationModal from "../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
 
 const RoomList = () => {

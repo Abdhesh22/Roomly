@@ -11,15 +11,7 @@ const CustomDatePicker = ({
     dateFormat = "dd/MM/yyyy",
     className = "",
 }) => {
-    // const datePickerRef = useRef(null);
 
-    // useEffect(() => {
-    //     if (datePickerRef.current) {
-    //         datePickerRef.current.setOpen(true);
-    //     }
-    // }, []);
-
-    console.log("className: ", className);
     return (
         <DatePicker
             selected={selectedDate}

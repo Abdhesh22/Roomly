@@ -13,6 +13,7 @@ const MiniCustomModal = ({
     submitText = "Submit",
     closeText = "Close",
     footer = null,
+    modalClass = "modal-dialog modal-dialog-centered modal-sm"
 }) => {
     const modalRef = useRef(null);
     const modalInstance = useRef(null);
@@ -46,7 +47,7 @@ const MiniCustomModal = ({
 
     return (
         <div className="modal fade" tabIndex="-1" ref={modalRef}>
-            <div className="modal-dialog modal-dialog-centered modal-sm">
+            <div className={modalClass}>
                 <div className="modal-content p-3">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
@@ -60,9 +61,10 @@ const MiniCustomModal = ({
 
                     <div className="modal-body">{children}</div>
 
-                    {/* Handle Custom or Default Footer */}
                     {footer ? (
-                        <div className="modal-footer">{footer}</div>
+                        <div className="modal-footer">
+                            {typeof footer === "function" ? footer({ handleClose }) : footer}
+                        </div>
                     ) : (
                         showFooter && (
                             <div className="modal-footer">

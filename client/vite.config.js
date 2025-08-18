@@ -3,14 +3,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  appType: 'spa', // 🔥 This makes Vite fallback to index.html for unknown routes
+  appType: 'spa', // SPA fallback for unknown routes
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    host: true,                // allow LAN & custom hostnames
+    port: 5173,
+    strictPort: true,          // fail if port is already in use
+    allowedHosts: ['roomly.local', 'localhost'], // whitelist your hostname
   },
 });

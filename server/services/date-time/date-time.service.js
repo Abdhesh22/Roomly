@@ -18,6 +18,10 @@ class DateTimeService {
     return 3600 * hour;
   }
 
+  getFormmatedTime(dateTime) {
+    return format(new Date(dateTime), "yyyy-MM-dd HH:mm:ss");
+  }
+
 }
 
 module.exports = DateTimeService;

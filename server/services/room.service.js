@@ -1,6 +1,6 @@
-const RoomDao = require("../../dao/room.dao");
-const { toaster } = require("../../utilities/messages/toaster.messages");
-const FileSystemService = require("../file-system/file-system.service");
+const RoomDao = require("../dao/room.dao");
+const { toaster } = require("../utilities/messages/toaster.messages");
+const FileSystemService = require("./file-system/file-system.service");
 
 
 class RoomService {

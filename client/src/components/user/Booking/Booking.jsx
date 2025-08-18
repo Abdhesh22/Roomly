@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import CustomTable from "../common/CustomComponent/CustomTable/CustomTable";
-import api from "../../utils/request/api.util";
-import { debounce, handleCatch } from "../../utils/common";
-import CustomConfirmationModal from "../common/CustomComponent/CustomModal/ConfirmationModal";
+import CustomTable from "../../common/CustomComponent/CustomTable/CustomTable";
+import api from "../../../utils/request/api.util";
+import { debounce, handleCatch } from "../../../utils/common";
+import CustomConfirmationModal from "../../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
-import MiniCustomModal from "../common/CustomComponent/CustomModal/MiniCustomModal";
-import { getStatusLabel, BillingStatus } from "../../utils/constants/orders.constant";
-import CustomMultiSelect from "../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
-
+import MiniCustomModal from "../../common/CustomComponent/CustomModal/MiniCustomModal";
+import { getStatusLabel, BillingStatus } from "../../../utils/constants/orders.constant";
+import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
+import { format, subDays, isBefore, isEqual } from 'date-fns';
+import BillingBreakdown from "./BillingBreakDown";
 // --- Filters Component ---
 const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => (
     < div className="d-flex justify-content-end align-items-end mb-4 gap-3 flex-wrap" >
@@ -40,7 +41,7 @@ const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => 
     </div >
 );
 
-const HostBooking = () => {
+const UserBooking = () => {
     const navigate = useNavigate();
 
     const [rooms, setRooms] = useState([]);
@@ -72,7 +73,6 @@ const HostBooking = () => {
     const columns = [
         { header: "Booking Number", accessor: "receipt" },
         { header: "Title", accessor: "title" },
-        { header: "Booked By", accessor: "tenantName" },
         { header: "Status", accessor: "statusLabel" },
         { header: "Total Amount", accessor: "totalBilling" },
         { header: "City", accessor: "city" },
@@ -103,35 +103,129 @@ const HostBooking = () => {
             },
         ];
 
+
+
+
         if (row.status === BillingStatus.PENDING) {
-            actions.push({
-                label: () => (
-                    <span className="text-success" title="Confirm this booking">
-                        <i className="bi bi-check-circle" />
-                    </span>
-                ),
-                onClick: () => {
-                    setModalData({
-                        title: "Confirm Booking",
-                        message: (
-                            <>
-                                <p>Are you sure you want to confirm this booking?</p>
-                                <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                    <li className="warning-note mb-2">
-                                        <i className="bi bi-exclamation-triangle me-1"></i>
-                                        This action cannot be undone.
-                                    </li>
-                                </ul>
-                            </>
-                        ),
-                        confirmText: "Yes, Confirm",
-                        onConfirm: () => {
-                            handleConfirmationBooking(row);
-                        },
-                    });
-                    setShowConfirm(true);
-                },
-            });
+
+            const checkinDate = new Date(row.bookingDetails.checkin);
+
+            const freeCancelDate = subDays(checkinDate, 5);
+            const partialRefundDate = subDays(checkinDate, 4);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let refundMessage = null;
+            let refundStatus = 0;
+
+            // --- Refund Policy Handling ---
+            if (isBefore(today, freeCancelDate) || isEqual(today, freeCancelDate)) {
+                // ✅ Full Refund
+                const refund = row.bookingDetails.total; // full amount refunded
+
+                refundMessage = (
+                    <li className="refund-note mb-2 p-3 border rounded bg-light">
+                        <div className="fw-bold text-success mb-1">
+                            <i className="bi bi-check-circle me-1"></i>
+                            Full Refund Policy
+                        </div>
+                        <BillingBreakdown bookingDetails={row.bookingDetails} />
+                        <div className="mt-2 small">
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Refunded Amount</span>
+                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Charged Amount</span>
+                                <span className="fw-bold text-danger">₹0.00</span>
+                            </div>
+                        </div>
+                        <small className="text-muted d-block mt-1">
+                            Free cancellation valid until {format(freeCancelDate, "d MMM")}.
+                        </small>
+                    </li>
+                );
+
+                refundStatus = 1;
+            }
+            else if (isBefore(today, partialRefundDate) || isEqual(today, partialRefundDate)) {
+                // ✅ Partial Refund
+                const firstNightCharge =
+                    row.bookingDetails.basePrice +
+                    (row.bookingDetails.extraAdultRate * row.bookingDetails.extraAdultCount) +
+                    (row.bookingDetails.childRate * row.bookingDetails.childCount) +
+                    (row.bookingDetails.petRate * row.bookingDetails.petCount);
+
+                const refund = row.bookingDetails.total - firstNightCharge;
+                const charged = firstNightCharge;
+
+                refundMessage = (
+                    <li className="refund-note mb-2 p-3 border rounded bg-light">
+                        <div className="fw-bold text-warning mb-1">
+                            <i className="bi bi-exclamation-circle me-1"></i>
+                            Partial Refund Policy
+                        </div>
+                        <BillingBreakdown
+                            bookingDetails={row.bookingDetails}
+                            highlight={{ base: true, extraAdults: true, children: true, pets: true }}
+                        />
+                        <div className="mt-2 small">
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Refunded Amount</span>
+                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Charged Amount</span>
+                                <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <p className="text-danger small mt-2">
+                            Charged: 1st night stay (base + guests).
+                            Refund includes cleaning fee, service fee, GST, and remaining nights.
+                        </p>
+                        <small className="text-muted d-block mt-1">
+                            Partial refund valid until {format(partialRefundDate, "d MMM")}.
+                        </small>
+                    </li>
+                );
+
+                refundStatus = 2;
+            }
+            // ❌ No Refund (after partialRefundDate)
+            else {
+                const charged = row.bookingDetails.total;
+                const refund = 0;
+
+                refundMessage = (
+                    <li className="refund-note mb-2 p-3 border rounded bg-light">
+                        <div className="fw-bold text-danger mb-1">
+                            <i className="bi bi-x-circle me-1"></i>
+                            No Refund Policy
+                        </div>
+                        <BillingBreakdown bookingDetails={row.bookingDetails} />
+                        <div className="mt-2 small">
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Refunded Amount</span>
+                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span className="text-muted">Charged Amount</span>
+                                <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <p className="text-danger small mt-2">
+                            No refund applicable — full amount charged.
+                        </p>
+                    </li>
+                );
+
+                refundStatus = 3;
+            }
+
+
+
+
 
             actions.push({
                 label: () => (
@@ -144,20 +238,9 @@ const HostBooking = () => {
                         title: "Cancel Booking",
                         message: (
                             <>
-                                <p>Are you sure you want to cancel this booking?</p>
+                                <p>Are you sure you want to cancel your booking?</p>
                                 <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                    <li className="refund-note mb-2">
-                                        <i className="bi bi-currency-rupee me-1"></i>
-                                        The full amount of ₹{row.bookingDetails.total} will be refunded.
-                                    </li>
-                                    <li className="notification-note mb-2">
-                                        <i className="bi bi-bell me-1"></i>
-                                        The user will also be notified about this cancellation.
-                                    </li>
-                                    <li className="rating-note mb-2">
-                                        <i className="bi bi-star me-1"></i>
-                                        Cancelling may affect your host rating.
-                                    </li>
+                                    {refundMessage}
                                     <li className="warning-note">
                                         <i className="bi bi-exclamation-triangle me-1"></i>
                                         This action cannot be undone.
@@ -165,8 +248,8 @@ const HostBooking = () => {
                                 </ul>
                             </>
                         ),
-                        confirmText: "Yes, cancel",
-                        onConfirm: () => handleCancelBooking(row),
+                        confirmText: "Yes, cancel my booking",
+                        onConfirm: () => handleCancelBooking(row, refundStatus),
                     });
                     setShowConfirm(true);
                 },
@@ -180,7 +263,7 @@ const HostBooking = () => {
     // --- Fetch Rooms ---
     const fetchRooms = useCallback(async () => {
         try {
-            const { data } = await api.get("/api/booking", {
+            const { data } = await api.get("/api/booking/user-booking", {
                 skip: filters.page,
                 limit: filters.limit,
                 sortKey: filters.sortKey,
@@ -189,9 +272,8 @@ const HostBooking = () => {
                 status: filters.status.value,
             });
 
-            const list = data.list.map(({ _id, bookingDetails, room, tenant, hostId, status, receipt }) => ({
+            const list = data.list.map(({ _id, bookingDetails, room, hostId, status, receipt }) => ({
                 billingId: _id,
-                userId: tenant[0]._id,
                 receipt: receipt || '--',
                 bookingDetails,
                 totalBilling: bookingDetails.total,
@@ -201,9 +283,11 @@ const HostBooking = () => {
                 statusLabel: getStatusLabel(status),
                 city: room[0].location.city,
                 roomId: room[0]._id,
-                pincode: room[0].location.pincode,
-                tenantName: `${tenant[0].firstName} ${tenant[0].lastName}`,
+                pincode: room[0].location.pincode
             }));
+
+
+            console.log("data.list: ", data.list);
 
             if (data.status) {
                 setTotal(data.total || list.length);
@@ -232,22 +316,9 @@ const HostBooking = () => {
     const cancelConfirm = () => setShowConfirm(false);
     const closeBillingModal = () => { setShowBillingModal(false); setBookingDetails(null); }
 
-    const handleConfirmationBooking = async (row) => {
+    const handleCancelBooking = async (row, refundStatus) => {
         try {
-            const { data } = await api.post("/api/booking/confirm", { billingId: row.billingId, title: row.title, userId: row.userId, tenantName: row.tenantName });
-            if (data.status) {
-                toast.success(data.message);
-                setShowConfirm(false);
-                fetchRooms();
-            }
-        } catch (error) {
-            handleCatch(error);
-        }
-    };
-
-    const handleCancelBooking = async (row) => {
-        try {
-            const { data } = await api.post("/api/booking/cancel-by-host", { billingId: row.billingId, title: row.title, userId: row.userId, tenantName: row.tenantName });
+            const { data } = await api.post("/api/booking/cancel-by-user", { billingId: row.billingId, refundStatus });
             if (data.status) {
                 toast.success(data.message);
                 setShowConfirm(false);
@@ -389,4 +460,4 @@ const HostBooking = () => {
     );
 };
 
-export default HostBooking;
+export default UserBooking;

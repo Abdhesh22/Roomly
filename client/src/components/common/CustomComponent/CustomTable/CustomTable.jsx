@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 const CustomTable = ({
     columns = [],
@@ -12,17 +12,21 @@ const CustomTable = ({
 
     const handleSort = (key) => {
         if (!enableSorting) return;
+        let newConfig;
         if (sortConfig?.key === key) {
-            setSortConfig({ key, direction: sortConfig.direction === "asc" ? "desc" : "asc" });
+            newConfig = {
+                key,
+                direction: sortConfig.direction === "asc" ? "desc" : "asc"
+            };
         } else {
-            setSortConfig({ key, direction: "asc" });
+            newConfig = { key, direction: "asc" };
         }
-        sortTable(sortConfig.key, sortConfig.direction);
+        setSortConfig(newConfig);
+        sortTable?.(newConfig.key, newConfig.direction);
     };
 
     const renderPagination = () => {
         if (!pagination) return null;
-
         const { page, limit, total, onPageChange } = pagination;
         const totalPages = Math.ceil(total / limit);
 
@@ -65,47 +69,67 @@ const CustomTable = ({
                                 {col.header}
                                 {enableSorting && (
                                     <span className="ml-1 text-xs">
-                                        {sortConfig?.key === col.accessor ? sortConfig.direction === "asc" ? "🔼" : "🔽" : "⬍"}
+                                        {sortConfig?.key === col.accessor
+                                            ? sortConfig.direction === "asc"
+                                                ? "🔼"
+                                                : "🔽"
+                                            : "⬍"}
                                     </span>
                                 )}
                             </th>
                         ))}
-                        {actions.length > 0 && <th className="border px-4 py-2">Actions</th>}
+                        {actions && (Array.isArray(actions) ? actions.length > 0 : true) && (
+                            <th className="border px-4 py-2">Actions</th>
+                        )}
                     </tr>
                 </thead>
                 <tbody>
                     {data.length === 0 ? (
                         <tr>
-                            <td colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="text-center py-4 text-gray-500">
+                            <td
+                                colSpan={columns.length + (actions ? 1 : 0)}
+                                className="text-center py-4 text-gray-500"
+                            >
                                 No data available.
                             </td>
                         </tr>
                     ) : (
-                        data.map((row, rowIndex) => (
-                            <tr key={rowIndex} className="hover:bg-gray-50">
-                                {columns.map((col) => (
-                                    <td key={col.accessor} className="border px-4 py-2">
-                                        {row[col.accessor]}
-                                    </td>
-                                ))}
-                                {actions.length > 0 && (
-                                    <td className="border px-4 py-2 whitespace-nowrap">
-                                        <div className="d-flex gap-2 flex-wrap">
-                                            {actions.map((action, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => action.onClick(row)}
-                                                    type="button"
-                                                    className="btn btn-sm btn-light d-inline-flex align-items-center gap-1"
-                                                >
-                                                    {action.label(row)}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </td>
-                                )}
-                            </tr>
-                        ))
+                        data.map((row, rowIndex) => {
+                            const rowActions = typeof actions === "function" ? actions(row) : actions;
+
+                            return (
+                                <tr key={rowIndex} className="hover:bg-gray-50">
+                                    {columns.map((col) => (
+                                        <td key={col.accessor} className="border px-4 py-2">
+                                            {row[col.accessor]}
+                                        </td>
+                                    ))}
+                                    {rowActions && rowActions.length > 0 && (
+                                        <td className="border px-4 py-2 whitespace-nowrap">
+                                            <div className="d-flex gap-2 flex-wrap">
+                                                {rowActions.map((action, i) => {
+                                                    if (typeof action.hidden === "function" && action.hidden(row)) {
+                                                        return null;
+                                                    }
+                                                    return (
+                                                        <button
+                                                            key={i}
+                                                            onClick={() => action.onClick?.(row)}
+                                                            type="button"
+                                                            className={`btn btn-sm btn-light d-inline-flex align-items-center gap-1 ${action.className || ""}`}
+                                                        >
+                                                            {typeof action.label === "function"
+                                                                ? action.label(row)
+                                                                : action.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </td>
+                                    )}
+                                </tr>
+                            );
+                        })
                     )}
                 </tbody>
             </table>

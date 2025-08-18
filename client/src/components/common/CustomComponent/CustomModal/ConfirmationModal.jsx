@@ -4,7 +4,7 @@ import { Modal } from "bootstrap";
 const CustomConfirmationModal = ({
     show = false,
     title = "Are you sure?",
-    message = "This action cannot be undone.",
+    message = null, // now can accept JSX
     onConfirm,
     onCancel,
     confirmText = "Yes, Confirm",
@@ -15,7 +15,10 @@ const CustomConfirmationModal = ({
 
     useEffect(() => {
         if (modalRef.current) {
-            bsModal.current = new Modal(modalRef.current);
+            bsModal.current = new Modal(modalRef.current, {
+                backdrop: "static", // prevent closing on backdrop click
+                keyboard: false, // prevent closing on ESC
+            });
         }
     }, []);
 
@@ -37,7 +40,7 @@ const CustomConfirmationModal = ({
 
     return (
         <div className="modal fade" tabIndex="-1" ref={modalRef}>
-            <div className="modal-dialog">
+            <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
@@ -45,19 +48,17 @@ const CustomConfirmationModal = ({
                             type="button"
                             className="btn-close"
                             onClick={handleClose}
-                            data-bs-dismiss="modal"
                             aria-label="Close"
                         />
                     </div>
                     <div className="modal-body">
-                        <p>{message}</p>
+                        {message}
                     </div>
                     <div className="modal-footer">
                         <button
                             type="button"
                             className="btn btn-secondary"
                             onClick={handleClose}
-                            data-bs-dismiss="modal"
                         >
                             {cancelText}
                         </button>
@@ -65,7 +66,6 @@ const CustomConfirmationModal = ({
                             type="button"
                             className="btn btn-danger"
                             onClick={handleConfirm}
-                            data-bs-dismiss="modal"
                         >
                             {confirmText}
                         </button>

@@ -1,5 +1,4 @@
 const Razorpay = require("razorpay");
-const DateTimeService = require("../date-time/date-time.service");
 
 class RazorPayService {
     #razorpayInstance;
@@ -17,15 +16,33 @@ class RazorPayService {
         });
     }
 
-    makeOrder = async (amount, customerId, currency) => {
-        const dateTime = new DateTimeService();
+
+    #generateReceipt = () => {
+        const timestamp = Date.now().toString(36); // shorter base36 timestamp
+        const randomStr = Math.random().toString(36).substring(2, 8); // 6 chars
+        return `order_${timestamp}_${randomStr}`;
+    };
+
+
+    createOrder = async (amount, customerId, currency) => {
         const options = {
-            amount: amount * 100,
+            amount: Math.round(parseFloat(amount) * 100),
             currency: currency,
-            receipt: `order_rcptid_${await dateTime.getCurrentFormattedTime()}`,
-            customer_id: customerId
+            receipt: this.#generateReceipt(),
+            customer_id: customerId,
+            payment_capture: 1
         };
         return await this.#razorpayInstance.orders.create(options);
+    }
+
+    refundPayment = async (paymentId, { amount, reason }) => {
+        return await this.#razorpayInstance.payments.refund(paymentId, {
+            amount: Math.round(parseFloat(amount) * 100),
+            speed: 'normal',
+            notes: {
+                reason: reason
+            }
+        });
     }
 
 }
