@@ -9,6 +9,7 @@ const CustomConfirmationModal = ({
     onCancel,
     confirmText,
     cancelText,
+    size = "lg", // 👈 new prop (sm, md, lg, xl)
 }) => {
     const modalRef = useRef(null);
     const bsModal = useRef(null);
@@ -30,17 +31,23 @@ const CustomConfirmationModal = ({
         }
     }, [show]);
 
-    const handleClose = () => {
-        onCancel?.();
-    };
+    const handleClose = () => onCancel?.();
+    const handleConfirm = () => onConfirm?.();
 
-    const handleConfirm = () => {
-        onConfirm?.();
+    // ✅ helper to map size prop → bootstrap class
+    const getSizeClass = () => {
+        switch (size) {
+            case "sm": return "modal-sm";
+            case "lg": return "modal-lg";
+            case "xl": return "modal-xl";
+            case "md": return "modal-md";
+            default: return "";
+        }
     };
 
     return (
         <div className="modal fade" tabIndex="-1" ref={modalRef}>
-            <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${getSizeClass()}`}>
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
@@ -51,26 +58,20 @@ const CustomConfirmationModal = ({
                             aria-label="Close"
                         />
                     </div>
-                    {/* Scrollable body with Bootstrap class */}
-                    <div className="modal-body">
-                        {message}
-                    </div>
-                    <div className="modal-footer">
-                        {cancelText && (<button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={handleClose}
-                        >
-                            {cancelText}
-                        </button>)}
-                        {confirmText && (<button
-                            type="button"
-                            className="btn btn-danger"
-                            onClick={handleConfirm}
-                        >
-                            {confirmText}
-                        </button>)}
 
+                    <div className="modal-body">{message}</div>
+
+                    <div className="modal-footer">
+                        {cancelText && (
+                            <button type="button" className="btn btn-secondary" onClick={handleClose}>
+                                {cancelText}
+                            </button>
+                        )}
+                        {confirmText && (
+                            <button type="button" className="btn btn-danger" onClick={handleConfirm}>
+                                {confirmText}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

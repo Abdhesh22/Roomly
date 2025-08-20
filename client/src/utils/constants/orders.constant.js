@@ -69,3 +69,35 @@ export const orderStatusOptions = [
     { label: "Refund", value: "refund" },
     { label: "Complete", value: "complete" },
 ];
+
+
+export const statusConfig = {
+    [BillingStatus.PAYMENT_IN_PROGRESS]: { icon: "bi-arrow-repeat", class: "timeline-warning" },
+    [BillingStatus.PAYMENT_DONE]: { icon: "bi-credit-card-fill", class: "timeline-success" },
+    [BillingStatus.CONFIRMED]: { icon: "bi-check-circle-fill", class: "timeline-success" },
+    [BillingStatus.COMPLETE]: { icon: "bi-check2-circle", class: "timeline-success" },
+    [BillingStatus.FAILED]: { icon: "bi-x-circle-fill", class: "timeline-danger" },
+    [BillingStatus.EXPIRED]: { icon: "bi-hourglass-split", class: "timeline-danger" },
+
+    // Refund flows
+    [BillingStatus.REFUND_INITIATED]: { icon: "bi-arrow-counterclockwise", class: "timeline-info" },
+    [BillingStatus.REFUND_COMPLETE]: { icon: "bi-cash-stack", class: "timeline-success" },
+    [BillingStatus.REFUND_BY_HOST_INITIATED]: { icon: "bi-arrow-counterclockwise", class: "timeline-info" },
+    [BillingStatus.REFUND_BY_HOST_COMPLETE]: { icon: "bi-cash-stack", class: "timeline-success" },
+    [BillingStatus.REFUND_BY_USER_INITIATED]: { icon: "bi-arrow-counterclockwise", class: "timeline-info" },
+    [BillingStatus.REFUND_BY_USER_COMPLETE]: { icon: "bi-cash-stack", class: "timeline-success" },
+    [BillingStatus.REFUND_BY_HOST_PROCEDDED]: { icon: "bi-hourglass", class: "timeline-info" },
+    [BillingStatus.REFUND_BY_USER_PROCEDDED]: { icon: "bi-hourglass", class: "timeline-info" },
+
+    // Partial refund flows
+    [BillingStatus.REFUND_PARTIAL_INITIATED]: { icon: "bi-arrow-counterclockwise", class: "timeline-info" },
+    [BillingStatus.REFUND_PARTIAL_COMPLETE]: { icon: "bi-cash-stack", class: "timeline-success" },
+    [BillingStatus.REFUND_PARTIAL_BY_USER_INITIATED]: { icon: "bi-arrow-counterclockwise", class: "timeline-info" },
+    [BillingStatus.REFUND_PARTIAL_BY_USER_COMPLETE]: { icon: "bi-cash-stack", class: "timeline-success" },
+    [BillingStatus.REFUND_PARTIAL_BY_USER_PROCEDDED]: { icon: "bi-hourglass", class: "timeline-info" },
+
+    // Cancelled
+    [BillingStatus.BOOKING_CANCELLED]: { icon: "bi-x-octagon-fill", class: "timeline-danger" },
+    [BillingStatus.CANCELLED_BY_USER]: { icon: "bi-person-x-fill", class: "timeline-danger" },
+    [BillingStatus.CANCELLED_BY_HOST]: { icon: "bi-house-x-fill", class: "timeline-danger" },
+};

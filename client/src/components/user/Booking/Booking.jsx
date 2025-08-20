@@ -6,7 +6,7 @@ import { debounce, handleCatch } from "../../../utils/common";
 import CustomConfirmationModal from "../../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
 import MiniCustomModal from "../../common/CustomComponent/CustomModal/MiniCustomModal";
-import { BillingStatusLabels, BillingStatus, orderStatusOptions } from "../../../utils/constants/orders.constant";
+import { BillingStatusLabels, BillingStatus, orderStatusOptions, statusConfig } from "../../../utils/constants/orders.constant";
 import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
 import { format, subDays, isBefore, isEqual } from 'date-fns';
 import BillingBreakdown from "./BillingBreakDown";
@@ -61,6 +61,7 @@ const UserBooking = () => {
     const [modalData, setModalData] = useState({
         title: "",
         message: null,
+        size: "lg",
         confirmText: "Confirm",
         onConfirm: () => { },
     });
@@ -103,44 +104,44 @@ const UserBooking = () => {
                     </span>
                 ),
                 onClick: () => {
+                    console.log(row);
                     setModalData({
                         title: "Booking Timeline",
                         message: (
-                            <ul className="list-group list-group-flush">
-                                {row.timeline?.map((event, index) => {
-                                    const isLast = index === row.timeline.length - 1;
-                                    return (
-                                        <li
-                                            key={index}
-                                            className={`list-group-item border-0 ps-0 d-flex align-items-start ${isLast ? "bg-light rounded" : ""
-                                                }`}
-                                        >
-                                            {/* Marker */}
-                                            <div className="me-3">
-                                                <i
-                                                    className={`bi bi-circle-fill small ${isLast ? "text-success" : "text-primary"
-                                                        }`}
-                                                />
-                                            </div>
+                            <div className="timeline-container">
+                                <ul className="timeline-list">
+                                    {row.timeline?.map((event, index) => {
+                                        const isLast = index === row.timeline.length - 1;
+                                        const cfg = statusConfig[event.status] || {
+                                            icon: "bi-circle-fill",
+                                            class: "timeline-muted",
+                                        };
 
-                                            {/* Content */}
-                                            <div>
-                                                <div
-                                                    className={`fw-semibold ${isLast ? "text-success" : "text-dark"
-                                                        }`}
-                                                >
-                                                    {BillingStatusLabels[event.status]}
+                                        return (
+                                            <li key={index} className="timeline-item">
+                                                {/* Connector Line */}
+                                                {!isLast && <div className="timeline-line" />}
+
+                                                {/* Marker */}
+                                                <div className={`timeline-marker ${cfg.class}`}>
+                                                    <i className={`bi ${cfg.icon}`} />
                                                 </div>
-                                                <small className="text-muted">
-                                                    {format(new Date(event.createdAt), "d MMM, h:mm:ss a")}
-                                                </small>
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
+
+                                                {/* Content */}
+                                                <div className="timeline-content">
+                                                    <div className="timeline-title">{BillingStatusLabels[event.status]}</div>
+                                                    <small className="timeline-date">
+                                                        {format(new Date(event.createdAt), "d MMM, h:mm:ss a")}
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
                         ),
-                        confirmText: "Close",
+                        size: 'sm',
+                        confirmText: false,
                         onConfirm: () => setShowConfirm(false),
                     });
                     setShowConfirm(true);
@@ -291,6 +292,7 @@ const UserBooking = () => {
                                 </ul>
                             </>
                         ),
+                        size: "lg",
                         confirmText: "Yes, cancel my booking",
                         onConfirm: () => handleCancelBooking(row, refundStatus),
                     });
@@ -408,6 +410,7 @@ const UserBooking = () => {
                     onCancel={cancelConfirm}
                     confirmText={modalData.confirmText}
                     cancelText="Cancel"
+                    size={modalData.size}
                     isHtml={false} // now we use JSX directly
                 />
 
