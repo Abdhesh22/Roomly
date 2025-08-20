@@ -559,6 +559,72 @@ class EmailTemplate {
         break;
       }
 
+      case EMAIL_TEMPLATE.BOOKING_CANCELLED_BY_HOST_FULL_REFUND: {
+        const order = options.order;
+        const tenant = order.tenant[0];
+        const host = order.host[0];
+        const room = order.room[0];
+        const d = order.bookingDetails;
+        const refund = order.bookingDetails.total;
+
+        const checkin = await dateTimeService.getFormmatedTime(d.checkin);
+        const checkout = await dateTimeService.getFormmatedTime(d.checkout);
+
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width:720px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">
+            <div style="background:#dc3545; color:#fff; padding:20px; text-align:center;">
+              <h2 style="margin:0;">Booking Cancelled – Full Refund Issued</h2>
+            </div>
+
+            <div style="padding:20px;">
+              <p>Hello <strong>${host.firstName} ${host.lastName}</strong>,</p>
+              <p>You cancelled the booking for <strong>${room.title}</strong> made by guest <strong>${tenant.firstName} ${tenant.lastName}</strong>. A full refund has been successfully issued to the guest’s original payment method.</p>
+
+              <h3 style="margin:16px 0 8px;">Financial Summary</h3>
+              <table style="width:100%; border-collapse:collapse;">
+                <tbody>
+                  <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">Guest charged (total)</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${d.total.toFixed(2)}</td>
+                  </tr>
+                  <tr style="background:#fbe9eb; font-weight:bold;">
+                    <td style="padding:8px;">Refund to guest</td>
+                    <td style="padding:8px; text-align:right;">₹${refund.amount.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">Expected host payout</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p style="margin-top:10px; color:#666; font-size:13px;">
+                Note: Since the booking was cancelled by you, no payout will be made for this reservation.
+              </p>
+
+              <h3 style="margin:20px 0 8px; color:#333;">Booking Details</h3>
+              <table style="width:100%; border-collapse:collapse;">
+                <tbody>
+                  <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">Order ID</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${order.receipt}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">Check-in</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkin}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">Check-out</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkout}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>`;
+        break;
+      }
+
+
       default:
         throw new Error("Please Select a valid type")
     }

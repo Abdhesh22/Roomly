@@ -151,52 +151,53 @@ const RoomList = () => {
 
     return (
         <>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="mb-0">Rooms</h1>
-                <button className="btn btn-primary" onClick={handleAddRoom}>
-                    <i className="bi bi-house-add me-2"></i> Add Room
-                </button>
-            </div>
-
-            <div className="d-flex justify-content-end mb-4">
-                <div className="input-group w-50">
-                    <span className="input-group-text bg-white">
-                        <i className="bi bi-search"></i>
-                    </span>
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search rooms by name, location, etc."
-                        onInput={(e) => searchRooms(e.target.value)}
-                    />
+            <div className="container">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h1 className="mb-0">Rooms</h1>
+                    <button className="btn btn-primary" onClick={handleAddRoom}>
+                        <i className="bi bi-house-add me-2"></i> Add Room
+                    </button>
                 </div>
+
+                <div className="d-flex justify-content-end mb-4">
+                    <div className="input-group w-50">
+                        <span className="input-group-text bg-white">
+                            <i className="bi bi-search"></i>
+                        </span>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search rooms by name, location, etc."
+                            onInput={(e) => searchRooms(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <CustomTable
+                    columns={columns}
+                    data={rooms}
+                    enableSorting={true}
+                    actions={actions}
+                    pagination={pagination}
+                    sortTable={(key, order) => {
+                        setSortKey(key);
+                        setSortOrder(order);
+                    }}
+                />
+
+                <CustomConfirmationModal
+                    show={showConfirm}
+                    title={modalData.title}
+                    message={modalData.message}
+                    onConfirm={() => {
+                        modalData.onConfirm();
+                        setShowConfirm(false);
+                    }}
+                    onCancel={cancelConfirm}
+                    confirmText={modalData.confirmText}
+                    cancelText="Cancel"
+                />
             </div>
-
-            <CustomTable
-                columns={columns}
-                data={rooms}
-                enableSorting={true}
-                actions={actions}
-                pagination={pagination}
-                sortTable={(key, order) => {
-                    setSortKey(key);
-                    setSortOrder(order);
-                }}
-            />
-
-            <CustomConfirmationModal
-                show={showConfirm}
-                title={modalData.title}
-                message={modalData.message}
-                onConfirm={() => {
-                    modalData.onConfirm();
-                    setShowConfirm(false);
-                }}
-                onCancel={cancelConfirm}
-                confirmText={modalData.confirmText}
-                cancelText="Cancel"
-            />
-
         </>
     );
 };

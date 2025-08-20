@@ -1,15 +1,14 @@
 module.exports.BillingStatus = {
     PAYMENT_IN_PROGRESS: 1,
-    PENDING: 2,
+    PAYMENT_DONE: 2,
     COMPLETE: 3,
     CONFIRMED: 4,
     FAILED: 5,
-    CANCELLED_BY_HOST: 6,
-    CANCELLED_BY_USER: 7,
 
     // Full refund
     REFUND_INITIATED: 8,
     REFUND_COMPLETE: 9,
+    EXPIRED: 10,
     REFUND_BY_HOST_INITIATED: 13,
     REFUND_BY_HOST_COMPLETE: 14,
     REFUND_BY_USER_INITIATED: 15,
@@ -24,12 +23,25 @@ module.exports.BillingStatus = {
     // Booking Cancelled by without refund
     BOOKING_CANCELLED: 21,
 
-    EXPIRED: 10
+    REFUND_BY_HOST_PROCEDDED: 22,
+    REFUND_PARTIAL_BY_USER_PROCEDDED: 23,
+    REFUND_BY_USER_PROCEDDED: 24
+
 };
 
 
 module.exports.RefundStatus = {
     FULL_REFUND: 1,
     PARTIAL_REFUND: 2,
-    NO_REFUND: 3
+    NO_REFUND: 3,
+    HOST_REFUND_FULL_REFUND: 4
+}
+
+module.exports.orderStatusOptions = {
+    ALL: 'all',
+    PAYMENT_IN_PROGRESS: "payment_progress",
+    PAYMENT_DONE: "payment_done",
+    CONFIRMED: "confirmed",
+    REFUND: "refund",
+    COMPLETE: 'complete'
 }

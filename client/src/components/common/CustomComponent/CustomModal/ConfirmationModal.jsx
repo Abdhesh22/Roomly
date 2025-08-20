@@ -4,11 +4,11 @@ import { Modal } from "bootstrap";
 const CustomConfirmationModal = ({
     show = false,
     title = "Are you sure?",
-    message = null, // now can accept JSX
+    message = null, // can accept JSX
     onConfirm,
     onCancel,
-    confirmText = "Yes, Confirm",
-    cancelText = "Cancel",
+    confirmText,
+    cancelText,
 }) => {
     const modalRef = useRef(null);
     const bsModal = useRef(null);
@@ -16,8 +16,8 @@ const CustomConfirmationModal = ({
     useEffect(() => {
         if (modalRef.current) {
             bsModal.current = new Modal(modalRef.current, {
-                backdrop: "static", // prevent closing on backdrop click
-                keyboard: false, // prevent closing on ESC
+                backdrop: "static",
+                keyboard: false,
             });
         }
     }, []);
@@ -40,7 +40,7 @@ const CustomConfirmationModal = ({
 
     return (
         <div className="modal fade" tabIndex="-1" ref={modalRef}>
-            <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
@@ -51,24 +51,26 @@ const CustomConfirmationModal = ({
                             aria-label="Close"
                         />
                     </div>
+                    {/* Scrollable body with Bootstrap class */}
                     <div className="modal-body">
                         {message}
                     </div>
                     <div className="modal-footer">
-                        <button
+                        {cancelText && (<button
                             type="button"
                             className="btn btn-secondary"
                             onClick={handleClose}
                         >
                             {cancelText}
-                        </button>
-                        <button
+                        </button>)}
+                        {confirmText && (<button
                             type="button"
                             className="btn btn-danger"
                             onClick={handleConfirm}
                         >
                             {confirmText}
-                        </button>
+                        </button>)}
+
                     </div>
                 </div>
             </div>

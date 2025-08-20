@@ -3,6 +3,7 @@ const dbConnection = require("../connection/db.connection.js");
 const BaseDAO = require("./base.dao.js");
 const getSchema = require(path.join(__dirname, "..", "model", "billing.model.js"));
 const mongoose = require("mongoose");
+const { orderStatusOptions, BillingStatus } = require("../utilities/constants/order-status.constant.js");
 const { ObjectId } = mongoose.Types;
 class BookingDAO extends BaseDAO {
     constructor(mongoose) {
@@ -20,7 +21,10 @@ class BookingDAO extends BaseDAO {
 
         let matchCondtion = {
             hostId: params.hostId,
-            status: parseInt(params.status)
+        }
+
+        if (params.status != orderStatusOptions.ALL) {
+            matchCondtion.status = await this.#fetchStatusCondition(params.status)
         }
 
         const pagination = [];
@@ -69,10 +73,15 @@ class BookingDAO extends BaseDAO {
                     from: "rooms",
                     let: { roomId: "$roomId" },
                     pipeline: [
-                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] } } },
+                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] }, ...searchCondition } },
                         { $project: { title: 1, location: 1 } }
                     ],
                     as: "room"
+                }
+            },
+            {
+                $match: {
+                    $expr: { $gt: [{ $size: "$room" }, 0] }
                 }
             },
             {
@@ -84,7 +93,8 @@ class BookingDAO extends BaseDAO {
                     room: 1,
                     createdAt: 1,
                     status: 1,
-                    receipt: 1
+                    receipt: 1,
+                    timeline: 1
                 }
             },
             {
@@ -99,10 +109,11 @@ class BookingDAO extends BaseDAO {
     getHostBookingLength = async (params) => {
 
         let matchCondtion = {
-            hostId: params.hostId,
-            status: parseInt(params.status)
+            hostId: params.hostId
         }
-
+        if (params.status != orderStatusOptions.ALL) {
+            matchCondtion.status = await this.#fetchStatusCondition(params.status)
+        }
 
         let searchCondition = {};
         if (params.searchKey) {
@@ -122,6 +133,22 @@ class BookingDAO extends BaseDAO {
                 $match: matchCondtion
             },
             {
+                $lookup: {
+                    from: "rooms",
+                    let: { roomId: "$roomId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] }, ...searchCondition } },
+                        { $project: { title: 1, location: 1 } }
+                    ],
+                    as: "room"
+                }
+            },
+            {
+                $match: {
+                    $expr: { $gt: [{ $size: "$room" }, 0] }
+                }
+            },
+            {
                 $project: {
                     _id: 1
                 }
@@ -130,16 +157,44 @@ class BookingDAO extends BaseDAO {
         return result.length;
     }
 
+    #fetchStatusCondition = (status) => {
+        switch (status) {
+            case "payment_progress":
+                return { $in: [BillingStatus.PAYMENT_IN_PROGRESS] };
+
+            case "payment_done":
+                return { $in: [BillingStatus.COMPLETE, BillingStatus.CONFIRMED] };
+            // Adjust depending on how you define "done"
+
+            case "complete":
+                return { $in: [BillingStatus.COMPLETE] };
+
+            case "confirmed":
+                return { $in: [BillingStatus.CONFIRMED] };
+
+            case "refund":
+                return {
+                    $nin: [
+                        BillingStatus.CONFIRMED,
+                        BillingStatus.COMPLETE,
+                        BillingStatus.PAYMENT_IN_PROGRESS,
+                    ],
+                };
+            default:
+                return {};
+        }
+    };
+
 
     bookingForUser = async (params) => {
 
         let matchCondtion = {
             userId: params.userId,
-            status: parseInt(params.status)
         }
 
-
-        console.log("matchCondition: ", matchCondtion);
+        if (params.status != orderStatusOptions.ALL) {
+            matchCondtion.status = await this.#fetchStatusCondition(params.status)
+        }
 
         const pagination = [];
         if (params.skip) {
@@ -176,10 +231,15 @@ class BookingDAO extends BaseDAO {
                     from: "rooms",
                     let: { roomId: "$roomId" },
                     pipeline: [
-                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] } } },
+                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] }, ...searchCondition } },
                         { $project: { title: 1, location: 1, checkin: 1, checkout: 1 } }
                     ],
                     as: "room"
+                }
+            },
+            {
+                $match: {
+                    $expr: { $gt: [{ $size: "$room" }, 0] }
                 }
             },
             {
@@ -191,7 +251,8 @@ class BookingDAO extends BaseDAO {
                     room: 1,
                     createdAt: 1,
                     status: 1,
-                    receipt: 1
+                    receipt: 1,
+                    timeline: 1
                 }
             },
             {
@@ -206,7 +267,10 @@ class BookingDAO extends BaseDAO {
 
         let matchCondtion = {
             userId: params.userId,
-            status: parseInt(params.status)
+        }
+
+        if (params.status != orderStatusOptions.ALL) {
+            matchCondtion.status = await this.#fetchStatusCondition(params.status)
         }
 
         let searchCondition = {};
@@ -225,6 +289,22 @@ class BookingDAO extends BaseDAO {
         const result = await this.model.aggregate([
             {
                 $match: matchCondtion
+            },
+            {
+                $lookup: {
+                    from: "rooms",
+                    let: { roomId: "$roomId" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$roomId"] }, ...searchCondition } },
+                        { $project: { title: 1, location: 1, checkin: 1, checkout: 1 } }
+                    ],
+                    as: "room"
+                }
+            },
+            {
+                $match: {
+                    $expr: { $gt: [{ $size: "$room" }, 0] }
+                }
             },
             {
                 $project: {
@@ -288,6 +368,20 @@ class BookingDAO extends BaseDAO {
                 }
             }
         ]);
+    }
+
+    updateStatus = async (_id, status) => {
+        return this.model.updateOne({ _id: new ObjectId(_id) },
+            {
+                $set: { status: status },
+                $push: {
+                    timeline: {
+                        status,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
     }
 
 }

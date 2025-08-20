@@ -1,6 +1,12 @@
 module.exports = (mongoose) => {
     const { Schema } = mongoose;
-
+    const StatusTimelineSchema = new Schema(
+        {
+            status: { type: Number, required: true },
+            createdAt: { type: Date, default: Date.now }
+        },
+        { _id: false }
+    );
     const BookingSchema = new Schema(
         {
             userId: {
@@ -32,7 +38,8 @@ module.exports = (mongoose) => {
             },
             paymentId: {
                 type: String
-            }
+            },
+            timeline: [StatusTimelineSchema]
         },
         {
             timestamps: {

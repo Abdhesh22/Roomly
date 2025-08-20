@@ -90,6 +90,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status: true, isEmailExist: false, order, customer, user });
         } catch (error) {
+            console.log("error:", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true });
         }
     }

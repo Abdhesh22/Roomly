@@ -11,7 +11,8 @@ class RoomController {
             const { bookingId, paymentId } = req.body;
 
             const bookingDao = await BookingDAO.init();
-            await bookingDao.updateById(bookingId, { status: BillingStatus.PENDING, paymentId: paymentId });
+            await bookingDao.updateById(bookingId, { paymentId: paymentId });
+            await bookingDao.updateStatus(bookingId, BillingStatus.PAYMENT_DONE);
 
             return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_SUCCESS });
         } catch (error) {

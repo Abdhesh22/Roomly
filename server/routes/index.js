@@ -6,5 +6,6 @@ router.use("/user", require("./user.route"));
 router.use("/rooms", require("./room.route.js"));
 router.use("/common", require("./common.route.js"));
 router.use("/booking", require("./booking.route.js"));
+router.use("/webhook", require("./webhook/webhook.route.js"));
 
 module.exports = router;

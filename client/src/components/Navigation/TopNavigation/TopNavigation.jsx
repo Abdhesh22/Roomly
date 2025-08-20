@@ -78,6 +78,12 @@ const TopNavigation = () => {
               </>)}
               {isLoggedIn && (<li>
                 {loggedUserType == USER_TYPE.USER && (<button className="dropdown-item" onClick={() => goto('/user/booking')}>My Bookings</button>)}
+                {loggedUserType == USER_TYPE.HOST && (
+                  <>
+                    <button className="dropdown-item" onClick={() => goto('/host/rooms')}>My Rooms</button>
+                    <button className="dropdown-item" onClick={() => goto('/host/bookings')}>My Bookings</button>
+                  </>
+                )}
                 <button className="dropdown-item" onClick={() => logOut()}>Sign out</button>
               </li>)}
             </ul>
