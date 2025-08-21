@@ -8,6 +8,36 @@ const PaymentService = require("./payment/payment.service");
 
 class BillingService {
 
+    book = async ({ bookingId, paymentId }) => {
+        try {
+
+            const bookingDao = await BookingDAO.init();
+
+            await bookingDao.updateById(bookingId, { paymentId: paymentId });
+            await bookingDao.updateStatus(bookingId, BillingStatus.PAYMENT_DONE);
+
+            //Now sending message your booking has been done
+            const emailTemplate = new EmailTemplate();
+            const emailService = new EmailService();
+
+            const order = await bookingDao.getBookingDetailById({ _id: bookingId });
+
+            //send email to user
+            const tenantHtml = await emailTemplate.createTemplate(EMAIL_TEMPLATE.BOOKING_PAYMENT_RECEIVED_TENANT, { order: order[0] });
+            const tenantSubject = await emailTemplate.createSubject(EMAIL_TEMPLATE.BOOKING_PAYMENT_RECEIVED_TENANT, { title: order[0].room[0].title });
+            await emailService.sendMail({ to: order[0].tenant[0].email, subject: tenantSubject, html: tenantHtml });
+
+            // send email to host
+            const hostHtml = await emailTemplate.createTemplate(EMAIL_TEMPLATE.NEW_BOOKING_HOST, { order: order[0] });
+            const hostSubject = await emailTemplate.createSubject(EMAIL_TEMPLATE.NEW_BOOKING_HOST, { title: order[0].room[0].title });
+            await emailService.sendMail({ to: order[0].host[0].email, subject: hostSubject, html: hostHtml });
+
+            return;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     checkout = async ({ user, bookingDetails, roomId, hostId }) => {
         try {
 
@@ -37,6 +67,7 @@ class BillingService {
                 customer
             }
         } catch (error) {
+            console.log("error: ", error);
             throw error;
         }
     }
@@ -69,7 +100,7 @@ class BillingService {
             const subject = await emailTemplate.createSubject(EMAIL_TEMPLATE.ROOM_CONFIRMED, { title });
 
             await bookingDao.updateStatus(billingId, BillingStatus.CONFIRMED);
-            await emailService.sendMail({ to: booking.tenant[0].email, subject, html });
+            await emailService.sendMail({ to: order[0].tenant[0].email, subject, html });
 
         } catch (error) {
             throw error;
@@ -198,6 +229,17 @@ class BillingService {
             throw error;
         }
     };
+
+    updateStatus = async ({ billingId, status }) => {
+        try {
+
+            const bookingDao = await BookingDAO.init();
+            await bookingDao.updateStatus(billingId, status);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = BillingService;

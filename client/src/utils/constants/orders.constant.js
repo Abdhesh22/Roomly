@@ -26,6 +26,8 @@ export const BillingStatus = {
     REFUND_BY_HOST_PROCEDDED: 22,
     REFUND_PARTIAL_BY_USER_PROCEDDED: 23,
     REFUND_BY_USER_PROCEDDED: 24,
+    CHECK_IN: 25,
+    CHECK_OUT: 26,
 
     EXPIRED: 10
 };
@@ -56,7 +58,10 @@ export const BillingStatusLabels = {
 
     // Cancelled / expired
     [BillingStatus.BOOKING_CANCELLED]: "Booking Cancelled",
-    [BillingStatus.EXPIRED]: "Payment Expired"
+    [BillingStatus.EXPIRED]: "Payment Expired",
+
+    [BillingStatus.CHECK_IN]: "Checked In",
+    [BillingStatus.CHECK_OUT]: "Checked Out",
 };
 
 
@@ -66,8 +71,10 @@ export const orderStatusOptions = [
     { label: "Payment Progress", value: "payment_progress" },
     { label: "Payment Done", value: "payment_done" },
     { label: "Confirmed", value: "confirmed" },
+    { label: "Checked In", value: "check_in" },
+    { label: "Checked Out", value: "check_out" },
     { label: "Refund", value: "refund" },
-    { label: "Complete", value: "complete" },
+    { label: "No Refund", value: 'no_refund' }
 ];
 
 
@@ -98,6 +105,6 @@ export const statusConfig = {
 
     // Cancelled
     [BillingStatus.BOOKING_CANCELLED]: { icon: "bi-x-octagon-fill", class: "timeline-danger" },
-    [BillingStatus.CANCELLED_BY_USER]: { icon: "bi-person-x-fill", class: "timeline-danger" },
-    [BillingStatus.CANCELLED_BY_HOST]: { icon: "bi-house-x-fill", class: "timeline-danger" },
+    [BillingStatus.CHECK_IN]: { icon: "bi-box-arrow-in-right", class: "timeline-primary" },
+    [BillingStatus.CHECK_OUT]: { icon: "bi-box-arrow-right", class: "timeline-warning" },
 };

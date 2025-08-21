@@ -1,25 +1,8 @@
-const BookingDAO = require("../../dao/billing.dao");
 const RoomService = require("../../services/room.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
-const { BillingStatus } = require("../../utilities/constants/order-status.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
 
 class RoomController {
-    book = async (req, res) => {
-        try {
-
-            const { bookingId, paymentId } = req.body;
-
-            const bookingDao = await BookingDAO.init();
-            await bookingDao.updateById(bookingId, { paymentId: paymentId });
-            await bookingDao.updateStatus(bookingId, BillingStatus.PAYMENT_DONE);
-
-            return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_SUCCESS });
-        } catch (error) {
-            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
-        }
-    }
-
     create = async (req, res) => {
         try {
 

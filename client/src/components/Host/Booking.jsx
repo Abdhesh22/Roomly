@@ -150,76 +150,138 @@ const HostBooking = () => {
             }
         ];
 
-        if (row.status === BillingStatus.PAYMENT_DONE) {
-            actions.push({
-                label: () => (
-                    <span className="text-success" title="Confirm this booking">
-                        <i className="bi bi-check-circle" />
-                    </span>
-                ),
-                onClick: () => {
-                    setModalData({
-                        title: "Confirm Booking",
-                        message: (
-                            <>
-                                <p>Are you sure you want to confirm this booking?</p>
-                                <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                    <li className="warning-note mb-2">
-                                        <i className="bi bi-exclamation-triangle me-1"></i>
-                                        This action cannot be undone.
-                                    </li>
-                                </ul>
-                            </>
-                        ),
-                        size: 'lg',
-                        confirmText: "Yes, Confirm",
-                        onConfirm: () => {
-                            handleConfirmationBooking(row);
-                        },
-                    });
-                    setShowConfirm(true);
-                },
-            });
+        switch (row.status) {
+            case BillingStatus.PAYMENT_DONE:
+                actions.push({
+                    label: () => (
+                        <span className="text-success" title="Confirm this booking">
+                            <i className="bi bi-check-circle" />
+                        </span>
+                    ),
+                    onClick: () => {
+                        setModalData({
+                            title: "Confirm Booking",
+                            message: (
+                                <>
+                                    <p>Are you sure you want to confirm this booking?</p>
+                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
+                                        <li className="warning-note mb-2">
+                                            <i className="bi bi-exclamation-triangle me-1"></i>
+                                            This action cannot be undone.
+                                        </li>
+                                    </ul>
+                                </>
+                            ),
+                            size: 'lg',
+                            confirmText: "Yes, Confirm",
+                            onConfirm: () => {
+                                handleConfirmationBooking(row);
+                            },
+                        });
+                        setShowConfirm(true);
+                    },
+                });
 
-            actions.push({
-                label: () => (
-                    <span className="text-danger" title="Cancel this booking">
-                        <i className="bi bi-x-circle" />
-                    </span>
-                ),
-                onClick: () => {
-                    setModalData({
-                        title: "Cancel Booking",
-                        message: (
-                            <>
-                                <p>Are you sure you want to cancel this booking?</p>
-                                <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                    <li className="refund-note mb-2">
-                                        <i className="bi bi-currency-rupee me-1"></i>
-                                        The full amount of ₹{row.bookingDetails.total} will be refunded.
-                                    </li>
-                                    <li className="notification-note mb-2">
-                                        <i className="bi bi-bell me-1"></i>
-                                        The user will also be notified about this cancellation.
-                                    </li>
-                                    <li className="rating-note mb-2">
-                                        <i className="bi bi-star me-1"></i>
-                                        Cancelling may affect your host rating.
-                                    </li>
-                                    <li className="warning-note">
-                                        <i className="bi bi-exclamation-triangle me-1"></i>
-                                        This action cannot be undone.
-                                    </li>
-                                </ul>
-                            </>
-                        ),
-                        size: 'lg',
-                        confirmText: "Yes, cancel",
-                        onConfirm: () => handleCancelBooking(row),
-                    });
-                    setShowConfirm(true);
-                },
-            });
+                actions.push({
+                    label: () => (
+                        <span className="text-danger" title="Cancel this booking">
+                            <i className="bi bi-x-circle" />
+                        </span>
+                    ),
+                    onClick: () => {
+                        setModalData({
+                            title: "Cancel Booking",
+                            message: (
+                                <>
+                                    <p>Are you sure you want to cancel this booking?</p>
+                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
+                                        <li className="refund-note mb-2">
+                                            <i className="bi bi-currency-rupee me-1"></i>
+                                            The full amount of ₹{row.bookingDetails.total} will be refunded.
+                                        </li>
+                                        <li className="notification-note mb-2">
+                                            <i className="bi bi-bell me-1"></i>
+                                            The user will also be notified about this cancellation.
+                                        </li>
+                                        <li className="rating-note mb-2">
+                                            <i className="bi bi-star me-1"></i>
+                                            Cancelling may affect your host rating.
+                                        </li>
+                                        <li className="warning-note">
+                                            <i className="bi bi-exclamation-triangle me-1"></i>
+                                            This action cannot be undone.
+                                        </li>
+                                    </ul>
+                                </>
+                            ),
+                            size: 'lg',
+                            confirmText: "Yes, cancel",
+                            onConfirm: () => handleCancelBooking(row),
+                        });
+                        setShowConfirm(true);
+                    },
+                });
+
+                break;
+            case BillingStatus.CONFIRMED:
+                actions.push({
+                    label: () => (
+                        <span className="text-primary" title="Mark as Check-in">
+                            <i className="bi bi-box-arrow-in-right" />
+                        </span>
+                    ),
+                    onClick: () => {
+                        setModalData({
+                            title: "Mark as Check-in",
+                            message: (
+                                <>
+                                    <p>Are you sure you want to mark this booking as checked in?</p>
+                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
+                                        <li className="warning-note">
+                                            <i className="bi bi-exclamation-triangle me-1"></i>
+                                            This action cannot be undone.
+                                        </li>
+                                    </ul>
+                                </>
+                            ),
+                            size: "lg",
+                            confirmText: "Yes, Check-in",
+                            onConfirm: () => handleBookingStatus(row, BillingStatus.CHECK_IN),
+                        });
+                        setShowConfirm(true);
+                    },
+                });
+                break;
+
+            case BillingStatus.CHECK_IN:
+                actions.push({
+                    label: () => (
+                        <span className="text-warning" title="Mark as Check-out">
+                            <i className="bi bi-box-arrow-right" />
+                        </span>
+                    ),
+                    onClick: () => {
+                        setModalData({
+                            title: "Mark as Check-out",
+                            message: (
+                                <>
+                                    <p>Are you sure you want to mark this booking as checked out?</p>
+                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
+                                        <li className="warning-note">
+                                            <i className="bi bi-exclamation-triangle me-1"></i>
+                                            This action cannot be undone.
+                                        </li>
+                                    </ul>
+                                </>
+                            ),
+                            size: "lg",
+                            confirmText: "Yes, Check-out",
+                            onConfirm: () => handleBookingStatus(row, BillingStatus.CHECK_OUT),
+                        });
+                        setShowConfirm(true);
+                    },
+                });
+                break;
         }
 
         return actions;
@@ -227,7 +289,7 @@ const HostBooking = () => {
 
 
     // --- Fetch Rooms ---
-    const fetchRooms = useCallback(async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             const { data } = await api.get("/api/booking", {
                 skip: filters.page,
@@ -265,8 +327,8 @@ const HostBooking = () => {
     }, [filters]);
 
     useEffect(() => {
-        fetchRooms();
-    }, [fetchRooms]);
+        fetchBookings();
+    }, [fetchBookings]);
 
     const searchRooms = debounce((value) => {
         setFilters(prev => ({ ...prev, searchKey: value, page: 1 }));
@@ -288,7 +350,7 @@ const HostBooking = () => {
             if (data.status) {
                 toast.success(data.message);
                 setShowConfirm(false);
-                fetchRooms();
+                fetchBookings();
             }
         } catch (error) {
             handleCatch(error);
@@ -301,8 +363,22 @@ const HostBooking = () => {
             if (data.status) {
                 toast.success(data.message);
                 setShowConfirm(false);
-                fetchRooms();
+                fetchBookings();
             }
+        } catch (error) {
+            handleCatch(error);
+        }
+    }
+
+    const handleBookingStatus = async (row, status) => {
+        try {
+            const { data } = await api.put("/api/booking/status", { billingId: row.billingId, status: status });
+            if (data.status) {
+                toast.success(data.message);
+                setShowConfirm(false);
+                fetchBookings();
+            }
+
         } catch (error) {
             handleCatch(error);
         }

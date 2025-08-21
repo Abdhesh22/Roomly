@@ -3,12 +3,13 @@ import HostBooking from "../components/Host/Booking.jsx";
 import RoomList from "../components/Host/RoomList.jsx";
 import CreateEditRoom from "../components/Host/CreateEditRoom.jsx";
 import Room from "../components/common/Room/Room.jsx";
+import { USER_TYPE } from "../utils/constants/user-type.constant.js";
 
 const hostRoutes = [
     {
         index: true,
         path: "/host/rooms",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.HOST}>
             <RoomList />
         </ProtectedRoute>,
         isSideNav: true,
@@ -16,7 +17,7 @@ const hostRoutes = [
     },
     {
         path: "/host/bookings",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.HOST}>
             <HostBooking />
         </ProtectedRoute>,
         isSideNav: true,
@@ -24,7 +25,7 @@ const hostRoutes = [
     },
     {
         path: "/host/rooms/add",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.HOST}>
             <CreateEditRoom />
         </ProtectedRoute>,
         isSideNav: true,
@@ -32,7 +33,7 @@ const hostRoutes = [
     },
     {
         path: "/host/rooms/edit/:roomId",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.HOST}>
             <CreateEditRoom />
         </ProtectedRoute>,
         isSideNav: true,
@@ -40,7 +41,7 @@ const hostRoutes = [
     },
     {
         path: "/host/rooms/view/:roomId",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.HOST}>
             <Room showReservation={false} />
         </ProtectedRoute>,
         isSideNav: true,

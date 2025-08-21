@@ -1,4 +1,4 @@
-module.exports.BillingStatus = {
+const BillingStatus = {
     PAYMENT_IN_PROGRESS: 1,
     PAYMENT_DONE: 2,
     COMPLETE: 3,
@@ -8,7 +8,6 @@ module.exports.BillingStatus = {
     // Full refund
     REFUND_INITIATED: 8,
     REFUND_COMPLETE: 9,
-    EXPIRED: 10,
     REFUND_BY_HOST_INITIATED: 13,
     REFUND_BY_HOST_COMPLETE: 14,
     REFUND_BY_USER_INITIATED: 15,
@@ -20,28 +19,48 @@ module.exports.BillingStatus = {
     REFUND_PARTIAL_BY_USER_INITIATED: 19,
     REFUND_PARTIAL_BY_USER_COMPLETE: 20,
 
-    // Booking Cancelled by without refund
+    // Booking cancelled without refund
     BOOKING_CANCELLED: 21,
 
+    // Refund in-progress
     REFUND_BY_HOST_PROCEDDED: 22,
     REFUND_PARTIAL_BY_USER_PROCEDDED: 23,
-    REFUND_BY_USER_PROCEDDED: 24
+    REFUND_BY_USER_PROCEDDED: 24,
+    CHECK_IN: 25,
+    CHECK_OUT: 26,
 
+    EXPIRED: 10
 };
 
 
-module.exports.RefundStatus = {
+const RefundStatus = {
     FULL_REFUND: 1,
     PARTIAL_REFUND: 2,
     NO_REFUND: 3,
     HOST_REFUND_FULL_REFUND: 4
 }
 
-module.exports.orderStatusOptions = {
+const orderStatusOptions = {
     ALL: 'all',
     PAYMENT_IN_PROGRESS: "payment_progress",
     PAYMENT_DONE: "payment_done",
     CONFIRMED: "confirmed",
     REFUND: "refund",
-    COMPLETE: 'complete'
+    CHECK_IN: 'check_in',
+    CHECK_OUT: 'check_out',
+    NO_REFUND: "no_refund"
+}
+
+
+const BillingStatusLabels = {
+    [BillingStatus.CHECK_IN]: "Checked In",
+    [BillingStatus.CHECK_OUT]: "Checked Out"
+}
+
+
+module.exports = {
+    BillingStatus,
+    orderStatusOptions,
+    BillingStatusLabels,
+    RefundStatus
 }

@@ -84,7 +84,7 @@ const UserBooking = () => {
                         <i className="bi bi-eye me-1" />
                     </span>
                 ),
-                onClick: () => navigate(`/host/rooms/view/${row.roomId}`),
+                onClick: () => navigate(`/user/rooms/view/${row.roomId}`),
             },
             {
                 label: () => (

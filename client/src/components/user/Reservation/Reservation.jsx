@@ -32,7 +32,7 @@ const Reservation = () => {
         hostId: room.hostId
       }
 
-      const { data } = await api.post(`/api/rooms/${roomId}/booking`, payload);
+      const { data } = await api.post(`/api/booking`, payload);
       if (data.status) {
         toast.success(data.message);
       }
@@ -82,10 +82,16 @@ const Reservation = () => {
   }
 
   const handleCheckout = async () => {
-    const { data } = await api.post(`/api/booking/checkout/`, { roomId: roomId, hostId: room.hostId, billing: { ...billing } });
-    if (data.status) {
-      openRazorpay(data);
+    try {
+      const { data } = await api.post(`/api/booking/checkout`, { roomId: roomId, hostId: room.hostId, billing: { ...billing } });
+      if (data.status) {
+        openRazorpay(data);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+      handleCatch(error);
     }
+
   }
 
   const onChangeTripDetail = (detail) => {

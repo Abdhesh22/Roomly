@@ -25,14 +25,18 @@ class RazorPayService {
 
 
     createOrder = async (amount, customerId, currency) => {
-        const options = {
-            amount: Math.round(parseFloat(amount) * 100),
-            currency: currency,
-            receipt: this.#generateReceipt(),
-            customer_id: customerId,
-            payment_capture: 1
-        };
-        return await this.#razorpayInstance.orders.create(options);
+        try {
+            const options = {
+                amount: Math.round(parseFloat(amount) * 100),
+                currency: currency,
+                receipt: this.#generateReceipt(),
+                customer_id: customerId,
+                payment_capture: 1
+            };
+            return await this.#razorpayInstance.orders.create(options);
+        } catch (error) {
+            throw error;
+        }
     }
 
     refundPayment = async (paymentId, { amount, reason }) => {

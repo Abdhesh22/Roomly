@@ -159,27 +159,34 @@ class BookingDAO extends BaseDAO {
 
     #fetchStatusCondition = (status) => {
         switch (status) {
-            case "payment_progress":
+
+            case orderStatusOptions.PAYMENT_IN_PROGRESS:
                 return { $in: [BillingStatus.PAYMENT_IN_PROGRESS] };
 
-            case "payment_done":
-                return { $in: [BillingStatus.COMPLETE, BillingStatus.CONFIRMED] };
-            // Adjust depending on how you define "done"
-
-            case "complete":
-                return { $in: [BillingStatus.COMPLETE] };
-
-            case "confirmed":
+            case orderStatusOptions.PAYMENT_DONE:
                 return { $in: [BillingStatus.CONFIRMED] };
 
-            case "refund":
+            case orderStatusOptions.CHECK_OUT:
+                return { $in: [BillingStatus.CHECK_OUT] };
+
+            case orderStatusOptions.CHECK_IN:
+                return { $in: [BillingStatus.CHECK_IN] };
+
+            case orderStatusOptions.REFUND:
                 return {
                     $nin: [
                         BillingStatus.CONFIRMED,
-                        BillingStatus.COMPLETE,
-                        BillingStatus.PAYMENT_IN_PROGRESS,
+                        BillingStatus.CHECK_IN,
+                        BillingStatus.CHECK_OUT,
+                        BillingStatus.PAYMENT_DONE,
+                        BillingStatus.BOOKING_CANCELLED,
+                        BillingStatus.PAYMENT_IN_PROGRESS
                     ],
                 };
+            case orderStatusOptions.NO_REFUND:
+                return {
+                    $in: [BillingStatus.BOOKING_CANCELLED]
+                }
             default:
                 return {};
         }

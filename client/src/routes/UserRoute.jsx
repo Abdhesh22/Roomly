@@ -4,6 +4,7 @@ import Reservation from "../components/user/Reservation/Reservation.jsx";
 import NotFound from "../components/Navigation/NotFound/NotFound.jsx";
 import UserBooking from "../components/user/Booking/Booking.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import { USER_TYPE } from "../utils/constants/user-type.constant.js";
 
 const userRoutes = [
     { index: true, element: <Home />, isSideNav: false, isHeader: true },
@@ -11,8 +12,16 @@ const userRoutes = [
     { path: "reservation/:roomId", element: <Reservation />, isSideNav: false, isHeader: true },
     {
         path: "/user/booking",
-        element: <ProtectedRoute>
+        element: <ProtectedRoute userType={USER_TYPE.USER}>
             <UserBooking />
+        </ProtectedRoute>,
+        isSideNav: false,
+        isHeader: true
+    },
+    {
+        path: "/user/rooms/view/:roomId",
+        element: <ProtectedRoute userType={USER_TYPE.USER}>
+            <Room showReservation={false} />
         </ProtectedRoute>,
         isSideNav: false,
         isHeader: true

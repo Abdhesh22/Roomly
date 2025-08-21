@@ -30,6 +30,7 @@ class AuthenticationMiddleware {
             req.user = user;
             next();
         } catch (error) {
+            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Invalid token", error: error.message });
         }
     };

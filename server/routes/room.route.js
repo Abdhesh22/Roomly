@@ -5,7 +5,6 @@ const MulterMiddleware = require("../middleware/multer.middleware");
 const RoomController = require("../controller/room/room.controller");
 
 router.post('/', AuthenticationMiddleware.verify, MulterMiddleware.multiple('images'), RoomController.create);
-router.post("/:roomId/booking", AuthenticationMiddleware.verify, RoomController.book);
 router.get('/', AuthenticationMiddleware.verify, RoomController.hostRoomList);
 router.get('/detail/:roomId', RoomController.getRoomDetails);
 router.get('/grid', RoomController.userRoomGrid);

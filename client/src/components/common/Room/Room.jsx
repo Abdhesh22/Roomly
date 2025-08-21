@@ -1,44 +1,43 @@
 import "../../../assets/style/Room.css";
 import { useNavigate, useParams } from "react-router-dom";
-import Amenities from "./Amenities/Amenities";
 import { useEffect, useState } from "react";
-import { handleCatch } from "../../../utils/common";
+import { fetchAmenities, handleCatch } from "../../../utils/common";
 import api from "../../../utils/request/api.util";
 import CustomLocationPicker from "../CustomComponent/CustomLocationPicker/CustomLocationPicker";
+import Amenities from "../Room/Amenities/Amenities";
 
 const Room = ({ showReservation }) => {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [room, setRoom] = useState({});
+  let amenitiesList = [];
 
   const fetchRoom = async () => {
     try {
+
       const res = await api.get(`/api/rooms/detail/${roomId}`);
-
-
-      const amenitiesList = [
-        { value: "wifi", title: "Wi-Fi", iconClass: "bi bi-wifi", description: "Stay connected with high-speed internet." },
-        { value: "ac", title: "Air Conditioning", iconClass: "bi bi-wind", description: "Beat the heat with A/C and ceiling fan." },
-        { value: "pool", title: "Swimming Pool", iconClass: "bi bi-water", description: "Relax and refresh in the pool." },
-        { value: "kitchen", title: "Kitchen", iconClass: "bi bi-cup-straw", description: "Cook your meals with ease." },
-        { value: "tv", title: "TV", iconClass: "bi bi-tv", description: "Enjoy your favorite shows and movies." },
-        { value: "parking", title: "Parking", iconClass: "bi bi-car-front-fill", description: "Secure parking available on-site." },
-        { value: "gym", title: "Gym", iconClass: "bi bi-heart-pulse", description: "Stay fit with our modern gym." }]
-
-
       if (res.data.status) {
+
+        const selectAmenities = res.data.room.amenities;
+        amenitiesList = amenitiesList.filter(item => selectAmenities.includes(item.value));
         res.data.room.amenities = amenitiesList;
+
         setRoom(res.data.room);
       }
+
     } catch (error) {
       handleCatch(error);
     }
   };
 
   const handleNavigate = (route) => navigate(route);
-
+  const run = async () => {
+    const list = await fetchAmenities();
+    amenitiesList = list;
+    await fetchRoom();
+  };
   useEffect(() => {
-    fetchRoom();
+    run();
   }, [roomId]);
 
   const getRoomOccupancy = () => {
@@ -71,8 +70,6 @@ const Room = ({ showReservation }) => {
         </>
         )}
       </div>
-
-
 
       {/* Image Gallery */}
       {room.attachments?.length > 0 ? (
@@ -132,7 +129,7 @@ const Room = ({ showReservation }) => {
           </div>
 
           {/* Amenities */}
-          {room?.amenities?.length > 0 && <Amenities list={room.amenities} />}
+          {room?.amenities?.length > 0 && <Amenities list={room?.amenities} />}
         </div>
 
         <div className="col-md-6">

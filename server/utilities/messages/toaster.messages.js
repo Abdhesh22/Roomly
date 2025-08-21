@@ -1,3 +1,5 @@
+const { BillingStatusLabels } = require("../constants/order-status.constant");
+
 const common = {
     SEND: "has been sent successfully",
 };
@@ -20,5 +22,9 @@ module.exports.toaster = {
     ROOM_ACTIVE: "Room is now active and available for booking.",
     ROOM_MAINTENANCE: "Room has been marked as under maintenance.",
     ROOM_CONFIRMED: (title, tenantName) => { return `Room "${title}" has been confirmed and an email has been sent to ${tenantName}.` },
-    ROOM_CANCELLED: (title, tenantName) => { return `Room "${title}" has been cancelled and an email has been sent to ${tenantName}.` }
+    ROOM_CANCELLED: (title, tenantName) => { return `Room "${title}" has been cancelled and an email has been sent to ${tenantName}.` },
+    BOOKING_STATUS: (status) => {
+        return `Booking status has been updated to "${BillingStatusLabels[status] || "Unknown"}".`;
+    }
+
 };

@@ -624,6 +624,88 @@ class EmailTemplate {
         break;
       }
 
+      // ======================
+      // TENANT EMAIL TEMPLATE
+      // ======================
+
+      case EMAIL_TEMPLATE.BOOKING_PAYMENT_RECEIVED_TENANT: {
+        const order = options.order;
+        const tenant = order.tenant[0];
+        const host = order.host[0];
+        const room = order.room[0];
+        const d = order.bookingDetails;
+
+        const checkin = await dateTimeService.getFormmatedTime(d.checkin);
+        const checkout = await dateTimeService.getFormmatedTime(d.checkout);
+
+        html = `
+            <div style="font-family: Arial, sans-serif; max-width:720px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">
+              <div style="background:#007bff; color:#fff; padding:20px; text-align:center;">
+                <h2 style="margin:0;">Payment Received Successfully</h2>
+              </div>
+
+              <div style="padding:20px;">
+                <p>Hello <strong>${tenant.firstName} ${tenant.lastName}</strong>,</p>
+                <p>We’ve received your payment of <strong>₹${d.total.toFixed(2)}</strong> for your booking at <strong>${room.title}</strong>.</p>
+                <p>Your booking confirmation will be processed shortly by the host <strong>${host.firstName} ${host.lastName}</strong>. We’ll inform you once it’s confirmed.</p>
+
+                <h3 style="margin:20px 0 8px; color:#333;">Booking Details</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                  <tbody>
+                    <tr><td style="padding:8px; border-bottom:1px solid #eee;">Order ID</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${order.receipt}</td></tr>
+                    <tr><td style="padding:8px; border-bottom:1px solid #eee;">Check-in</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkin}</td></tr>
+                    <tr><td style="padding:8px; border-bottom:1px solid #eee;">Check-out</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkout}</td></tr>
+                  </tbody>
+                </table>
+
+                <p style="margin-top:12px; color:#666; font-size:13px;">We’ll notify you once the host confirms your booking. Thank you for choosing our platform!</p>
+              </div>
+            </div>`;
+        break;
+      }
+
+
+      // ======================
+      // HOST EMAIL TEMPLATE
+      // ======================
+      case EMAIL_TEMPLATE.NEW_BOOKING_HOST: {
+        const order = options.order;
+        const tenant = order.tenant[0];
+        const host = order.host[0];
+        const room = order.room[0];
+        const d = order.bookingDetails;
+
+        const checkin = await dateTimeService.getFormmatedTime(d.checkin);
+        const checkout = await dateTimeService.getFormmatedTime(d.checkout);
+
+        html = `
+          <div style="font-family: Arial, sans-serif; max-width:720px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">
+            <div style="background:#28a745; color:#fff; padding:20px; text-align:center;">
+              <h2 style="margin:0;">New Booking Received</h2>
+            </div>
+
+            <div style="padding:20px;">
+              <p>Hello <strong>${host.firstName} ${host.lastName}</strong>,</p>
+              <p>You’ve received a new booking request from <strong>${tenant.firstName} ${tenant.lastName}</strong> for your property <strong>${room.title}</strong>.</p>
+
+              <h3 style="margin:20px 0 8px; color:#333;">Booking Details</h3>
+              <table style="width:100%; border-collapse:collapse;">
+                <tbody>
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Order ID</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${order.receipt}</td></tr>
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Guest</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${tenant.firstName} ${tenant.lastName}</td></tr>
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Check-in</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkin}</td></tr>
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Check-out</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">${checkout}</td></tr>
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Amount Paid</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${d.total.toFixed(2)}</td></tr>
+                </tbody>
+              </table>
+
+              <p style="margin-top:12px; color:#666; font-size:13px;">Please review and confirm the booking at your earliest convenience. The guest will be notified once you confirm.</p>
+            </div>
+          </div>`;
+        break;
+      }
+
+
 
       default:
         throw new Error("Please Select a valid type")
@@ -660,6 +742,10 @@ class EmailTemplate {
         return `Booking Cancelled by You: ${param.title} – Partial Refund Initiated | Roomly`;
       case EMAIL_TEMPLATE.BOOKING_CANCELLED_BY_USER_NO:
         return `Booking Cancelled by You: ${param.title} – No Refund Applicable | Roomly`;
+      case EMAIL_TEMPLATE.BOOKING_PAYMENT_RECEIVED_TENANT:
+        return `Payment Successful: ${param.title} – Awaiting Host Confirmation | Roomly`;
+      case EMAIL_TEMPLATE.NEW_BOOKING_HOST:
+        return `New Booking Received: ${param.title} – Action Required | Roomly`;
       default:
         break;
     }

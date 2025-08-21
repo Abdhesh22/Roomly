@@ -3,6 +3,22 @@ const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
 
 class BookingController {
+
+    book = async (req, res) => {
+        try {
+
+            const { bookingId, paymentId } = req.body;
+
+            const billingService = new BillingService();
+            await billingService.book({ bookingId, paymentId });
+
+            return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_SUCCESS });
+        } catch (error) {
+            console.log(error);
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
+        }
+    }
+
     getHostBooking = async (req, res) => {
         try {
 
@@ -90,8 +106,22 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status: true, isEmailExist: false, order, customer, user });
         } catch (error) {
-            console.log("error:", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true });
+        }
+    }
+
+    updateStatus = async (req, res) => {
+        try {
+
+            const { billingId, status } = req.body;
+
+            const billingService = new BillingService();
+            await billingService.updateStatus({ billingId, status });
+
+            return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_STATUS(status) });
+
+        } catch (error) {
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
 }

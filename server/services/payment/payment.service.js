@@ -83,12 +83,18 @@ class PaymentService {
             });
 
         } catch (error) {
+            console.log("error: ", error);
             throw error;
         }
     }
 
     createOrder = async (razorpayCustomer, { bookingDetails }) => {
-        return await this.#razorpayService.createOrder(bookingDetails.total, razorpayCustomer.customerId, "INR");
+        try {
+            return await this.#razorpayService.createOrder(bookingDetails.total, razorpayCustomer.customerId, "INR");
+        } catch (error) {
+            console.log("error: ", error);
+            throw error;
+        }
     }
 
     refundPayment = async (paymentId, { amount, receipt }) => {
