@@ -5,7 +5,7 @@ import api from "../../utils/request/api.util";
 import { debounce, handleCatch } from "../../utils/common";
 import CustomConfirmationModal from "../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
-
+import BackButton from "../common/CustomComponent/BackButton";
 const RoomList = () => {
 
     const navigate = useNavigate();
@@ -152,11 +152,17 @@ const RoomList = () => {
     return (
         <>
             <div className="container">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h1 className="mb-0">Rooms</h1>
-                    <button className="btn btn-primary" onClick={handleAddRoom}>
-                        <i className="bi bi-house-add me-2"></i> Add Room
-                    </button>
+                <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                    {/* Left side: Title */}
+                    <h2 className="mb-0">Rooms</h2>
+
+                    {/* Right side: Back + Reservation buttons */}
+                    <div className="d-flex align-items-center gap-2">
+                        <BackButton />
+                        <button className="btn btn-primary" onClick={handleAddRoom}>
+                            <i className="bi bi-house-add me-2"></i> Add Room
+                        </button>
+                    </div>
                 </div>
 
                 <div className="d-flex justify-content-end mb-4">

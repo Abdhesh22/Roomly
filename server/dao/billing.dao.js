@@ -3,7 +3,7 @@ const dbConnection = require("../connection/db.connection.js");
 const BaseDAO = require("./base.dao.js");
 const getSchema = require(path.join(__dirname, "..", "model", "billing.model.js"));
 const mongoose = require("mongoose");
-const { orderStatusOptions, BillingStatus } = require("../utilities/constants/order-status.constant.js");
+const { orderStatusOptions, BillingStatus } = require("../utilities/constants/booking-status.constant.js");
 const { ObjectId } = mongoose.Types;
 class BookingDAO extends BaseDAO {
     constructor(mongoose) {
@@ -52,11 +52,50 @@ class BookingDAO extends BaseDAO {
             };
         }
 
+
+        const sortOrder = params.order === "asc" ? 1 : -1;
+        const sortPipeline = [];
+
+        switch (params.sortKey) {
+            case "tenantName":
+                sortPipeline.push({
+                    $sort: { "tenant.firstName": sortOrder, "tenant.lastName": sortOrder }
+                });
+                break;
+            case "title":
+                sortPipeline.push({
+                    $sort: { "room.title": sortOrder }
+                });
+                break;
+            case "statusLabel":
+                sortPipeline.push({
+                    $sort: { status: sortOrder }
+                });
+                break;
+            case "totalBilling":
+                sortPipeline.push({
+                    $sort: { "bookingDetails.total": sortOrder }
+                });
+                break;
+            case "city":
+                sortPipeline.push({
+                    $sort: { "room.location.city": sortOrder }
+                });
+                break;
+            case "pincode":
+                sortPipeline.push({
+                    $sort: { "room.location.pincode": sortOrder }
+                });
+                break;
+            default:
+                sortPipeline.push({
+                    $sort: { createdOn: sortOrder }
+                });
+                break;
+        }
+
         return await this.model.aggregate([
-            {
-                $match: matchCondtion
-            },
-            ...pagination,
+            { $match: matchCondtion },
             {
                 $lookup: {
                     from: "users",
@@ -68,6 +107,7 @@ class BookingDAO extends BaseDAO {
                     as: "tenant"
                 }
             },
+            { $unwind: "$tenant" },
             {
                 $lookup: {
                     from: "rooms",
@@ -79,11 +119,10 @@ class BookingDAO extends BaseDAO {
                     as: "room"
                 }
             },
-            {
-                $match: {
-                    $expr: { $gt: [{ $size: "$room" }, 0] }
-                }
-            },
+            { $match: { $expr: { $gt: [{ $size: "$room" }, 0] } } },
+            { $unwind: "$room" },
+            ...sortPipeline,
+            ...pagination,
             {
                 $project: {
                     _id: 1,
@@ -96,13 +135,9 @@ class BookingDAO extends BaseDAO {
                     receipt: 1,
                     timeline: 1
                 }
-            },
-            {
-                $sort: {
-                    createdAt: -1
-                }
             }
         ]);
+
     }
 
 
@@ -164,8 +199,9 @@ class BookingDAO extends BaseDAO {
                 return { $in: [BillingStatus.PAYMENT_IN_PROGRESS] };
 
             case orderStatusOptions.PAYMENT_DONE:
+                return { $in: [BillingStatus.PAYMENT_DONE] };
+            case orderStatusOptions.CONFIRMED:
                 return { $in: [BillingStatus.CONFIRMED] };
-
             case orderStatusOptions.CHECK_OUT:
                 return { $in: [BillingStatus.CHECK_OUT] };
 
@@ -197,6 +233,40 @@ class BookingDAO extends BaseDAO {
 
         let matchCondtion = {
             userId: params.userId,
+        }
+
+        const sortPipeline = [];
+        const sortOrder = params.order === "asc" ? 1 : -1;
+        switch (params.sortKey) {
+            case "title":
+                sortPipeline.push({
+                    $sort: { "room.title": sortOrder }
+                });
+                break;
+            case "totalBilling":
+                sortPipeline.push({
+                    $sort: { "bookingDetails.total": sortOrder }
+                });
+                break;
+            case "city":
+                sortPipeline.push({
+                    $sort: { "room.location.city": sortOrder }
+                });
+                break;
+            case "pincode":
+                sortPipeline.push({
+                    $sort: { "room.location.pincode": sortOrder }
+                });
+                break;
+            case "statusLabel":
+                sortPipeline.push({
+                    $sort: { status: sortOrder }
+                })
+            default:
+                sortPipeline.push({
+                    $sort: { createdOn: sortOrder }
+                });
+                break;
         }
 
         if (params.status != orderStatusOptions.ALL) {
@@ -232,7 +302,6 @@ class BookingDAO extends BaseDAO {
             {
                 $match: matchCondtion
             },
-            ...pagination,
             {
                 $lookup: {
                     from: "rooms",
@@ -249,6 +318,9 @@ class BookingDAO extends BaseDAO {
                     $expr: { $gt: [{ $size: "$room" }, 0] }
                 }
             },
+            { $unwind: "$room" },
+            ...sortPipeline,
+            ...pagination,
             {
                 $project: {
                     _id: 1,
@@ -260,11 +332,6 @@ class BookingDAO extends BaseDAO {
                     status: 1,
                     receipt: 1,
                     timeline: 1
-                }
-            },
-            {
-                $sort: {
-                    createdAt: -1
                 }
             }
         ]);
@@ -371,7 +438,9 @@ class BookingDAO extends BaseDAO {
                     receipt: 1,
                     paymentId: 1,
                     host: 1,
-                    room: 1
+                    room: 1,
+                    roomId: 1,
+                    status: 1,
                 }
             }
         ]);

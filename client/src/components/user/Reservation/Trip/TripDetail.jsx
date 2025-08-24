@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import CustomDatePicker from "../../../common/CustomComponent/CustomDatePicker/CustomDatePicker";
+import { addMonthsToNow } from "../../../../utils/common";
+import { isWithinInterval } from "date-fns";
 
-const TripDetail = ({ onChange, occupancy }) => {
+const TripDetail = ({ onChange, occupancy, excludeDates, resetTrip }) => {
 
     const [checkin, setCheckin] = useState(null);
     const [checkout, setCheckout] = useState(null);
@@ -10,6 +12,11 @@ const TripDetail = ({ onChange, occupancy }) => {
     const [infants, setInfants] = useState(0);
     const [pets, setPets] = useState(0);
     const [totalGuests, setTotalGuests] = useState(1);
+    const [maxDate, setMaxDate] = useState(null);
+
+    const getMaxDate = async () => {
+        setMaxDate(await addMonthsToNow(6));
+    }
 
     useEffect(() => {
         setTotalGuests(adults + teens);
@@ -26,9 +33,32 @@ const TripDetail = ({ onChange, occupancy }) => {
         });
     }, [adults, teens, infants, pets, checkin, checkout]);
 
+    useEffect(() => {
+        getMaxDate();
+    }, [])
+
+    useEffect(() => {
+        if (resetTrip) {
+            setCheckin(null);
+            setCheckout(null);
+        }
+    }, [resetTrip]);
+
+    useEffect(() => {
+        if (checkin && checkout && excludeDates?.length) {
+            // Check if any excluded interval lies between checkin & checkout
+            const invalid = excludeDates.some(({ start, end }) =>
+                isWithinInterval(start, { start: checkin, end: checkout }) ||
+                isWithinInterval(end, { start: checkin, end: checkout })
+            );
+            if (invalid) {
+                setCheckout(checkin);
+            }
+        }
+    }, [checkin, checkout, excludeDates]);
+
     return (
         <div className="p-4">
-            <h2 className="mb-4 fw-bold">Trip Information and Payment</h2>
             <p className="mb-4 text-muted">
                 <span className="color-red">Note: </span> Please review and complete your trip details before proceeding to payment.
                 This includes selecting your check-in and check-out dates, and specifying
@@ -42,8 +72,10 @@ const TripDetail = ({ onChange, occupancy }) => {
                     <CustomDatePicker
                         selectedDate={checkin}
                         onChange={setCheckin}
+                        minDate={new Date()}
                         className="form-control"
-                        maxDate={checkout}
+                        maxDate={checkout || maxDate}
+                        excludeDateIntervals={excludeDates}
                         placeholder="Select check-in date"
                     />
                 </div>
@@ -53,7 +85,9 @@ const TripDetail = ({ onChange, occupancy }) => {
                         selectedDate={checkout}
                         onChange={setCheckout}
                         className="form-control"
-                        minDate={checkin}
+                        minDate={checkin || new Date()}
+                        maxDate={maxDate}
+                        excludeDateIntervals={excludeDates}
                         placeholder="Select check-out date"
                     />
                 </div>

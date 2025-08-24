@@ -10,6 +10,5 @@ router.post("/cancel-by-host", AuthenticationMiddleware.verify, BookingControlle
 router.post("/cancel-by-user", AuthenticationMiddleware.verify, BookingController.cancelByUser);
 router.get("/user-booking", AuthenticationMiddleware.verify, BookingController.bookingForUser);
 router.post("/checkout", AuthenticationMiddleware.verify, BookingController.checkout);
-router.put("/status", AuthenticationMiddleware.verify, BookingController.updateStatus);
 
 module.exports = router;

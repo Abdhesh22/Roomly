@@ -1,4 +1,4 @@
-const { addMinutes: addMinutesToDate, format } = require("date-fns");
+const { addMinutes: addMinutesToDate, format, setHours, parseISO, setMinutes, setMilliseconds, setSeconds } = require("date-fns");
 
 class DateTimeService {
   getCurrentTime() {
@@ -20,6 +20,24 @@ class DateTimeService {
 
   getFormmatedTime(dateTime) {
     return format(new Date(dateTime), "yyyy-MM-dd HH:mm:ss");
+  }
+
+  async convertToDate(date) {
+    return await parseISO(date);
+  }
+
+  async setFixedTime(dateStr, hour, minute = 0) {
+    let date = await parseISO(dateStr);
+    date = await setHours(date, hour);
+    date = await setMinutes(date, minute);
+    date = await setSeconds(date, 0);
+    date = await setMilliseconds(date, 0);
+    return awaitformat(date, "yyyy-MM-dd HH:mm:ss");
+  }
+
+  async subtractDays(date, noOfDays) {
+    date = await parseISO(date);
+    return await subDays(date, noOfDays);
   }
 
 }

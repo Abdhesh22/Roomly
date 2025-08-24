@@ -5,9 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
 
 /* === General Body & Text === */
-html, body {
+html, body, #root {
   height: 100%;
-  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 :root {
@@ -535,4 +536,61 @@ pre, code {
 
 .btn-gradient:active {
   transform: scale(0.98);
+}
+
+/* Icon wrapper (circle but very subtle) */
+.amenity-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 90, 95, 0.08); /* subtle primary tint */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Icon color */
+.amenity-icon {
+  color: var(--primary); /* Airbnb style primary color */
+}
+
+/* Label */
+.amenity-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Hover effect for row */
+.amenity-item:hover {
+  transform: translateX(4px);
+  transition: transform 0.2s ease;
+}
+.border-gradient {
+  border: 0;
+  height: 2px; /* line thickness */
+  background: linear-gradient(to right, var(--primary),var(--primary),var(--primary));
+  border-radius: 2px;
+}
+
+.profile-dropdown {
+  min-width: 200px; /* fix width */
+  padding: 0.5rem 0;
+}
+
+
+.profile-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.2s;
+}
+
+.profile-dropdown .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.fs-7 {
+  font-size: 0.75rem !important; /* 12px */
 }

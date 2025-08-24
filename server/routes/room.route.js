@@ -10,5 +10,6 @@ router.get('/detail/:roomId', RoomController.getRoomDetails);
 router.get('/grid', RoomController.userRoomGrid);
 router.delete("/:roomId/status/:status", AuthenticationMiddleware.verify, RoomController.updateStatus);
 router.put("/:roomId", AuthenticationMiddleware.verify, MulterMiddleware.multiple('images'), RoomController.update);
+router.get("/block-ranges/:roomId", RoomController.blockRanges);
 
 module.exports = router;

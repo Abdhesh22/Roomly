@@ -5,7 +5,7 @@ const RefundDAO = require("../../dao/refund.dao");
 const EmailTemplate = require("../../helper/email-template.helper");
 const EmailService = require("../email/email.service");
 const { EMAIL_TEMPLATE } = require("../../utilities/constants/email-template.constant");
-const { BillingStatus, RefundStatus } = require("../../utilities/constants/order-status.constant");
+const { BillingStatus, RefundStatus } = require("../../utilities/constants/booking-status.constant");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 

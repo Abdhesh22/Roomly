@@ -5,7 +5,6 @@ module.exports = (mongoose) => {
         {
             refundId: {
                 type: String,
-                required: true,
                 index: true,
             },
             bookingId: {

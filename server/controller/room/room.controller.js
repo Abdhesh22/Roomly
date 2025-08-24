@@ -15,6 +15,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, message: toaster.ROOM_CREATED });
         } catch (error) {
+            console.log(error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -86,6 +87,21 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, list });
         } catch (error) {
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
+        }
+    }
+
+    blockRanges = async (req, res) => {
+        try {
+
+            const { roomId } = req.params;
+
+            const roomService = new RoomService();
+            const ranges = await roomService.blockRanges(roomId);
+
+            return res.status(httpStatus.OK).json({ status: true, ranges });
+        } catch (error) {
+            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }

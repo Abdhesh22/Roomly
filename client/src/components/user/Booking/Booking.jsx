@@ -10,7 +10,8 @@ import { BillingStatusLabels, BillingStatus, orderStatusOptions, statusConfig } 
 import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
 import { format, subDays, isBefore, isEqual } from 'date-fns';
 import BillingBreakdown from "./BillingBreakDown";
-// --- Filters Component ---
+import BackButton from "../../common/CustomComponent/BackButton";
+
 const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => (
     < div className="d-flex justify-content-end align-items-end mb-4 gap-3 flex-wrap" >
         < div className="d-flex flex-column w-100 w-md-50" >
@@ -150,163 +151,163 @@ const UserBooking = () => {
         ];
 
 
-        if (row.status === BillingStatus.PAYMENT_DONE) {
 
-            const checkinDate = new Date(row.bookingDetails.checkin);
+        switch (row.status) {
+            case BillingStatus.PAYMENT_DONE:
+                const checkinDate = new Date(row.bookingDetails.checkin);
 
-            const freeCancelDate = subDays(checkinDate, 5);
-            const partialRefundDate = subDays(checkinDate, 4);
+                const freeCancelDate = subDays(checkinDate, 5);
+                const partialRefundDate = subDays(checkinDate, 4);
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
 
-            let refundMessage = null;
-            let refundStatus = 0;
+                let refundMessage = null;
+                let refundStatus = 0;
 
-            // --- Refund Policy Handling ---
-            if (isBefore(today, freeCancelDate) || isEqual(today, freeCancelDate)) {
-                // ✅ Full Refund
-                const refund = row.bookingDetails.total; // full amount refunded
+                // --- Refund Policy Handling ---
+                if (isBefore(today, freeCancelDate) || isEqual(today, freeCancelDate)) {
+                    // ✅ Full Refund
+                    const refund = row.bookingDetails.total; // full amount refunded
 
-                refundMessage = (
-                    <li className="refund-note mb-2 p-3 border rounded bg-light">
-                        <div className="fw-bold text-success mb-1">
-                            <i className="bi bi-check-circle me-1"></i>
-                            Full Refund Policy
-                        </div>
-                        <BillingBreakdown bookingDetails={row.bookingDetails} />
-                        <div className="mt-2 small">
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Refunded Amount</span>
-                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                    refundMessage = (
+                        <li className="refund-note mb-2 p-3 border rounded bg-light">
+                            <div className="fw-bold text-success mb-1">
+                                <i className="bi bi-check-circle me-1"></i>
+                                Full Refund Policy
                             </div>
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Charged Amount</span>
-                                <span className="fw-bold text-danger">₹0.00</span>
+                            <BillingBreakdown bookingDetails={row.bookingDetails} />
+                            <div className="mt-2 small">
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Refunded Amount</span>
+                                    <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Charged Amount</span>
+                                    <span className="fw-bold text-danger">₹0.00</span>
+                                </div>
                             </div>
-                        </div>
-                        <small className="text-muted d-block mt-1">
-                            Free cancellation valid until {format(freeCancelDate, "d MMM")}.
-                        </small>
-                    </li>
-                );
+                            <small className="text-muted d-block mt-1">
+                                Free cancellation valid until {format(freeCancelDate, "d MMM")}.
+                            </small>
+                        </li>
+                    );
 
-                refundStatus = 1;
-            }
-            else if (isBefore(today, partialRefundDate) || isEqual(today, partialRefundDate)) {
-                // ✅ Partial Refund
-                const firstNightCharge =
-                    row.bookingDetails.basePrice +
-                    (row.bookingDetails.extraAdultRate * row.bookingDetails.extraAdultCount) +
-                    (row.bookingDetails.childRate * row.bookingDetails.childCount) +
-                    (row.bookingDetails.petRate * row.bookingDetails.petCount);
+                    refundStatus = 1;
+                }
+                else if (isBefore(today, partialRefundDate) || isEqual(today, partialRefundDate)) {
+                    // ✅ Partial Refund
+                    const firstNightCharge =
+                        row.bookingDetails.basePrice +
+                        (row.bookingDetails.extraAdultRate * row.bookingDetails.extraAdultCount) +
+                        (row.bookingDetails.teenRate * row.bookingDetails.teenCount) +
+                        (row.bookingDetails.petRate * row.bookingDetails.petCount);
 
-                const refund = row.bookingDetails.total - firstNightCharge;
-                const charged = firstNightCharge;
+                    const refund = row.bookingDetails.total - firstNightCharge;
+                    const charged = firstNightCharge;
 
-                refundMessage = (
-                    <li className="refund-note mb-2 p-3 border rounded bg-light">
-                        <div className="fw-bold text-warning mb-1">
-                            <i className="bi bi-exclamation-circle me-1"></i>
-                            Partial Refund Policy
-                        </div>
-                        <BillingBreakdown
-                            bookingDetails={row.bookingDetails}
-                            highlight={{ base: true, extraAdults: true, children: true, pets: true }}
-                        />
-                        <div className="mt-2 small">
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Refunded Amount</span>
-                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                    refundMessage = (
+                        <li className="refund-note mb-2 p-3 border rounded bg-light">
+                            <div className="fw-bold text-warning mb-1">
+                                <i className="bi bi-exclamation-circle me-1"></i>
+                                Partial Refund Policy
                             </div>
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Charged Amount</span>
-                                <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                            <BillingBreakdown
+                                bookingDetails={row.bookingDetails}
+                                highlight={{ base: true, extraAdults: true, teens: true, pets: true }}
+                            />
+                            <div className="mt-2 small">
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Refunded Amount</span>
+                                    <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Charged Amount</span>
+                                    <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                                </div>
                             </div>
-                        </div>
-                        <p className="text-danger small mt-2">
-                            Charged: 1st night stay (base + guests).
-                            Refund includes cleaning fee, service fee, GST, and remaining nights.
-                        </p>
-                        <small className="text-muted d-block mt-1">
-                            Partial refund valid until {format(partialRefundDate, "d MMM")}.
-                        </small>
-                    </li>
-                );
+                            <p className="text-danger small mt-2">
+                                Charged: 1st night stay (base + guests).
+                                Refund includes cleaning fee, service fee, GST, and remaining nights.
+                            </p>
+                            <small className="text-muted d-block mt-1">
+                                Partial refund valid until {format(partialRefundDate, "d MMM")}.
+                            </small>
+                        </li>
+                    );
 
-                refundStatus = 2;
-            }
-            // ❌ No Refund (after partialRefundDate)
-            else {
-                const charged = row.bookingDetails.total;
-                const refund = 0;
+                    refundStatus = 2;
+                }
+                // ❌ No Refund (after partialRefundDate)
+                else {
+                    const charged = row.bookingDetails.total;
+                    const refund = 0;
 
-                refundMessage = (
-                    <li className="refund-note mb-2 p-3 border rounded bg-light">
-                        <div className="fw-bold text-danger mb-1">
-                            <i className="bi bi-x-circle me-1"></i>
-                            No Refund Policy
-                        </div>
-                        <BillingBreakdown bookingDetails={row.bookingDetails} />
-                        <div className="mt-2 small">
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Refunded Amount</span>
-                                <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                    refundMessage = (
+                        <li className="refund-note mb-2 p-3 border rounded bg-light">
+                            <div className="fw-bold text-danger mb-1">
+                                <i className="bi bi-x-circle me-1"></i>
+                                No Refund Policy
                             </div>
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Charged Amount</span>
-                                <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                            <BillingBreakdown bookingDetails={row.bookingDetails} />
+                            <div className="mt-2 small">
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Refunded Amount</span>
+                                    <span className="fw-bold text-success">₹{refund.toFixed(2)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Charged Amount</span>
+                                    <span className="fw-bold text-danger">₹{charged.toFixed(2)}</span>
+                                </div>
                             </div>
-                        </div>
-                        <p className="text-danger small mt-2">
-                            No refund applicable — full amount charged.
-                        </p>
-                    </li>
-                );
+                            <p className="text-danger small mt-2">
+                                No refund applicable — full amount charged.
+                            </p>
+                        </li>
+                    );
 
-                refundStatus = 3;
-            }
+                    refundStatus = 3;
+                }
 
+                actions.push({
+                    label: () => (
+                        <span className="text-danger" title="Cancel this booking">
+                            <i className="bi bi-x-circle" />
+                        </span>
+                    ),
+                    onClick: () => {
+                        setModalData({
+                            title: "Cancel Booking",
+                            message: (
+                                <>
+                                    <p>Are you sure you want to cancel your booking?</p>
+                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
+                                        {refundMessage}
+                                        <li className="warning-note">
+                                            <i className="bi bi-exclamation-triangle me-1"></i>
+                                            This action cannot be undone.
+                                        </li>
+                                    </ul>
+                                </>
+                            ),
+                            size: "lg",
+                            confirmText: "Yes, cancel my booking",
+                            onConfirm: () => handleCancelBooking(row, refundStatus),
+                        });
+                        setShowConfirm(true);
+                    },
+                });
+                break;
 
-
-
-
-            actions.push({
-                label: () => (
-                    <span className="text-danger" title="Cancel this booking">
-                        <i className="bi bi-x-circle" />
-                    </span>
-                ),
-                onClick: () => {
-                    setModalData({
-                        title: "Cancel Booking",
-                        message: (
-                            <>
-                                <p>Are you sure you want to cancel your booking?</p>
-                                <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                    {refundMessage}
-                                    <li className="warning-note">
-                                        <i className="bi bi-exclamation-triangle me-1"></i>
-                                        This action cannot be undone.
-                                    </li>
-                                </ul>
-                            </>
-                        ),
-                        size: "lg",
-                        confirmText: "Yes, cancel my booking",
-                        onConfirm: () => handleCancelBooking(row, refundStatus),
-                    });
-                    setShowConfirm(true);
-                },
-            });
         }
+
 
         return actions;
     }, [navigate]);
 
 
     // --- Fetch Rooms ---
-    const fetchRooms = useCallback(async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             const { data } = await api.get("/api/booking/user-booking", {
                 skip: filters.page,
@@ -322,18 +323,15 @@ const UserBooking = () => {
                 receipt: receipt || '--',
                 bookingDetails,
                 totalBilling: bookingDetails.total,
-                title: room[0].title,
+                title: room.title,
                 hostId,
                 timeline: timeline,
                 status,
                 statusLabel: BillingStatusLabels[status],
-                city: room[0].location.city,
-                roomId: room[0]._id,
-                pincode: room[0].location.pincode
+                city: room.location.city,
+                roomId: room._id,
+                pincode: room.location.pincode
             }));
-
-
-            console.log("data.list: ", data.list);
 
             if (data.status) {
                 setTotal(data.total || list.length);
@@ -345,8 +343,8 @@ const UserBooking = () => {
     }, [filters]);
 
     useEffect(() => {
-        fetchRooms();
-    }, [fetchRooms]);
+        fetchBookings();
+    }, [fetchBookings]);
 
     const searchRooms = debounce((value) => {
         setFilters(prev => ({ ...prev, searchKey: value, page: 1 }));
@@ -367,9 +365,11 @@ const UserBooking = () => {
             const { data } = await api.post("/api/booking/cancel-by-user", { billingId: row.billingId, refundStatus });
             if (data.status) {
                 toast.success(data.message);
-                setShowConfirm(false);
-                fetchRooms();
+            } else {
+                toast.error(data.message);
             }
+            setShowConfirm(false);
+            fetchBookings();
         } catch (error) {
             handleCatch(error);
         }
@@ -378,9 +378,13 @@ const UserBooking = () => {
     return (
         <>
             <div className="container">
-                {/* Title */}
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h1 className="fw-bold mb-0">Bookings</h1>
+                <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                    {/* Left side: Title */}
+                    <h2 className="mb-0">Trips</h2>
+                    {/* Right side: Back + Reservation buttons */}
+                    <div className="d-flex align-items-center gap-2">
+                        <BackButton />
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -452,10 +456,6 @@ const UserBooking = () => {
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <th>Base Charge</th>
-                                            <td>₹{bookingDetails.baseCharge}</td>
-                                        </tr>
                                         {bookingDetails.extraAdultCount > 0 && (
                                             <tr>
                                                 <th>
@@ -464,12 +464,12 @@ const UserBooking = () => {
                                                 <td>₹{bookingDetails.extraAdultCharge}</td>
                                             </tr>
                                         )}
-                                        {bookingDetails.childCount > 0 && (
+                                        {bookingDetails.teenCount > 0 && (
                                             <tr>
                                                 <th>
-                                                    Children ({bookingDetails.childCount} × ₹{bookingDetails.childRate})
+                                                    Teens ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
                                                 </th>
-                                                <td>₹{bookingDetails.childCharge}</td>
+                                                <td>₹{bookingDetails.teenCharge}</td>
                                             </tr>
                                         )}
                                         {bookingDetails.petCount > 0 && (

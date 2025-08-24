@@ -1,7 +1,7 @@
 const RoomDao = require("../dao/room.dao");
 const { toaster } = require("../utilities/messages/toaster.messages");
 const FileSystemService = require("./file-system/file-system.service");
-
+const RoomBlockRangeDAO = require("../dao/room-block-range.dao");
 
 class RoomService {
 
@@ -10,7 +10,7 @@ class RoomService {
      */
 
     #buildRoom = (hostId, data, attachments) => {
-
+        console.log(":data: ", data.type);
         const state = JSON.parse(data.state);
         const city = JSON.parse(data.city);
         const amenities = JSON.parse(data.amenities);
@@ -33,14 +33,18 @@ class RoomService {
             price: {
                 base: price.base,
                 guest: price.guest,
-                pet: price.pet
+                pet: price.pet,
+                cleaning: price.cleaning,
+                teens: price.teens
             },
             occupancy: {
                 guest: occupancy.guest,
                 bed: occupancy.bed,
                 bath: occupancy.bath,
                 bedRoom: occupancy.bedRoom,
-                pet: occupancy.pet
+                pet: occupancy.pet,
+                teens: occupancy.teens,
+                infants: occupancy.infants
             },
             amenities: amenities && amenities.length ? amenities.map(item => item.value) : [],
             attachments
@@ -186,6 +190,16 @@ class RoomService {
             return list;
         } catch (error) {
             throw error
+        }
+    }
+
+    blockRanges = async (roomId) => {
+        try {
+            const roomBlockRangeDao = await RoomBlockRangeDAO.init();
+            const roomBlockRanges = await roomBlockRangeDao.findOne({ roomId: roomId });
+            return roomBlockRanges ? roomBlockRanges?.ranges : [];
+        } catch (error) {
+            throw error;
         }
     }
 

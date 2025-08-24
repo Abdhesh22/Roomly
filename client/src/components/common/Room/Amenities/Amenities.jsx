@@ -1,21 +1,24 @@
 import { useState } from "react";
 import CustomConfirmationModal from "../../CustomComponent/CustomModal/ConfirmationModal";
 
+// List.jsx
 const List = ({ list, count }) => {
   return (
     <div className="container py-3">
       <div className="row">
         {list.slice(0, count).map((item, index) => (
           <div
-            className="col-md-6 mb-4 d-flex align-items-start"
+            className="col-md-6 mb-3 d-flex align-items-start amenity-item"
             key={index}
           >
-            <div className="me-3 d-flex justify-content-center align-items-center bg-light rounded-circle shadow-sm"
-              style={{ width: "48px", height: "48px" }}>
-              <i className={`${item.icon} fs-5 text-primary`}></i>
+            {/* Icon */}
+            <div className="me-3 d-flex justify-content-center align-items-center amenity-icon-wrapper">
+              <i className={`${item.icon} fs-5 amenity-icon`}></i>
             </div>
+
+            {/* Text */}
             <div>
-              <h6 className="mb-1 fw-semibold">{item.label}</h6>
+              <h6 className="mb-1 amenity-label">{item.label}</h6>
               <p className="text-muted small mb-0">{item.tagline}</p>
             </div>
           </div>
@@ -24,6 +27,7 @@ const List = ({ list, count }) => {
     </div>
   );
 };
+
 
 const Amenities = ({ list }) => {
   const [showModal, setShowModal] = useState(false);

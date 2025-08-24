@@ -40,13 +40,18 @@ module.exports = (mongoose) => {
                 base: { type: String, required: true },
                 guest: { type: String, required: true },
                 pet: { type: String, required: true },
+                cleaning: { type: String, required: true },
+                teens: { type: String, required: true }
             },
             occupancy: {
                 guest: { type: Number, required: true },
                 bed: { type: Number, required: true },
                 pet: { type: Number, required: true },
                 bath: { type: Number, required: true },
-                bedRoom: { type: Number, required: true }
+                bedRoom: { type: Number, required: true },
+                pet: { type: Number, required: true },
+                teens: { type: Number, required: true },
+                infants: { type: Number, required: true }
             },
             amenities: {
                 type: [String],

@@ -9,6 +9,7 @@ import MiniCustomModal from "../common/CustomComponent/CustomModal/MiniCustomMod
 import { BillingStatusLabels, BillingStatus, orderStatusOptions, statusConfig } from "../../utils/constants/orders.constant";
 import CustomMultiSelect from "../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
 import { format } from 'date-fns';
+import BackButton from "../common/CustomComponent/BackButton";
 
 // --- Filters Component ---
 const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => (
@@ -223,65 +224,6 @@ const HostBooking = () => {
                 });
 
                 break;
-            case BillingStatus.CONFIRMED:
-                actions.push({
-                    label: () => (
-                        <span className="text-primary" title="Mark as Check-in">
-                            <i className="bi bi-box-arrow-in-right" />
-                        </span>
-                    ),
-                    onClick: () => {
-                        setModalData({
-                            title: "Mark as Check-in",
-                            message: (
-                                <>
-                                    <p>Are you sure you want to mark this booking as checked in?</p>
-                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                        <li className="warning-note">
-                                            <i className="bi bi-exclamation-triangle me-1"></i>
-                                            This action cannot be undone.
-                                        </li>
-                                    </ul>
-                                </>
-                            ),
-                            size: "lg",
-                            confirmText: "Yes, Check-in",
-                            onConfirm: () => handleBookingStatus(row, BillingStatus.CHECK_IN),
-                        });
-                        setShowConfirm(true);
-                    },
-                });
-                break;
-
-            case BillingStatus.CHECK_IN:
-                actions.push({
-                    label: () => (
-                        <span className="text-warning" title="Mark as Check-out">
-                            <i className="bi bi-box-arrow-right" />
-                        </span>
-                    ),
-                    onClick: () => {
-                        setModalData({
-                            title: "Mark as Check-out",
-                            message: (
-                                <>
-                                    <p>Are you sure you want to mark this booking as checked out?</p>
-                                    <ul className="modal-notes list-unstyled ps-0 mt-3">
-                                        <li className="warning-note">
-                                            <i className="bi bi-exclamation-triangle me-1"></i>
-                                            This action cannot be undone.
-                                        </li>
-                                    </ul>
-                                </>
-                            ),
-                            size: "lg",
-                            confirmText: "Yes, Check-out",
-                            onConfirm: () => handleBookingStatus(row, BillingStatus.CHECK_OUT),
-                        });
-                        setShowConfirm(true);
-                    },
-                });
-                break;
         }
 
         return actions;
@@ -300,25 +242,26 @@ const HostBooking = () => {
                 status: filters.status.value,
             });
 
+            console.log("data: ", data);
             const list = data.list.map(({ _id, bookingDetails, room, tenant, hostId, status, receipt, timeline }) => ({
                 billingId: _id,
-                userId: tenant[0]._id,
+                userId: tenant._id,
                 receipt: receipt || '--',
                 bookingDetails,
                 totalBilling: bookingDetails.total,
-                title: room[0].title,
+                title: room.title,
                 hostId,
                 status,
                 timeline,
                 statusLabel: BillingStatusLabels[status],
-                city: room[0].location.city,
-                roomId: room[0]._id,
-                pincode: room[0].location.pincode,
-                tenantName: `${tenant[0].firstName} ${tenant[0].lastName}`,
+                city: room.location.city,
+                roomId: room._id,
+                pincode: room.location.pincode,
+                tenantName: `${tenant.firstName} ${tenant.lastName}`,
             }));
 
             if (data.status) {
-                setTotal(data.total || list.length);
+                setTotal(data.length || list.length);
                 setRooms(list);
             }
         } catch (error) {
@@ -349,9 +292,11 @@ const HostBooking = () => {
             const { data } = await api.post("/api/booking/confirm", { billingId: row.billingId, title: row.title, userId: row.userId, tenantName: row.tenantName });
             if (data.status) {
                 toast.success(data.message);
-                setShowConfirm(false);
-                fetchBookings();
+            } else {
+                toast.error(data.message);
             }
+            setShowConfirm(false);
+            fetchBookings();
         } catch (error) {
             handleCatch(error);
         }
@@ -362,23 +307,12 @@ const HostBooking = () => {
             const { data } = await api.post("/api/booking/cancel-by-host", { billingId: row.billingId, title: row.title, userId: row.userId, tenantName: row.tenantName });
             if (data.status) {
                 toast.success(data.message);
-                setShowConfirm(false);
-                fetchBookings();
-            }
-        } catch (error) {
-            handleCatch(error);
-        }
-    }
-
-    const handleBookingStatus = async (row, status) => {
-        try {
-            const { data } = await api.put("/api/booking/status", { billingId: row.billingId, status: status });
-            if (data.status) {
-                toast.success(data.message);
-                setShowConfirm(false);
-                fetchBookings();
+            } else {
+                toast.error(data.message);
             }
 
+            setShowConfirm(false);
+            fetchBookings();
         } catch (error) {
             handleCatch(error);
         }
@@ -388,8 +322,13 @@ const HostBooking = () => {
         <>
             <div className="container">
                 {/* Title */}
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h1 className="fw-bold mb-0">Bookings</h1>
+                <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                    {/* Left side: Title */}
+                    <h2 className="mb-0">Reservations</h2>
+                    {/* Right side: Back + Reservation buttons */}
+                    <div className="d-flex align-items-center gap-2">
+                        <BackButton />
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -453,17 +392,13 @@ const HostBooking = () => {
                                             <td>{bookingDetails.nights}</td>
                                         </tr>
                                         <tr>
-                                            <th>Base Price (2 Guests including Tenant)</th>
+                                            <th>Base Price</th>
                                             <td>
                                                 ₹{bookingDetails.basePrice}
                                                 <span className="text-muted ms-2">
                                                     (1 tenant + 1 guest)
                                                 </span>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Base Charge</th>
-                                            <td>₹{bookingDetails.baseCharge}</td>
                                         </tr>
                                         {bookingDetails.extraAdultCount > 0 && (
                                             <tr>
@@ -473,12 +408,12 @@ const HostBooking = () => {
                                                 <td>₹{bookingDetails.extraAdultCharge}</td>
                                             </tr>
                                         )}
-                                        {bookingDetails.childCount > 0 && (
+                                        {bookingDetails.teenCount > 0 && (
                                             <tr>
                                                 <th>
-                                                    Children ({bookingDetails.childCount} × ₹{bookingDetails.childRate})
+                                                    Teen ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
                                                 </th>
-                                                <td>₹{bookingDetails.childCharge}</td>
+                                                <td>₹{bookingDetails.teenCharge}</td>
                                             </tr>
                                         )}
                                         {bookingDetails.petCount > 0 && (

@@ -80,31 +80,31 @@ class EmailTemplate {
                 </tr>
                 <tr>
                   <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Base Price</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.basePrice}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.basePrice?.toFixed(2)}</td>
                 </tr>
                 ${details.extraAdultCount > 0 ? `<tr>
                   <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Extra Adults (${details.extraAdultCount} × ₹${details.extraAdultRate})</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.extraAdultCharge}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.extraAdultCharge?.toFixed(2)}</td>
                 </tr>` : ''}
-                ${details.childCount > 0 ? `<tr>
-                  <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Children (${details.childCount} × ₹${details.childRate})</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.childCharge}</td>
+                ${details.teenCount > 0 ? `<tr>
+                  <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Teens (${details.teenCount} × ₹${details.teenRate?.toFixed(2)})</th>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.teenCharge?.toFixed(2)}</td>
                 </tr>` : ''}
                 ${details.petCount > 0 ? `<tr>
-                  <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Pets (${details.petCount} × ₹${details.petRate})</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.petCharge}</td>
+                  <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Pets (${details.petCount} × ₹${details.petRate?.toFixed(2)})</th>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.petCharge?.toFixed(2)}</td>
                 </tr>` : ''}
                 <tr>
                   <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Cleaning Fee</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.cleaningFee}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.cleaningFee?.toFixed(2)}</td>
                 </tr>
                 <tr>
                   <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">Service Charge</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.serviceCharge}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.serviceCharge?.toFixed(2)}</td>
                 </tr>
                 <tr>
                   <th style="text-align:left; padding: 10px; border-bottom: 1px solid #ddd;">GST (${details.gstRate * 100}%)</th>
-                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.gst}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${details.gst?.toFixed(2)}</td>
                 </tr>
                 <tr style="background-color: #d9534f; color: #fff; font-weight:bold;">
                   <th style="text-align:left; padding: 10px;">Total</th>
@@ -213,10 +213,10 @@ class EmailTemplate {
               <h3 style="margin:20px 0 8px; color:#333;">What you paid</h3>
               <table style="width:100%; border-collapse:collapse;">
                 <tbody>
-                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Base rate (₹${d.basePrice} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.baseCharge || 0).toFixed(2)}</td></tr>
-                  ${d.extraAdultCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Extra adults (${d.extraAdultCount} × ₹${d.extraAdultRate} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.extraAdultCharge || 0).toFixed(2)}</td></tr>` : ``}
-                  ${d.childCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Children (${d.childCount} × ₹${d.childRate} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.childCharge || 0).toFixed(2)}</td></tr>` : ``}
-                  ${d.petCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Pets (${d.petCount} × ₹${d.petRate} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.petCharge || 0).toFixed(2)}</td></tr>` : ``}
+                  <tr><td style="padding:8px; border-bottom:1px solid #eee;">Base rate (₹${d.basePrice?.toFixed(2)} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.baseCharge || 0).toFixed(2)}</td></tr>
+                  ${d.extraAdultCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Extra adults (${d.extraAdultCount} × ₹${d.extraAdultRate?.toFixed(2)} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.extraAdultCharge?.toFixed(2) || 0).toFixed(2)}</td></tr>` : ``}
+                  ${d.teenCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Teens (${d.teenCount} × ₹${d.teenRate?.toFixed(2)} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.teenCharge || 0).toFixed(2)}</td></tr>` : ``}
+                  ${d.petCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Pets (${d.petCount} × ₹${d.petRate?.toFixed(2)} × ${d.nights} nights)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.petCharge || 0).toFixed(2)}</td></tr>` : ``}
                   ${d.cleaningFee > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Cleaning fee</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.cleaningFee || 0).toFixed(2)}</td></tr>` : ``}
                   ${d.serviceCharge > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Service fee (${(d.serviceRate * 100).toFixed(0)}%)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.serviceCharge || 0).toFixed(2)}</td></tr>` : ``}
                   <tr><td style="padding:8px; border-bottom:1px solid #eee;">GST (${(d.gstRate * 100).toFixed(0)}%)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${(d.gst || 0).toFixed(2)}</td></tr>
@@ -264,21 +264,21 @@ class EmailTemplate {
         // 1st-night components
         const firstNightBase = d.basePrice || 0;
         const firstNightExtraAdults = (d.extraAdultRate || 0) * (d.extraAdultCount || 0);
-        const firstNightChildren = (d.childRate || 0) * (d.childCount || 0);
+        const firstNightTeen = (d.teenRate || 0) * (d.teenCount || 0);
         const firstNightPets = (d.petRate || 0) * (d.petCount || 0);
-        const firstNightCharge = firstNightBase + firstNightExtraAdults + firstNightChildren + firstNightPets;
+        const firstNightCharge = firstNightBase + firstNightExtraAdults + firstNightTeen + firstNightPets;
 
         // Remaining nights (refunded)
         const remainingBase = Math.max((d.baseCharge || 0) - firstNightBase, 0);
         const remainingExtraAdults = Math.max((d.extraAdultCharge || 0) - firstNightExtraAdults, 0);
-        const remainingChildren = Math.max((d.childCharge || 0) - firstNightChildren, 0);
+        const remainingTeen = Math.max((d.teenCount || 0) - firstNightTeen, 0);
         const remainingPets = Math.max((d.petCharge || 0) - firstNightPets, 0);
 
         const refundedCleaning = d.cleaningFee || 0;
         const refundedService = d.serviceCharge || 0;
         const refundedGST = d.gst || 0;
 
-        const refundAmount = remainingBase + remainingExtraAdults + remainingChildren + remainingPets + refundedCleaning + refundedService + refundedGST;
+        const refundAmount = remainingBase + remainingExtraAdults + remainingTeen + remainingPets + refundedCleaning + refundedService + refundedGST;
 
         html = `
           <div style="font-family: Arial, sans-serif; max-width: 720px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">
@@ -295,7 +295,7 @@ class EmailTemplate {
                 <tbody>
                   <tr><td style="padding:8px; border-bottom:1px solid #eee;">Base rate (1 night)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${firstNightBase.toFixed(2)}</td></tr>
                   ${d.extraAdultCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Extra adults (${d.extraAdultCount} × ₹${d.extraAdultRate})</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${firstNightExtraAdults.toFixed(2)}</td></tr>` : ``}
-                  ${d.childCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Children (${d.childCount} × ₹${d.childRate})</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${firstNightChildren.toFixed(2)}</td></tr>` : ``}
+                  ${d.teenCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Teens (${d.teenCount} × ₹${d.teenRate})</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${firstNightTeen.toFixed(2)}</td></tr>` : ``}
                   ${d.petCount > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Pets (${d.petCount} × ₹${d.petRate})</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${firstNightPets.toFixed(2)}</td></tr>` : ``}
                   <tr style="font-weight:bold;"><td style="padding:8px;">Total deduction (kept)</td><td style="padding:8px; text-align:right;">₹${firstNightCharge.toFixed(2)}</td></tr>
                 </tbody>
@@ -306,7 +306,7 @@ class EmailTemplate {
                 <tbody>
                   ${remainingBase > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Remaining nights – base</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingBase.toFixed(2)}</td></tr>` : ``}
                   ${remainingExtraAdults > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Remaining nights – extra adults</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingExtraAdults.toFixed(2)}</td></tr>` : ``}
-                  ${remainingChildren > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Remaining nights – children</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingChildren.toFixed(2)}</td></tr>` : ``}
+                  ${remainingTeen > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Remaining nights – Teens</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingTeen.toFixed(2)}</td></tr>` : ``}
                   ${remainingPets > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Remaining nights – pets</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingPets.toFixed(2)}</td></tr>` : ``}
                   ${refundedCleaning > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Cleaning fee</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${refundedCleaning.toFixed(2)}</td></tr>` : ``}
                   ${refundedService > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">Service fee (${(d.serviceRate * 100).toFixed(0)}%)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${refundedService.toFixed(2)}</td></tr>` : ``}
@@ -442,20 +442,20 @@ class EmailTemplate {
         // 1st-night components (kept by host per policy)
         const firstNightBase = d.basePrice || 0;
         const firstNightExtraAdults = (d.extraAdultRate || 0) * (d.extraAdultCount || 0);
-        const firstNightChildren = (d.childRate || 0) * (d.childCount || 0);
+        const firstNightTeen = (d.teenRate || 0) * (d.teenCount || 0);
         const firstNightPets = (d.petRate || 0) * (d.petCount || 0);
-        const firstNightCharge = firstNightBase + firstNightExtraAdults + firstNightChildren + firstNightPets;
+        const firstNightCharge = firstNightBase + firstNightExtraAdults + firstNightTeen + firstNightPets;
 
         // Remaining nights + fees refunded to guest
         const remainingBase = Math.max((d.baseCharge || 0) - firstNightBase, 0);
         const remainingExtraAdults = Math.max((d.extraAdultCharge || 0) - firstNightExtraAdults, 0);
-        const remainingChildren = Math.max((d.childCharge || 0) - firstNightChildren, 0);
+        const remainingTeen = Math.max((d.teenCharge || 0) - firstNightTeen, 0);
         const remainingPets = Math.max((d.petCharge || 0) - firstNightPets, 0);
 
         const refundedCleaning = d.cleaningFee || 0;
         const refundedService = d.serviceCharge || 0;
         const refundedGST = d.gst || 0;
-        const refundAmount = remainingBase + remainingExtraAdults + remainingChildren + remainingPets + refundedCleaning + refundedService + refundedGST;
+        const refundAmount = remainingBase + remainingExtraAdults + remainingTeen + remainingPets + refundedCleaning + refundedService + refundedGST;
 
         // Host payout (pre-fees) = first night kept; platform fees/taxes handled separately by payout system
         const expectedHostPayoutPreFees = firstNightCharge;
@@ -480,7 +480,7 @@ class EmailTemplate {
                   <tr style="background:#fff7e0;"><td style="padding:8px;">Refund breakdown</td><td style="padding:8px; text-align:right;"></td></tr>
                   ${remainingBase > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Remaining nights – base</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingBase.toFixed(2)}</td></tr>` : ``}
                   ${remainingExtraAdults > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Remaining nights – extra adults</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingExtraAdults.toFixed(2)}</td></tr>` : ``}
-                  ${remainingChildren > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Remaining nights – children</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingChildren.toFixed(2)}</td></tr>` : ``}
+                  ${remainingTeen > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Remaining nights – teens</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingTeen.toFixed(2)}</td></tr>` : ``}
                   ${remainingPets > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Remaining nights – pets</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${remainingPets.toFixed(2)}</td></tr>` : ``}
                   ${refundedCleaning > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Cleaning fee</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${refundedCleaning.toFixed(2)}</td></tr>` : ``}
                   ${refundedService > 0 ? `<tr><td style="padding:8px; border-bottom:1px solid #eee;">• Service fee (${(d.serviceRate * 100).toFixed(0)}%)</td><td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">₹${refundedService.toFixed(2)}</td></tr>` : ``}
@@ -520,7 +520,7 @@ class EmailTemplate {
 
         // Expected host payout (pre-fees) excludes service fee and GST
         const expectedHostPayoutPreFees =
-          (d.baseCharge || 0) + (d.extraAdultCharge || 0) + (d.childCharge || 0) + (d.petCharge || 0) + (d.cleaningFee || 0);
+          (d.baseCharge || 0) + (d.extraAdultCharge || 0) + (d.teenCharge || 0) + (d.petCharge || 0) + (d.cleaningFee || 0);
 
         html = `
 <div style="font-family: Arial, sans-serif; max-width:720px; margin:auto; border:1px solid #eee; border-radius:8px; overflow:hidden;">

@@ -5,8 +5,8 @@ const BillingBreakdown = ({ bookingDetails, highlight }) => {
         baseCharge,
         extraAdultCount,
         extraAdultCharge,
-        childCount,
-        childCharge,
+        teenCount,
+        teenCharge,
         petCount,
         petCharge,
         infantsNum,
@@ -38,11 +38,11 @@ const BillingBreakdown = ({ bookingDetails, highlight }) => {
                 </div>
             )}
 
-            {childCount > 0 && (
+            {teenCount > 0 && (
                 <div className="d-flex justify-content-between small mt-1">
-                    <span className="text-muted">Children</span>
-                    <span className={highlight?.children ? "fw-bold text-danger" : ""}>
-                        ₹{childCharge.toLocaleString()}
+                    <span className="text-muted">Teens</span>
+                    <span className={highlight?.teens ? "fw-bold text-danger" : ""}>
+                        ₹{teenCharge.toLocaleString()}
                     </span>
                 </div>
             )}

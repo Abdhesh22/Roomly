@@ -89,10 +89,8 @@ class AuthenticationController {
       const userService = new UserService();
 
       const { token, status, message, httpStatus, user } = await userService.login({ email, password, userType });
-      console.log("user: ", user);
       return res.status(httpStatus).json({ status: status, message: message, token, user: user, userType });
     } catch (error) {
-      console.error("Error in registerUser:", error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"

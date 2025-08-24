@@ -1,37 +1,27 @@
-import { useContext } from "react";
-import { AuthContext } from "../authentication/AuthContext";
-import { Outlet, useMatches } from "react-router-dom";
-import TopNavigation from "../Navigation/TopNavigation/TopNavigation";
+import { Outlet } from "react-router-dom";
+import TopNavigation from "./TopNavigation/TopNavigation";
 import Footer from "./Footer/Footer";
 
 const Layout = () => {
-
-  const { isLoggedIn } = useContext(AuthContext);
-  const matches = useMatches();
-
-  const currentPath = matches[matches.length - 1]?.handle;
-
-  const mainContentClass = [
-    "col-12",
-    "p-3",
-    "h-100",
-    "overflow-auto",
-  ].join(" ");
-
   return (
-    <>
-      <TopNavigation />
-      <div className={`main-layout d-flex flex-column h-78vh`}>
-        <div className="container-fluid flex-grow-1">
-          <div className="row h-100">
-            <div className={mainContentClass}>
-              <Outlet />
-            </div>
-          </div>
+    <div className="d-flex flex-column vh-100">
+      {/* Header - fixed */}
+      <header className="flex-shrink-0">
+        <TopNavigation />
+      </header>
+
+      {/* Scrollable main content */}
+      <main className="flex-grow-1 overflow-auto">
+        <div className="container py-4">
+          <Outlet />
         </div>
-      </div>
-      <Footer />
-    </>
+      </main>
+
+      {/* Footer - fixed */}
+      <footer className="flex-shrink-0">
+        <Footer />
+      </footer>
+    </div>
   );
 };
 

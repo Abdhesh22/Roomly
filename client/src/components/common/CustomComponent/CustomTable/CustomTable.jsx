@@ -100,8 +100,8 @@ const CustomTable = ({
                             return (
                                 <tr key={rowIndex} className="hover:bg-gray-50">
                                     {columns.map((col) => (
-                                        <td key={col.accessor} className="border px-4 py-2">
-                                            {row[col.accessor]}
+                                        <td key={col.accessor} className="border px-4 py-0 fs-7">
+                                            {row[col.accessor] && row[col.accessor].length > 15 ? row[col.accessor].slice(0, 15) + "..." : row[col.accessor]}
                                         </td>
                                     ))}
                                     {rowActions && rowActions.length > 0 && (

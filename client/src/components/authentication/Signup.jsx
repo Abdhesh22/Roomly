@@ -1,41 +1,46 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../utils/request/api.util";
-import CustomModal from "../common/CustomComponent/CustomModal/CustomModal";
 import OTPModal from "./Otp";
 import { toast } from 'react-toastify';
 import { handleCatch } from "../../utils/common";
+import MiniCustomModal from "../common/CustomComponent/CustomModal/MiniCustomModal";
 
 const SignUp = ({ showModal, onClose, userType }) => {
-  const [showOtp, setShowOtp] = useState(false);
+  const [optModal, setOtpModal] = useState({
+    open: false,
+    email: ''
+  });
 
   const { register, handleSubmit, formState: { errors }, getValues, watch, setValue, reset } = useForm();
 
-  const onSubmit = async (payload) => {
+  const onSubmit = async (data) => {
     try {
-      const { data } = await api.post("/api/authentication/send-otp", payload);
-      if (data.status) {
-        onClose();
-        toast.success(data.message);
-        setShowOtp(true);
-      }
+      setOtpModal({
+        open: true,
+        email: data.email
+      });
     } catch (error) {
       handleCatch(error);
     }
   };
 
-  const handleOtpSubmit = async (otp) => {
+  const handleOtpSubmit = async (isOtpVerified, message) => {
     try {
       const values = getValues();
-      const { data } = await api.post("/api/authentication/verify-otp", { email: values.email, otp });
-      if (data.status) {
-        toast.success(data.message);
+      if (isOtpVerified) {
         values.userType = userType;
         const response = await api.post("/api/authentication/register/user", values);
         if (response.data.status) {
           toast.success(response.data.message);
-          setShowOtp(false);
+          setOtpModal({
+            open: false,
+            email: ''
+          });
+          onClose(true);
         }
+      } else {
+        toast.error(message);
       }
     } catch (error) {
       handleCatch(error);
@@ -45,7 +50,8 @@ const SignUp = ({ showModal, onClose, userType }) => {
   const checkEmailExist = async () => {
     try {
       const email = getValues('email');
-      const res = await api.get(`/api/user/check-email/${email}`, { userType });
+      await api.get(`/api/user/check-email/${email}`, { userType });
+      return false;
     } catch (error) {
       setValue("email", "");
       handleCatch(error);
@@ -62,7 +68,7 @@ const SignUp = ({ showModal, onClose, userType }) => {
 
   return (
     <>
-      <CustomModal show={showModal} onClose={onClose} title="Sign Up">
+      <MiniCustomModal show={!optModal.email && showModal} onClose={onClose} title="Sign Up" modalClass="modal-dialog modal-dialog-centered modal-lg" showFooter={false}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           {/* First Name */}
           <div className="mb-3">
@@ -149,9 +155,11 @@ const SignUp = ({ showModal, onClose, userType }) => {
             Verify Email
           </button>
         </form>
-      </CustomModal>
-
-      <OTPModal showModal={showOtp} onClose={() => setShowOtp(false)} onSubmit={handleOtpSubmit} />
+      </MiniCustomModal>
+      <OTPModal email={optModal.email} showModal={optModal.open} onClose={() => setOtpModal({
+        open: false,
+        email: ''
+      })} onSubmit={handleOtpSubmit} onSendOtp={handleSubmit} />
     </>
   );
 };

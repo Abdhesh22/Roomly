@@ -1,5 +1,13 @@
 module.exports = (mongoose) => {
   const { Schema } = mongoose;
+  const AttachmentSchema = new Schema({
+    originalFileName: { type: String, required: true },
+    remotePath: { type: String, required: true },
+    remoteId: { type: String, required: true },
+    mimetype: { type: String, required: true },
+    size: { type: Number, required: true }
+  }, { _id: false });
+
   return new Schema(
     {
       firstName: {
@@ -16,14 +24,19 @@ module.exports = (mongoose) => {
       },
       password: {
         type: String,
-        require: true,
+        required: true,
       },
       userType: {
         type: Number,
-        require: true,
+        required: true,
       },
       isEmailVerified: {
         type: Boolean,
+        default: false,
+      },
+      profileAttachment: {
+        type: AttachmentSchema,
+        default: null,
       },
     },
     {

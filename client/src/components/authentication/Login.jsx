@@ -1,16 +1,15 @@
 import { useState, useContext } from "react";
-import SignUp from "./Signup";
 import { AuthContext } from "./AuthContext";
 import api from "../../utils/request/api.util";
 import { toast } from 'react-toastify';
 import { handleCatch } from "../../utils/common";
-import { useNavigate } from "react-router-dom";
 import { USER_TYPE } from "../../utils/constants/user-type.constant";
+import { useNavigate } from "react-router-dom";
 
-const Login = ({ onClose, userType, title = "Login to continue" }) => {
-  const navigate = useNavigate()
+const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => {
+
+  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [showModal, setShowModal] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
   const handleLogin = async () => {
@@ -38,8 +37,6 @@ const Login = ({ onClose, userType, title = "Login to continue" }) => {
       handleCatch(error);
     }
   };
-
-  const closeSignup = () => setShowModal(false);
 
   return (
     <>
@@ -75,7 +72,7 @@ const Login = ({ onClose, userType, title = "Login to continue" }) => {
         <p className="mt-3 text-center">
           Don't have an account?
           <span
-            onClick={() => setShowModal(true)}
+            onClick={() => onSignUp(true)}
             className="text-primary ms-1 text-decoration-underline"
             role="button"
           >
@@ -83,8 +80,6 @@ const Login = ({ onClose, userType, title = "Login to continue" }) => {
           </span>
         </p>
       </div>
-
-      <SignUp showModal={showModal} onClose={closeSignup} userType={userType} />
     </>
   );
 };

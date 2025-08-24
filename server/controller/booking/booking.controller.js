@@ -41,9 +41,9 @@ class BookingController {
             const billingService = new BillingService();
             const { billingId, title, tenantName } = req.body;
 
-            await billingService.confirm(billingId, title);
+            const { status, message } = await billingService.confirm(billingId, title, tenantName);
 
-            return res.status(httpStatus.OK).json({ status: true, message: toaster.ROOM_CONFIRMED(title, tenantName) });
+            return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
@@ -55,10 +55,11 @@ class BookingController {
             const billingService = new BillingService();
             const { billingId, title, tenantName } = req.body;
 
-            await billingService.cancelByHost(billingId);
+            const { status, message } = await billingService.cancelByHost(billingId, title, tenantName);
 
-            return res.status(httpStatus.OK).json({ status: true, message: toaster.ROOM_CANCELLED(title, tenantName) });
+            return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
+            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -85,9 +86,9 @@ class BookingController {
             const billingService = new BillingService();
             const { billingId, refundStatus } = req.body;
 
-            await billingService.cancelByUser(billingId, refundStatus);
+            const { status, message } = await billingService.cancelByUser(billingId, refundStatus);
 
-            return res.status(httpStatus.OK).json({ status: true, message: "Room Cancelled" });
+            return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
             console.log("err: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
@@ -102,28 +103,14 @@ class BookingController {
             const { billing: bookingDetails, roomId, hostId } = req.body;
 
             const billingService = new BillingService();
-            const { order, customer } = await billingService.checkout({ user, bookingDetails, roomId, hostId });
+            const { order, customer, status, message } = await billingService.checkout({ user, bookingDetails, roomId, hostId });
 
-            return res.status(httpStatus.OK).json({ status: true, isEmailExist: false, order, customer, user });
+            return res.status(httpStatus.OK).json({ status, message, order, customer, user });
         } catch (error) {
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true });
         }
     }
 
-    updateStatus = async (req, res) => {
-        try {
-
-            const { billingId, status } = req.body;
-
-            const billingService = new BillingService();
-            await billingService.updateStatus({ billingId, status });
-
-            return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_STATUS(status) });
-
-        } catch (error) {
-            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
-        }
-    }
 }
 
 module.exports = new BookingController();

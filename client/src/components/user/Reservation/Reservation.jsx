@@ -3,13 +3,15 @@ import Login from "../../authentication/Login";
 import api from "../../../utils/request/api.util";
 import { loadRazorpayScript } from "../../../utils/razorpay/razorpay";
 import { toast } from "react-toastify";
-import { handleCatch } from "../../../utils/common";
+import { convertStringToIsoDate, handleCatch } from "../../../utils/common";
 import { USER_TYPE } from "../../../utils/constants/user-type.constant";
 import TripDetail from "./Trip/TripDetail";
 import BillingDetails from "./BillingDetail.jsx";
 import { AuthContext } from "../../authentication/AuthContext.jsx";
 import { useParams } from "react-router-dom";
 import { format, subDays, differenceInCalendarDays } from 'date-fns';
+import BackButton from "../../common/CustomComponent/BackButton.jsx";
+import SignUp from "../../authentication/Signup.jsx";
 
 const Reservation = () => {
 
@@ -20,9 +22,19 @@ const Reservation = () => {
   const [room, setRoom] = useState([]);
   const [occupancy, setOccupancy] = useState([]);
   const [billing, setBilling] = useState(null);
+  const [excludeDates, setExcludeDates] = useState([]);
+  const [showSignup, setShowSignup] = useState(false);
+  const [resetTrip, setResetTrip] = useState(false);
 
   const booking = async (order, razorpayResponse) => {
     try {
+
+      const dates = {
+        start: billing.checkin,
+        end: billing.checkout
+      };
+
+      setExcludeDates((prev) => [...prev, dates]);
 
       const payload = {
         billingId: order.id,
@@ -30,17 +42,47 @@ const Reservation = () => {
         bookingId: order.bookingId,
         razorpaySign: razorpayResponse.razorpay_signature,
         hostId: room.hostId
-      }
+      };
 
       const { data } = await api.post(`/api/booking`, payload);
+
       if (data.status) {
         toast.success(data.message);
+        setBilling(null);
+        setResetTrip(true);
+      } else {
+        // Rollback last inserted dates
+        setExcludeDates((prev) => prev.slice(0, -1));
+      }
+    } catch (error) {
+      // Rollback on error too
+      setExcludeDates((prev) => prev.slice(0, -1));
+      handleCatch(error);
+    }
+  };
+
+
+  const fetchBlockRanges = async () => {
+    try {
+
+      const { data } = await api.get(`/api/rooms/block-ranges/${roomId}`);
+
+      const dates = [];
+
+      for (let i = 0; i < data.ranges.length; i++) {
+        const range = data.ranges[i];
+        const start = await convertStringToIsoDate(range.startDate);
+        const end = await convertStringToIsoDate(range.endDate);
+        dates.push({
+          start: start,
+          end: end,
+        })
       }
 
+      setExcludeDates(dates);
     } catch (error) {
       handleCatch(error);
     }
-
   }
 
   const openRazorpay = async (data) => {
@@ -86,9 +128,10 @@ const Reservation = () => {
       const { data } = await api.post(`/api/booking/checkout`, { roomId: roomId, hostId: room.hostId, billing: { ...billing } });
       if (data.status) {
         openRazorpay(data);
+      } else {
+        toast.error(data.message);
       }
     } catch (error) {
-      console.log("error: ", error);
       handleCatch(error);
     }
 
@@ -106,7 +149,6 @@ const Reservation = () => {
       const { data } = await api.get(`/api/rooms/detail/${roomId}`);
 
       const room = data.room;
-
       setPricing(room.price);
       setOccupancy(room.occupancy);
 
@@ -126,6 +168,7 @@ const Reservation = () => {
 
   useEffect(() => {
     fetchRoom();
+    fetchBlockRanges();
   }, [])
 
   const getCancellationPolicy = () => {
@@ -146,16 +189,27 @@ const Reservation = () => {
 
   return (
     <div className="container">
+
+      <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+        {/* Left side: Title */}
+        <h2 className="mb-0">Trip Information and Payment</h2>
+        {/* Right side: Back + Reservation buttons */}
+        <div className="d-flex align-items-center gap-2">
+          <BackButton />
+        </div>
+      </div>
+
+
       <div className="row">
         {/* Left: Booking Details */}
         <div className="col-md-7">
-          <TripDetail onChange={(value) => onChangeTripDetail(value)} occupancy={occupancy}></TripDetail>
+          <TripDetail onChange={(value) => onChangeTripDetail(value)} occupancy={occupancy} excludeDates={excludeDates} resetTrip={resetTrip}></TripDetail>
           {/* Show login form if not logged in */}
           {!isLoggedIn && (
             <>
               <hr />
-              <Login userType={USER_TYPE.USER} title={"Login Before Checkout"} onClose={() => { }}></Login>
-
+              <Login userType={USER_TYPE.USER} title={"Login Before Checkout"} onClose={() => { }} onSignUp={setShowSignup}></Login>
+              <SignUp userType={USER_TYPE.USER} showModal={showSignup} onClose={() => setShowSignup(false)} />
             </>
           )}
           {isLoggedIn && billing?.checkin && billing?.checkout && (<>

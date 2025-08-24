@@ -57,10 +57,17 @@ const BillingStatusLabels = {
     [BillingStatus.CHECK_OUT]: "Checked Out"
 }
 
+const BookingTime = {
+    CHECK_IN_HOUR: 15,
+    CHECK_OUT_MINUTE: 0,
+    CHECK_OUT_HOUR: 11,
+    CHECK_IN_MINUTE: 0,
+}
 
 module.exports = {
     BillingStatus,
     orderStatusOptions,
     BillingStatusLabels,
-    RefundStatus
+    RefundStatus,
+    BookingTime
 }

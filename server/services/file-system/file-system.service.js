@@ -1,5 +1,6 @@
 const CloudinaryService = require("./cloudinary.service");
 const fs = require("fs");
+const path = require("path");
 
 class FileSystemService {
     #cloudinaryInstance;
@@ -9,14 +10,40 @@ class FileSystemService {
     }
 
     unlinkFiles = async (paths) => {
-        for (const path of paths) {
+        for (const filePath of paths) {
             try {
-                await fs.unlink(path);
+                await this.unlinkFile(filePath);
             } catch (err) {
-                console.warn(`Failed to delete file: ${path}`, err.message);
+                console.warn(`Failed to delete file: ${filePath}`, err.message);
             }
         }
     };
+
+    unlinkFile = (filePath) => {
+        const absolutePath = path.resolve(filePath);
+        fs.unlink(absolutePath, (err) => {
+            if (err) {
+                console.warn(`Failed to delete file: ${absolutePath}`, err.message);
+            } else {
+                console.log(`Deleted file: ${absolutePath}`);
+            }
+        });
+    };
+
+    async privateSingleUpload(file, folder) {
+        console.log("file: ", file);
+
+        const result = await this.#cloudinaryInstance.privateUpload(file.path, folder);
+        await this.unlinkFile(file.path);
+
+        return {
+            originalFileName: file.originalname,
+            remotePath: result.secure_url,
+            remoteId: result.public_id,
+            mimetype: file.mimetype,
+            size: file.size
+        }
+    }
 
     async privateUpload(files, folder) {
 

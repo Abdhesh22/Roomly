@@ -5,7 +5,7 @@ import { fetchAmenities, handleCatch } from "../../../utils/common";
 import api from "../../../utils/request/api.util";
 import CustomLocationPicker from "../CustomComponent/CustomLocationPicker/CustomLocationPicker";
 import Amenities from "../Room/Amenities/Amenities";
-
+import BackButton from "../CustomComponent/BackButton";
 const Room = ({ showReservation }) => {
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -56,19 +56,27 @@ const Room = ({ showReservation }) => {
 
   return (
     <div className="container mb-5">
-      {/* Title + Reservation Button */}
       <div className="d-flex justify-content-between align-items-center mb-4 room-title">
-        <h2 className="mb-0">{"Modern Cozy Apartment in Downtown"}</h2>
-        {showReservation && (<>
-          <button
-            className="btn btn-outline-primary d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow-sm w-30"
-            onClick={() => handleNavigate(`/reservation/${roomId}`)}
-          >
-            Go to Reservation
-            <i className="bi bi-arrow-right-square-fill fs-4"></i>
-          </button>
-        </>
-        )}
+        {/* Left side: Title */}
+        <h2 className="mb-0">
+          {room?.title?.length > 35 ? room.title.slice(0, 35) + "..." : room.title}
+        </h2>
+
+
+        {/* Right side: Back + Reservation buttons */}
+        <div className="d-flex align-items-center gap-2">
+          <BackButton />
+
+          {showReservation && (
+            <button
+              className="btn btn-outline-primary d-flex align-items-center gap-2 rounded-3 shadow-sm"
+              onClick={() => handleNavigate(`/reservation/${roomId}`)}
+            >
+              Go to Reservation
+              <i className="bi bi-arrow-right-square-fill"></i>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Image Gallery */}
@@ -107,7 +115,7 @@ const Room = ({ showReservation }) => {
           {/* Host */}
           <div className="d-flex align-items-center mb-3">
             <img
-              src={room.host?.[0]?.avatar || "/default-host.png"}
+              src={room.host?.[0]?.profileAttachment?.remotePath || "/default-host.png"}
               alt="Host Avatar"
               className="host-avatar me-3"
             />

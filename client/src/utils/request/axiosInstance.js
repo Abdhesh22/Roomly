@@ -46,7 +46,10 @@ const axiosJSON = applyInterceptors(
 const axiosMultipart = applyInterceptors(
   axios.create({
     baseURL: BASE_URL,
-    timeout: 100000,
+    timeout: TIMEOUT,
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
   })
 );
 

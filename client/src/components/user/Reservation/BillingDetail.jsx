@@ -7,7 +7,7 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
 
         const {
             adults = 0,
-            teens: children = 0,
+            teens = 0,
             infants = 0,
             pets = 0,
             checkin,
@@ -18,20 +18,21 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
             base: basePrice = 0,
             guest: extraGuestPrice = 0,
             pet: petPrice = 0,
-            cleaningFee = 100,
+            teens: teenPrice = 0,
+            cleaning,
         } = pricing;
 
         const adultsNum = Number(adults) || 0;
-        const childrenNum = Number(children) || 0;
+        const teenNum = Number(teens) || 0;
         const infantsNum = Number(infants) || 0;
         const petsNum = Number(pets) || 0;
 
         const basePriceNum = Number(basePrice) || 0;
         const extraGuestPriceNum = Number(extraGuestPrice) || 0;
         const petPriceNum = Number(petPrice) || 0;
-        const cleaningFeeNum = Number(cleaningFee) || 0;
+        const cleaningFeeNum = Number(cleaning) || 0;
         const serviceRateNum = 0.10;
-        const childRateNum = 300;
+        const teenRateNum = Number(teenPrice);
 
         let nights = 1;
         if (checkin && checkout) {
@@ -44,10 +45,10 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
 
         const baseCharge = basePriceNum * nights;
         const extraAdultCharge = extraAdultCount * extraGuestPriceNum * nights;
-        const childCharge = childrenNum * childRateNum * nights;
+        const teenCharge = teenNum * teenRateNum * nights;
         const petCharge = petsNum * petPriceNum * nights;
 
-        const subtotal = baseCharge + extraAdultCharge + childCharge + petCharge + cleaningFeeNum;
+        const subtotal = baseCharge + extraAdultCharge + teenCharge + petCharge + cleaningFeeNum;
 
         const serviceCharge = subtotal * serviceRateNum;
         const gst = (subtotal + serviceCharge) * gstRate;
@@ -63,9 +64,9 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
             extraAdultCount,
             extraAdultRate: extraGuestPriceNum,
             extraAdultCharge,
-            childCount: childrenNum,
-            childRate: childRateNum,
-            childCharge,
+            teenCount: teenNum,
+            teenRate: teenRateNum,
+            teenCharge: teenCharge,
             petCount: petsNum,
             petRate: petPriceNum,
             petCharge,
@@ -86,14 +87,15 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
 
     if (!billing) return null;
 
+    // ✅ Full billing details if checkin & checkout exist
     const breakdowns = {
         extraAdults: {
             text: `Extra adults (₹${billing.extraAdultRate} × ${billing.extraAdultCount} adult${billing.extraAdultCount !== 1 ? 's' : ''} × ${billing.nights} night${billing.nights !== 1 ? 's' : ''})`,
             total: billing.extraAdultRate * billing.extraAdultCount * billing.nights
         },
-        children: {
-            text: `Children (₹${billing.childRate} × ${billing.childCount} child${billing.childCount !== 1 ? 'ren' : ''} × ${billing.nights} night${billing.nights !== 1 ? 's' : ''})`,
-            total: billing.childRate * billing.childCount * billing.nights
+        teens: {
+            text: `Teens (₹${billing.teenRate} × ${billing.teenCount} teen${billing.teenCount !== 1 ? 's' : ''} × ${billing.nights} night${billing.nights !== 1 ? 's' : ''})`,
+            total: billing.teenRate * billing.teenCount * billing.nights
         },
         pets: {
             text: `Pets (₹${billing.petRate} × ${billing.petCount} pet${billing.petCount !== 1 ? 's' : ''} × ${billing.nights} night${billing.nights !== 1 ? 's' : ''})`,
@@ -129,10 +131,10 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
                     </div>
                 )}
 
-                {billing.childCount > 0 && (
+                {billing.teenCount > 0 && (
                     <div className="d-flex justify-content-between small mt-1">
-                        <span className="text-muted">{breakdowns.children.text}</span>
-                        <span>₹{breakdowns.children.total.toLocaleString()}</span>
+                        <span className="text-muted">{breakdowns.teens.text}</span>
+                        <span>₹{breakdowns.teens.total.toLocaleString()}</span>
                     </div>
                 )}
 
@@ -184,7 +186,7 @@ const BillingDetail = ({ occupancy, pricing, room, billing, setBilling }) => {
                     <span>₹{billing.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
                 <p className="text-muted small mt-1 mb-0">
-                    Charges are calculated per night for extra adults, children, and pets.
+                    Charges are calculated per night for extra adults, teens, and pets.
                     One-time fees and GST are applied at the end.
                 </p>
             </div>

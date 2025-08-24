@@ -1,5 +1,7 @@
 import { toast } from "react-toastify";
 import api from "./request/api.util";
+import { addMonths, parseISO, format } from "date-fns";
+
 
 export function handleCatch(error) {
     if (error?.response?.data?.message) {
@@ -50,4 +52,17 @@ export const fetchAmenities = async () => {
     } catch (error) {
         handleCatch(error);
     }
+}
+
+export const addMonthsToNow = async (monthToAdd) => {
+    try {
+        const now = new Date();
+        return await addMonths(now, monthToAdd);
+    } catch (error) {
+        handleCatch(error);
+    }
+}
+
+export const convertStringToIsoDate = async (dateString) => {
+    return await parseISO(dateString);
 }

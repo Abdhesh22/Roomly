@@ -113,7 +113,7 @@ class RoomDao extends BaseDAO {
                     let: { hostId: "$hostId" },
                     pipeline: [
                         { $match: { $expr: { $eq: ["$_id", "$$hostId"] } } },
-                        { $project: { firstName: 1, lastName: 1, email: 1, _id: 0 } }
+                        { $project: { firstName: 1, lastName: 1, email: 1, _id: 0, profileAttachment: 1 } }
                     ],
                     as: "host"
                 }
