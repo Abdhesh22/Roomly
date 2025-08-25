@@ -6,9 +6,12 @@ const cors = require("cors");
 const PORT = process.env.PORT || 3000;
 const CronJobController = require("./controller/cron-job/cron-job.controller");
 
-app.use(cors());
+
+// Allow only your frontend domain
 app.use(cors({
-  origin: "*"
+  origin: "https://roomly-d2ep.onrender.com",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 // Logging and parsing
