@@ -21,7 +21,6 @@ const CreateEditRoom = () => {
             pincode: "",
             latitude: "",
             longitude: "",
-            type: "",
             amenities: [],
             description: "",
             occupancy: {
