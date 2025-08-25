@@ -114,11 +114,11 @@ const Room = ({ showReservation }) => {
         <div className="col-md-6">
           {/* Host */}
           <div className="d-flex align-items-center mb-3">
-            <img
-              src={room.host?.[0]?.profileAttachment?.remotePath || "/default-host.png"}
+            {room.host?.[0]?.profileAttachment?.remotePath && (<img
+              src={room.host?.[0]?.profileAttachment?.remotePath}
               alt="Host Avatar"
               className="host-avatar me-3"
-            />
+            />)}
             <div>
               <h5 className="mb-0">
                 Entire rental unit hosted by{" "}
