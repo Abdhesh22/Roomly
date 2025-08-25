@@ -2,8 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+const cors = require("cors");
 const PORT = process.env.PORT || 3000;
 const CronJobController = require("./controller/cron-job/cron-job.controller");
+
+app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 
 // Logging and parsing
 app.use(morgan("dev"));
