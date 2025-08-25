@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // 🔧 Shared config values
-const BASE_URL = "/";
+const BASE_URL = import.meta.env.VITE_END_POINT_API;
 const TIMEOUT = 10000;
 
 // 🔐 Auth + Error Interceptors
