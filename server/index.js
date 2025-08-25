@@ -8,6 +8,11 @@ const CronJobController = require("./controller/cron-job/cron-job.controller");
 
 
 // Allow only your frontend domain
+app.use(cors({
+  origin: process.env.ALLOWED_HOST,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 // Logging and parsing
 app.use(morgan("dev"));
