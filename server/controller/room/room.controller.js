@@ -87,6 +87,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, list });
         } catch (error) {
+            console.log("error: ", error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
