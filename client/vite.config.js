@@ -12,10 +12,10 @@ export default defineConfig(({ mode }) => {
       host: true,
       port,
       strictPort: true,
-      allowedHosts: ["roomly.local", "05cf54a21f01.ngrok-free.app"],
+      allowedHosts: [env.VITE_ALLOWED_HOST],
       proxy: {
         '/api': {
-          target: 'http://localhost:3000',
+          target: env.VITE_END_POINT_API,
           changeOrigin: true,
           secure: false,
         },
