@@ -61,7 +61,7 @@ const Room = ({ showReservation }) => {
 
   return (
     <div className="container">
-      {loader && <Loader show={loader}></Loader>}
+      {loader && <Loader show={loader} message="Loading Room Detail..."></Loader>}
       {!loader && (<>
         <div className="d-flex justify-content-between align-items-center mb-4 room-title">
           {/* Left side: Title */}
