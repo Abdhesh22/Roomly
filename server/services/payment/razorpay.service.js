@@ -33,6 +33,7 @@ class RazorPayService {
                 customer_id: customerId,
                 payment_capture: 1
             };
+            console.log("options: ", options);
             return await this.#razorpayInstance.orders.create(options);
         } catch (error) {
             throw error;

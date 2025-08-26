@@ -75,8 +75,9 @@ class PaymentService {
             }
 
             const name = `${user.firstName} ${user.lastName}`;
+            console.log("name : ", name);
             const customer = await this.#razorpayService.createCustomer(name, user.email);
-
+            console.log("custmoer created: ", customer);
             return await paymentAccountDao.create({
                 userId: new ObjectId(user._id),
                 customerId: customer.id
