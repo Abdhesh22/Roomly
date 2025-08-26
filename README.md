@@ -49,9 +49,9 @@ It provides an end-to-end flow including **room listing, image uploads, interact
 git clone https://github.com/Abdhesh22/Roomly.git
 cd Roomly
 ```
-
-### 2. Front Setup
-## Create .env file in front directory
+---
+## 2. Front Setup
+### Create .env file in front directory
 - 👉 [Frontend .env Setup Guide](https://docs.google.com/document/d/1JrXRnu1E_hUQQh0O7QquCnA1hW60CP-15wRfWPJAfEI/edit?addon_store&tab=t.0)
 
 ```bash
@@ -65,9 +65,9 @@ touch .env
 npm run dev
 
 ```
-
-### 3. Backend Setup
-## Create .env file in server directory
+---
+## 3. Backend Setup
+### Create .env file in server directory
 - 👉 [Backend .env Setup Guide](https://docs.google.com/document/d/1JrXRnu1E_hUQQh0O7QquCnA1hW60CP-15wRfWPJAfEI/edit?addon_store&tab=t.jdnobkf3e0xf)  
 
 ```bash
