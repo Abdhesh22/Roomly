@@ -32,7 +32,7 @@ class DateTimeService {
     date = await setMinutes(date, minute);
     date = await setSeconds(date, 0);
     date = await setMilliseconds(date, 0);
-    return awaitformat(date, "yyyy-MM-dd HH:mm:ss");
+    return await format(date, "yyyy-MM-dd HH:mm:ss");
   }
 
   async subtractDays(date, noOfDays) {
