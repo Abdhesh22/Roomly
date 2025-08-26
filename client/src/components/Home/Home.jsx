@@ -12,9 +12,10 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loader, setLoader] = useState(true);
-  let retry = true;
+  const MAX_RETRIES = 5;
   const sortKey = "createdAt";
   const sortOrder = "desc";
+  let retryCount = 0;
 
   const fetchRooms = async () => {
     if (loading || !hasMore) return;
@@ -28,19 +29,23 @@ const Home = () => {
         order: sortOrder,
         searchKey,
       });
+
       if (data.status) {
-        retry = false;
         const newRooms = data.list || [];
-        console.log("newRooms: ", newRooms);
         setRooms((prev) => (page === 1 ? newRooms : [...prev, ...newRooms]));
         if (newRooms.length < limit) setHasMore(false);
         setLoader(false);
+        retryCount = 6;
       }
     } catch (error) {
-      if (retry) {
-        fetchRooms();
+      if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        console.log(`Retrying fetchRooms... attempt ${retryCount}`);
+        setTimeout(fetchRooms, 20000); // retry after 20s
+      } else {
+        handleCatch(error); // show error after max retries
+        setLoader(false);
       }
-      handleCatch(error);
     } finally {
       setLoading(false);
     }
