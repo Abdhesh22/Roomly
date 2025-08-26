@@ -67,8 +67,10 @@ const CreateEditRoom = () => {
 
             // Images
             const images = [];
+            console.log("files.length: ", files.length);
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+                console.log("file: ", file);
                 if (file instanceof File) {
                     if (file.toUpload) {
                         images.push(file);
@@ -220,9 +222,11 @@ const CreateEditRoom = () => {
                 setRemoveAttachments(prev => [...prev, file]);
             }
         } else if (method === "ADD") {
-            file[0].toUpload = true;
-            updatedFiles = [...updatedFiles, ...file];
+            const newFiles = Array.isArray(file) ? file : [file];
+            newFiles.forEach(f => (f.toUpload = true));
+            updatedFiles = [...updatedFiles, ...newFiles];
         }
+
         setFiles(updatedFiles);
     };
 
