@@ -67,14 +67,18 @@ const CreateEditRoom = () => {
 
             // Images
             const images = [];
-            files.forEach((file) => {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 if (file instanceof File) {
                     if (file.toUpload) {
                         images.push(file);
-                        formData.append("images", file);
+                        await formData.append("images", file);
+
                     }
                 }
-            });
+            }
+
+            console.log("NumberOf Image Push: ", images.length);
 
             if (removeAttachments.length > 0) {
                 const filesToRemove = removeAttachments.map(file => file.remoteId);
