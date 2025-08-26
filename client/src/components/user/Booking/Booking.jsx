@@ -11,6 +11,7 @@ import CustomMultiSelect from "../../common/CustomComponent/CustomMultiSelect/Cu
 import { format, subDays, isBefore, isEqual } from 'date-fns';
 import BillingBreakdown from "./BillingBreakDown";
 import BackButton from "../../common/CustomComponent/BackButton";
+import Loader from "../../common/CustomComponent/Loader";
 
 const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => (
     < div className="d-flex justify-content-end align-items-end mb-4 gap-3 flex-wrap" >
@@ -58,6 +59,7 @@ const UserBooking = () => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showBillingModal, setShowBillingModal] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
+    const [loader, setLoader] = useState(true);
 
     const [modalData, setModalData] = useState({
         title: "",
@@ -337,6 +339,7 @@ const UserBooking = () => {
                 setTotal(data.total || list.length);
                 setRooms(list);
             }
+            setLoader(false);
         } catch (error) {
             handleCatch(error);
         }
@@ -376,8 +379,9 @@ const UserBooking = () => {
     }
 
     return (
-        <>
-            <div className="container">
+        <div className="container">
+            {loader && <Loader show={loader} message="Loading Booking..."></Loader>}
+            {!loader && <>
                 <div className="d-flex justify-content-between align-items-center mb-4 room-title">
                     {/* Left side: Title */}
                     <h2 className="mb-0">Trips</h2>
@@ -419,93 +423,93 @@ const UserBooking = () => {
                 />
 
                 {/* Billing Modal */}
-                {showBillingModal && (
-                    <MiniCustomModal
-                        show={showBillingModal}
-                        onClose={closeBillingModal}
-                        title="Billing Details"
-                        modalClass="modal-dialog modal-dialog-centered modal-lg"
-                        footer={({ handleClose }) => (
-                            <>
-                                <button className="btn btn-secondary" onClick={handleClose}>Cancel</button>
-                            </>
-                        )}
-                    >
-                        {bookingDetails && (
-                            <div className="space-y-3">
-                                <table className="table table-sm table-bordered mb-0 w-full text-sm">
-                                    <tbody>
-                                        <tr>
-                                            <th>Check-in</th>
-                                            <td>{new Date(bookingDetails.checkin).toLocaleDateString()}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Check-out</th>
-                                            <td>{new Date(bookingDetails.checkout).toLocaleDateString()}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Nights</th>
-                                            <td>{bookingDetails.nights}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Base Price (2 Guests including Tenant)</th>
-                                            <td>
-                                                ₹{bookingDetails.basePrice}
-                                                <span className="text-muted ms-2">
-                                                    (1 tenant + 1 guest)
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {bookingDetails.extraAdultCount > 0 && (
+                {
+                    showBillingModal && (
+                        <MiniCustomModal
+                            show={showBillingModal}
+                            onClose={closeBillingModal}
+                            title="Billing Details"
+                            modalClass="modal-dialog modal-dialog-centered modal-lg"
+                            footer={({ handleClose }) => (
+                                <>
+                                    <button className="btn btn-secondary" onClick={handleClose}>Cancel</button>
+                                </>
+                            )}
+                        >
+                            {bookingDetails && (
+                                <div className="space-y-3">
+                                    <table className="table table-sm table-bordered mb-0 w-full text-sm">
+                                        <tbody>
                                             <tr>
-                                                <th>
-                                                    Extra Adults ({bookingDetails.extraAdultCount} × ₹{bookingDetails.extraAdultRate})
-                                                </th>
-                                                <td>₹{bookingDetails.extraAdultCharge}</td>
+                                                <th>Check-in</th>
+                                                <td>{new Date(bookingDetails.checkin).toLocaleDateString()}</td>
                                             </tr>
-                                        )}
-                                        {bookingDetails.teenCount > 0 && (
                                             <tr>
-                                                <th>
-                                                    Teens ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
-                                                </th>
-                                                <td>₹{bookingDetails.teenCharge}</td>
+                                                <th>Check-out</th>
+                                                <td>{new Date(bookingDetails.checkout).toLocaleDateString()}</td>
                                             </tr>
-                                        )}
-                                        {bookingDetails.petCount > 0 && (
                                             <tr>
-                                                <th>
-                                                    Pets ({bookingDetails.petCount} × ₹{bookingDetails.petRate})
-                                                </th>
-                                                <td>₹{bookingDetails.petCharge}</td>
+                                                <th>Nights</th>
+                                                <td>{bookingDetails.nights}</td>
                                             </tr>
-                                        )}
-                                        <tr>
-                                            <th>Cleaning Fee</th>
-                                            <td>₹{bookingDetails.cleaningFee}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Service Charge</th>
-                                            <td>₹{bookingDetails.serviceCharge}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>GST</th>
-                                            <td>₹{bookingDetails.gst} ({bookingDetails.gstRate * 100}%)</td>
-                                        </tr>
-                                        <tr className="fw-bold">
-                                            <th>Total</th>
-                                            <td>₹{bookingDetails.total}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-
-
-                    </MiniCustomModal>
-                )}
-            </div>
-        </>
+                                            <tr>
+                                                <th>Base Price (2 Guests including Tenant)</th>
+                                                <td>
+                                                    ₹{bookingDetails.basePrice}
+                                                    <span className="text-muted ms-2">
+                                                        (1 tenant + 1 guest)
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {bookingDetails.extraAdultCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Extra Adults ({bookingDetails.extraAdultCount} × ₹{bookingDetails.extraAdultRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.extraAdultCharge}</td>
+                                                </tr>
+                                            )}
+                                            {bookingDetails.teenCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Teens ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.teenCharge}</td>
+                                                </tr>
+                                            )}
+                                            {bookingDetails.petCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Pets ({bookingDetails.petCount} × ₹{bookingDetails.petRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.petCharge}</td>
+                                                </tr>
+                                            )}
+                                            <tr>
+                                                <th>Cleaning Fee</th>
+                                                <td>₹{bookingDetails.cleaningFee}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Service Charge</th>
+                                                <td>₹{bookingDetails.serviceCharge}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>GST</th>
+                                                <td>₹{bookingDetails.gst} ({bookingDetails.gstRate * 100}%)</td>
+                                            </tr>
+                                            <tr className="fw-bold">
+                                                <th>Total</th>
+                                                <td>₹{bookingDetails.total}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </MiniCustomModal>
+                    )
+                }
+            </>}
+        </div >
     );
 };
 

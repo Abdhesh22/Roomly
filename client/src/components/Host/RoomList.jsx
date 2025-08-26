@@ -6,6 +6,8 @@ import { debounce, handleCatch } from "../../utils/common";
 import CustomConfirmationModal from "../common/CustomComponent/CustomModal/ConfirmationModal";
 import { toast } from 'react-toastify';
 import BackButton from "../common/CustomComponent/BackButton";
+import Loader from "../common/CustomComponent/Loader";
+
 const RoomList = () => {
 
     const navigate = useNavigate();
@@ -23,7 +25,7 @@ const RoomList = () => {
         confirmText: "Confirm",
         onConfirm: () => { },
     });
-
+    const [loader, setLoader] = useState(true);
 
     const columns = [
         { header: "Title", accessor: "title" },
@@ -80,6 +82,7 @@ const RoomList = () => {
                 setTotal(data.length || 0);
                 setRooms(data.list || []);
             }
+            setLoader(false);
         } catch (error) {
             handleCatch(error);
         }
@@ -150,8 +153,9 @@ const RoomList = () => {
     };
 
     return (
-        <>
-            <div className="container">
+        <div className="container">
+            {loader && <Loader show={loader} message="Loading Rooms..."></Loader>}
+            {!loader && <>
                 <div className="d-flex justify-content-between align-items-center mb-4 room-title">
                     {/* Left side: Title */}
                     <h2 className="mb-0">Rooms</h2>
@@ -164,7 +168,6 @@ const RoomList = () => {
                         </button>
                     </div>
                 </div>
-
                 <div className="d-flex justify-content-end mb-4">
                     <div className="input-group w-50">
                         <span className="input-group-text bg-white">
@@ -178,7 +181,6 @@ const RoomList = () => {
                         />
                     </div>
                 </div>
-
                 <CustomTable
                     columns={columns}
                     data={rooms}
@@ -190,7 +192,6 @@ const RoomList = () => {
                         setSortOrder(order);
                     }}
                 />
-
                 <CustomConfirmationModal
                     show={showConfirm}
                     title={modalData.title}
@@ -203,8 +204,8 @@ const RoomList = () => {
                     confirmText={modalData.confirmText}
                     cancelText="Cancel"
                 />
-            </div>
-        </>
+            </>}
+        </div>
     );
 };
 

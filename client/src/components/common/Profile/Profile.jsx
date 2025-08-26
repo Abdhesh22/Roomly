@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { handleCatch } from "../../../utils/common";
 import OTPModal from "../../authentication/Otp";
 import { toast } from 'react-toastify';
+import Loader from "../CustomComponent/Loader";
 
 const Profile = () => {
     const { updateUser, user: loggedUser } = useContext(AuthContext);
@@ -29,6 +30,8 @@ const Profile = () => {
         open: false,
         email: null
     });
+
+    const [loader, setLoader] = useState(true);
 
     // Profile form
     const { register, handleSubmit, setValue, formState: { errors } } = useForm({
@@ -55,6 +58,7 @@ const Profile = () => {
             setValue("email", data.user.email);
             setEmailValue("email", data.user.email);
             setPreview(data.user?.profileAttachment?.remotePath || "");
+            setLoader(false);
         } catch (err) { console.error(err); }
     };
 
@@ -169,146 +173,149 @@ const Profile = () => {
     };
 
     return (
-        <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4 room-title">
-                <h2 className="mb-0">Profile</h2>
-                <BackButton />
-            </div>
+        <div className="container">
+            {loader && <Loader show={loader} message="Loading Profile..."></Loader>}
+            {!loader && (<>
+                <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                    <h2 className="mb-0">Profile</h2>
+                    <BackButton />
+                </div>
 
-            <div className="row g-4">
-                {/* Profile Card */}
-                <div className="col-md-4">
-                    <div className="card text-center shadow-sm border-0 rounded-4 p-4 h-100">
-                        <div className="position-relative mb-3">
-                            <img
-                                src={preview || "https://i.pravatar.cc/150?img=5"}
-                                alt="Profile"
-                                className="rounded-circle border border-3 border-primary shadow mx-auto"
-                                width="150"
-                                height="150"
-                            />
-                            {isEditing && (
-                                <>
-                                    <label htmlFor="avatarUpload" className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow" style={{ cursor: "pointer" }}>
-                                        <i className="bi bi-camera-fill"></i>
-                                    </label>
-                                    <input id="avatarUpload" type="file" accept="image/*" className="d-none" onChange={handleAvatarChange} />
-                                </>
+                <div className="row g-4">
+                    {/* Profile Card */}
+                    <div className="col-md-4">
+                        <div className="card text-center shadow-sm border-0 rounded-4 p-4 h-100">
+                            <div className="position-relative mb-3">
+                                <img
+                                    src={preview || "https://i.pravatar.cc/150?img=5"}
+                                    alt="Profile"
+                                    className="rounded-circle border border-3 border-primary shadow mx-auto"
+                                    width="150"
+                                    height="150"
+                                />
+                                {isEditing && (
+                                    <>
+                                        <label htmlFor="avatarUpload" className="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow" style={{ cursor: "pointer" }}>
+                                            <i className="bi bi-camera-fill"></i>
+                                        </label>
+                                        <input id="avatarUpload" type="file" accept="image/*" className="d-none" onChange={handleAvatarChange} />
+                                    </>
+                                )}
+                            </div>
+                            <h4 className="mt-3 mb-1">{user.firstName} {user.lastName}</h4>
+                            <p className="text-muted">{user.email}</p>
+                            {user.createdOn && (
+                                <span className="badge bg-light text-dark rounded-pill px-3 py-2">
+                                    <i className="bi bi-calendar-check me-1 text-primary"></i> {format(new Date(user.createdOn), "d MMM yyyy")}
+                                </span>
                             )}
                         </div>
-                        <h4 className="mt-3 mb-1">{user.firstName} {user.lastName}</h4>
-                        <p className="text-muted">{user.email}</p>
-                        {user.createdOn && (
-                            <span className="badge bg-light text-dark rounded-pill px-3 py-2">
-                                <i className="bi bi-calendar-check me-1 text-primary"></i> {format(new Date(user.createdOn), "d MMM yyyy")}
-                            </span>
-                        )}
                     </div>
-                </div>
 
-                {/* Forms */}
-                <div className="col-md-8">
-                    <div className="card shadow-sm border-0 rounded-4 p-4 h-100">
+                    {/* Forms */}
+                    <div className="col-md-8">
+                        <div className="card shadow-sm border-0 rounded-4 p-4 h-100">
 
-                        {!isEditing && !isChangingPassword && !isChangingEmail && (
-                            <>
-                                <h5 className="mb-4 text-primary fw-bold"><i className="bi bi-info-circle me-2"></i> Profile Details</h5>
-                                <div className="row gy-3 mb-4">
-                                    <div className="col-sm-6"><strong className="text-muted d-block">First Name</strong>{user.firstName}</div>
-                                    <div className="col-sm-6"><strong className="text-muted d-block">Last Name</strong>{user.lastName}</div>
-                                    <div className="col-sm-6"><strong className="text-muted d-block">Email</strong>{user.email}</div>
-                                </div>
-                                <div className="d-flex justify-content-end gap-2 mt-4">
-                                    <button className="btn btn-primary" onClick={() => setIsEditing(true)}><i className="bi bi-pencil-square me-1"></i> Edit Profile</button>
-                                    <button className="btn btn-warning" onClick={() => setIsChangingPassword(true)}><i className="bi bi-key-fill me-1"></i> Change Password</button>
-                                    <button className="btn btn-info" onClick={() => setIsChangingEmail(true)}><i className="bi bi-envelope-fill me-1"></i> Change Email</button>
-                                </div>
-                            </>
-                        )}
+                            {!isEditing && !isChangingPassword && !isChangingEmail && (
+                                <>
+                                    <h5 className="mb-4 text-primary fw-bold"><i className="bi bi-info-circle me-2"></i> Profile Details</h5>
+                                    <div className="row gy-3 mb-4">
+                                        <div className="col-sm-6"><strong className="text-muted d-block">First Name</strong>{user.firstName}</div>
+                                        <div className="col-sm-6"><strong className="text-muted d-block">Last Name</strong>{user.lastName}</div>
+                                        <div className="col-sm-6"><strong className="text-muted d-block">Email</strong>{user.email}</div>
+                                    </div>
+                                    <div className="d-flex justify-content-end gap-2 mt-4">
+                                        <button className="btn btn-primary" onClick={() => setIsEditing(true)}><i className="bi bi-pencil-square me-1"></i> Edit Profile</button>
+                                        <button className="btn btn-warning" onClick={() => setIsChangingPassword(true)}><i className="bi bi-key-fill me-1"></i> Change Password</button>
+                                        <button className="btn btn-info" onClick={() => setIsChangingEmail(true)}><i className="bi bi-envelope-fill me-1"></i> Change Email</button>
+                                    </div>
+                                </>
+                            )}
 
-                        {/* Edit Profile Form */}
-                        {isEditing && (
-                            <form onSubmit={handleSubmit(onSubmitProfile)}>
-                                <h5 className="mb-4 text-primary fw-bold"><i className="bi bi-gear-fill me-2"></i> Update Profile</h5>
-                                {error && <p className="text-danger small">{error}</p>}
+                            {/* Edit Profile Form */}
+                            {isEditing && (
+                                <form onSubmit={handleSubmit(onSubmitProfile)}>
+                                    <h5 className="mb-4 text-primary fw-bold"><i className="bi bi-gear-fill me-2"></i> Update Profile</h5>
+                                    {error && <p className="text-danger small">{error}</p>}
 
-                                <div className="mb-3">
-                                    <label className="form-label fw-semibold">First Name</label>
-                                    <input className="form-control" {...register("firstName", { required: true })} />
-                                    {errors.firstName && <span className="text-danger small">First Name is required</span>}
-                                </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">First Name</label>
+                                        <input className="form-control" {...register("firstName", { required: true })} />
+                                        {errors.firstName && <span className="text-danger small">First Name is required</span>}
+                                    </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label fw-semibold">Last Name</label>
-                                    <input className="form-control" {...register("lastName", { required: true })} />
-                                    {errors.lastName && <span className="text-danger small">Last Name is required</span>}
-                                </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Last Name</label>
+                                        <input className="form-control" {...register("lastName", { required: true })} />
+                                        {errors.lastName && <span className="text-danger small">Last Name is required</span>}
+                                    </div>
 
-                                <div className="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" className="btn btn-outline-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-success"><i className="bi bi-check-circle me-1"></i> Save Changes</button>
-                                </div>
-                            </form>
-                        )}
+                                    <div className="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
+                                        <button type="submit" className="btn btn-success"><i className="bi bi-check-circle me-1"></i> Save Changes</button>
+                                    </div>
+                                </form>
+                            )}
 
-                        {/* Change Password */}
-                        {isChangingPassword && (
-                            <form onSubmit={handlePasswordSubmit(onSubmitPassword)}>
-                                <h5 className="mb-4 text-warning fw-bold"><i className="bi bi-shield-lock-fill me-2"></i> Change Password</h5>
+                            {/* Change Password */}
+                            {isChangingPassword && (
+                                <form onSubmit={handlePasswordSubmit(onSubmitPassword)}>
+                                    <h5 className="mb-4 text-warning fw-bold"><i className="bi bi-shield-lock-fill me-2"></i> Change Password</h5>
 
-                                {["current", "new", "confirm"].map((field, idx) => {
-                                    const label = field === "current" ? "Current Password" : field === "new" ? "New Password" : "Confirm Password";
-                                    return (
-                                        <div key={idx} className="mb-3 position-relative d-flex align-items-center">
-                                            <div className="flex-grow-1">
-                                                <label className="form-label fw-semibold">{label}</label>
-                                                <input
-                                                    type={showPassword[field] ? "text" : "password"}
-                                                    className={`form-control ${passwordErrors[field + "Password"] ? "is-invalid" : ""}`}
-                                                    {...registerPassword(field + "Password", { required: `${label} is required` })}
-                                                />
-                                                {passwordErrors[field + "Password"] && (
-                                                    <div className="text-danger small">{passwordErrors[field + "Password"].message}</div>
-                                                )}
+                                    {["current", "new", "confirm"].map((field, idx) => {
+                                        const label = field === "current" ? "Current Password" : field === "new" ? "New Password" : "Confirm Password";
+                                        return (
+                                            <div key={idx} className="mb-3 position-relative d-flex align-items-center">
+                                                <div className="flex-grow-1">
+                                                    <label className="form-label fw-semibold">{label}</label>
+                                                    <input
+                                                        type={showPassword[field] ? "text" : "password"}
+                                                        className={`form-control ${passwordErrors[field + "Password"] ? "is-invalid" : ""}`}
+                                                        {...registerPassword(field + "Password", { required: `${label} is required` })}
+                                                    />
+                                                    {passwordErrors[field + "Password"] && (
+                                                        <div className="text-danger small">{passwordErrors[field + "Password"].message}</div>
+                                                    )}
+                                                </div>
+                                                <span
+                                                    className="ms-3 mt-4"
+                                                    style={{ cursor: "pointer", userSelect: "none" }}
+                                                    onClick={() => setShowPassword({ ...showPassword, [field]: !showPassword[field] })}
+                                                >
+                                                    <i className={showPassword[field] ? "bi bi-eye-slash fs-5 text-muted" : "bi bi-eye fs-5 text-muted"}></i>
+                                                </span>
                                             </div>
-                                            <span
-                                                className="ms-3 mt-4"
-                                                style={{ cursor: "pointer", userSelect: "none" }}
-                                                onClick={() => setShowPassword({ ...showPassword, [field]: !showPassword[field] })}
-                                            >
-                                                <i className={showPassword[field] ? "bi bi-eye-slash fs-5 text-muted" : "bi bi-eye fs-5 text-muted"}></i>
-                                            </span>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
 
 
-                                <div className="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" className="btn btn-outline-secondary" onClick={() => { resetPassword(); setIsChangingPassword(false); }}>Cancel</button>
-                                    <button type="submit" className="btn btn-warning"><i className="bi bi-key-fill me-1"></i> Update Password</button>
-                                </div>
-                            </form>
-                        )}
+                                    <div className="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => { resetPassword(); setIsChangingPassword(false); }}>Cancel</button>
+                                        <button type="submit" className="btn btn-warning"><i className="bi bi-key-fill me-1"></i> Update Password</button>
+                                    </div>
+                                </form>
+                            )}
 
-                        {/* Change Email */}
-                        {isChangingEmail && (
-                            <form onSubmit={handleEmailSubmit(openOtpModal)}>
-                                <h5 className="mb-4 text-info fw-bold"><i className="bi bi-envelope-fill me-2"></i> Change Email</h5>
-                                <div className="mb-3">
-                                    <label className="form-label fw-semibold">New Email</label>
-                                    <input type="email" className="form-control" {...registerEmail("email", { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ })} />
-                                </div>
-                                <div className="d-flex justify-content-end gap-2 mt-4">
-                                    <button type="button" className="btn btn-outline-secondary" onClick={() => { resetEmail(); setIsChangingEmail(false); }}>Cancel</button>
-                                    <button type="submit" className="btn btn-info"><i className="bi bi-check-circle me-1"></i> Update Email</button>
-                                </div>
-                            </form>
-                        )}
+                            {/* Change Email */}
+                            {isChangingEmail && (
+                                <form onSubmit={handleEmailSubmit(openOtpModal)}>
+                                    <h5 className="mb-4 text-info fw-bold"><i className="bi bi-envelope-fill me-2"></i> Change Email</h5>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">New Email</label>
+                                        <input type="email" className="form-control" {...registerEmail("email", { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ })} />
+                                    </div>
+                                    <div className="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => { resetEmail(); setIsChangingEmail(false); }}>Cancel</button>
+                                        <button type="submit" className="btn btn-info"><i className="bi bi-check-circle me-1"></i> Update Email</button>
+                                    </div>
+                                </form>
+                            )}
 
+                        </div>
                     </div>
                 </div>
-            </div>
-            <OTPModal showModal={showOtpModal.open} email={showOtpModal.email} onClose={() => setShowOtpModal(false)} onSubmit={onSubmitEmail} />
+                <OTPModal showModal={showOtpModal.open} email={showOtpModal.email} onClose={() => setShowOtpModal(false)} onSubmit={onSubmitEmail} />
+            </>)}
         </div>
     );
 };

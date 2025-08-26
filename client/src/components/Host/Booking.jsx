@@ -10,6 +10,7 @@ import { BillingStatusLabels, BillingStatus, orderStatusOptions, statusConfig } 
 import CustomMultiSelect from "../common/CustomComponent/CustomMultiSelect/CustomMultiSelect";
 import { format } from 'date-fns';
 import BackButton from "../common/CustomComponent/BackButton";
+import Loader from "../common/CustomComponent/Loader";
 
 // --- Filters Component ---
 const RoomFilters = ({ status, setStatus, searchRooms, orderStatusOptions }) => (
@@ -58,7 +59,7 @@ const HostBooking = () => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showBillingModal, setShowBillingModal] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
-
+    const [loader, setLoader] = useState(true);
     const [modalData, setModalData] = useState({
         title: "",
         message: null,
@@ -242,7 +243,6 @@ const HostBooking = () => {
                 status: filters.status.value,
             });
 
-            console.log("data: ", data);
             const list = data.list.map(({ _id, bookingDetails, room, tenant, hostId, status, receipt, timeline }) => ({
                 billingId: _id,
                 userId: tenant._id,
@@ -264,6 +264,7 @@ const HostBooking = () => {
                 setTotal(data.length || list.length);
                 setRooms(list);
             }
+            setLoader(false);
         } catch (error) {
             handleCatch(error);
         }
@@ -321,133 +322,137 @@ const HostBooking = () => {
     return (
         <>
             <div className="container">
-                {/* Title */}
-                <div className="d-flex justify-content-between align-items-center mb-4 room-title">
-                    {/* Left side: Title */}
-                    <h2 className="mb-0">Reservations</h2>
-                    {/* Right side: Back + Reservation buttons */}
-                    <div className="d-flex align-items-center gap-2">
-                        <BackButton />
+                {loader && <Loader show={loader} message="Loading Reservations..."></Loader>}
+                {!loader && <>
+                    {/* Title */}
+                    <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                        {/* Left side: Title */}
+                        <h2 className="mb-0">Reservations</h2>
+                        {/* Right side: Back + Reservation buttons */}
+                        <div className="d-flex align-items-center gap-2">
+                            <BackButton />
+                        </div>
                     </div>
-                </div>
 
-                {/* Filters */}
-                <RoomFilters
-                    status={filters.status}
-                    setStatus={(value) => setFilters(prev => ({ ...prev, status: value }))}
-                    searchRooms={searchRooms}
-                    orderStatusOptions={orderStatusOptions}
-                />
+                    {/* Filters */}
+                    <RoomFilters
+                        status={filters.status}
+                        setStatus={(value) => setFilters(prev => ({ ...prev, status: value }))}
+                        searchRooms={searchRooms}
+                        orderStatusOptions={orderStatusOptions}
+                    />
 
-                {/* Table */}
-                <CustomTable
-                    columns={columns}
-                    data={rooms}
-                    enableSorting={true}
-                    actions={getActions}
-                    pagination={pagination}
-                    sortTable={(key, order) => setFilters(prev => ({ ...prev, sortKey: key, sortOrder: order }))}
-                />
+                    {/* Table */}
+                    <CustomTable
+                        columns={columns}
+                        data={rooms}
+                        enableSorting={true}
+                        actions={getActions}
+                        pagination={pagination}
+                        sortTable={(key, order) => setFilters(prev => ({ ...prev, sortKey: key, sortOrder: order }))}
+                    />
 
-                {/* Confirmation Modal */}
-                <CustomConfirmationModal
-                    show={showConfirm}
-                    title={modalData.title}
-                    message={modalData.message}
-                    onConfirm={() => modalData.onConfirm?.()}
-                    onCancel={cancelConfirm}
-                    confirmText={modalData.confirmText}
-                    size={modalData.size}
-                    cancelText="Cancel"
-                    isHtml={false} // now we use JSX directly
-                />
+                    {/* Confirmation Modal */}
+                    <CustomConfirmationModal
+                        show={showConfirm}
+                        title={modalData.title}
+                        message={modalData.message}
+                        onConfirm={() => modalData.onConfirm?.()}
+                        onCancel={cancelConfirm}
+                        confirmText={modalData.confirmText}
+                        size={modalData.size}
+                        cancelText="Cancel"
+                        isHtml={false} // now we use JSX directly
+                    />
 
-                {/* Billing Modal */}
-                {showBillingModal && (
-                    <MiniCustomModal
-                        show={showBillingModal}
-                        onClose={closeBillingModal}
-                        title="Billing Details"
-                        modalClass="modal-dialog modal-dialog-centered modal-lg"
-                        footer={({ handleClose }) => (
-                            <>
-                                <button className="btn btn-secondary" onClick={handleClose}>Cancel</button>
-                            </>
-                        )}
-                    >
-                        {bookingDetails && (
-                            <div className="space-y-3">
-                                <table className="table table-sm table-bordered mb-0 w-full text-sm">
-                                    <tbody>
-                                        <tr>
-                                            <th>Check-in</th>
-                                            <td>{new Date(bookingDetails.checkin).toLocaleDateString()}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Check-out</th>
-                                            <td>{new Date(bookingDetails.checkout).toLocaleDateString()}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Nights</th>
-                                            <td>{bookingDetails.nights}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Base Price</th>
-                                            <td>
-                                                ₹{bookingDetails.basePrice}
-                                                <span className="text-muted ms-2">
-                                                    (1 tenant + 1 guest)
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {bookingDetails.extraAdultCount > 0 && (
+                    {/* Billing Modal */}
+                    {showBillingModal && (
+                        <MiniCustomModal
+                            show={showBillingModal}
+                            onClose={closeBillingModal}
+                            title="Billing Details"
+                            modalClass="modal-dialog modal-dialog-centered modal-lg"
+                            footer={({ handleClose }) => (
+                                <>
+                                    <button className="btn btn-secondary" onClick={handleClose}>Cancel</button>
+                                </>
+                            )}
+                        >
+                            {bookingDetails && (
+                                <div className="space-y-3">
+                                    <table className="table table-sm table-bordered mb-0 w-full text-sm">
+                                        <tbody>
                                             <tr>
-                                                <th>
-                                                    Extra Adults ({bookingDetails.extraAdultCount} × ₹{bookingDetails.extraAdultRate})
-                                                </th>
-                                                <td>₹{bookingDetails.extraAdultCharge}</td>
+                                                <th>Check-in</th>
+                                                <td>{new Date(bookingDetails.checkin).toLocaleDateString()}</td>
                                             </tr>
-                                        )}
-                                        {bookingDetails.teenCount > 0 && (
                                             <tr>
-                                                <th>
-                                                    Teen ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
-                                                </th>
-                                                <td>₹{bookingDetails.teenCharge}</td>
+                                                <th>Check-out</th>
+                                                <td>{new Date(bookingDetails.checkout).toLocaleDateString()}</td>
                                             </tr>
-                                        )}
-                                        {bookingDetails.petCount > 0 && (
                                             <tr>
-                                                <th>
-                                                    Pets ({bookingDetails.petCount} × ₹{bookingDetails.petRate})
-                                                </th>
-                                                <td>₹{bookingDetails.petCharge}</td>
+                                                <th>Nights</th>
+                                                <td>{bookingDetails.nights}</td>
                                             </tr>
-                                        )}
-                                        <tr>
-                                            <th>Cleaning Fee</th>
-                                            <td>₹{bookingDetails.cleaningFee}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Service Charge</th>
-                                            <td>₹{bookingDetails.serviceCharge}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>GST</th>
-                                            <td>₹{bookingDetails.gst} ({bookingDetails.gstRate * 100}%)</td>
-                                        </tr>
-                                        <tr className="fw-bold">
-                                            <th>Total</th>
-                                            <td>₹{bookingDetails.total}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                            <tr>
+                                                <th>Base Price</th>
+                                                <td>
+                                                    ₹{bookingDetails.basePrice}
+                                                    <span className="text-muted ms-2">
+                                                        (1 tenant + 1 guest)
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {bookingDetails.extraAdultCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Extra Adults ({bookingDetails.extraAdultCount} × ₹{bookingDetails.extraAdultRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.extraAdultCharge}</td>
+                                                </tr>
+                                            )}
+                                            {bookingDetails.teenCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Teen ({bookingDetails.teenCount} × ₹{bookingDetails.teenRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.teenCharge}</td>
+                                                </tr>
+                                            )}
+                                            {bookingDetails.petCount > 0 && (
+                                                <tr>
+                                                    <th>
+                                                        Pets ({bookingDetails.petCount} × ₹{bookingDetails.petRate})
+                                                    </th>
+                                                    <td>₹{bookingDetails.petCharge}</td>
+                                                </tr>
+                                            )}
+                                            <tr>
+                                                <th>Cleaning Fee</th>
+                                                <td>₹{bookingDetails.cleaningFee}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Service Charge</th>
+                                                <td>₹{bookingDetails.serviceCharge}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>GST</th>
+                                                <td>₹{bookingDetails.gst} ({bookingDetails.gstRate * 100}%)</td>
+                                            </tr>
+                                            <tr className="fw-bold">
+                                                <th>Total</th>
+                                                <td>₹{bookingDetails.total}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
 
 
-                    </MiniCustomModal>
-                )}
+                        </MiniCustomModal>
+                    )}
+
+                </>}
             </div>
         </>
     );
