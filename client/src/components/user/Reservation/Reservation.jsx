@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { format, subDays, differenceInCalendarDays } from 'date-fns';
 import BackButton from "../../common/CustomComponent/BackButton.jsx";
 import SignUp from "../../authentication/Signup.jsx";
+import Loader from "../../common/CustomComponent/Loader.jsx";
 
 const Reservation = () => {
 
@@ -25,6 +26,8 @@ const Reservation = () => {
   const [excludeDates, setExcludeDates] = useState([]);
   const [showSignup, setShowSignup] = useState(false);
   const [resetTrip, setResetTrip] = useState(false);
+  const [loader, setLoader] = useState(true);
+
 
   const booking = async (order, razorpayResponse) => {
     try {
@@ -161,6 +164,7 @@ const Reservation = () => {
         city: room.location.city,
       })
 
+      setLoader(false);
     } catch (error) {
       handleCatch(error);
     }
@@ -189,70 +193,72 @@ const Reservation = () => {
 
   return (
     <div className="container">
-
-      <div className="d-flex justify-content-between align-items-center mb-4 room-title">
-        {/* Left side: Title */}
-        <h2 className="mb-0">Trip Information and Payment</h2>
-        {/* Right side: Back + Reservation buttons */}
-        <div className="d-flex align-items-center gap-2">
-          <BackButton />
+      {loader && <Loader show={loader}></Loader>}
+      {!loader && <>
+        <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+          {/* Left side: Title */}
+          <h2 className="mb-0">Trip Information and Payment</h2>
+          {/* Right side: Back + Reservation buttons */}
+          <div className="d-flex align-items-center gap-2">
+            <BackButton />
+          </div>
         </div>
-      </div>
 
 
-      <div className="row">
-        {/* Left: Booking Details */}
-        <div className="col-md-7">
-          <TripDetail onChange={(value) => onChangeTripDetail(value)} occupancy={occupancy} excludeDates={excludeDates} resetTrip={resetTrip}></TripDetail>
-          {/* Show login form if not logged in */}
-          {!isLoggedIn && (
-            <>
+        <div className="row">
+          {/* Left: Booking Details */}
+          <div className="col-md-7">
+            <TripDetail onChange={(value) => onChangeTripDetail(value)} occupancy={occupancy} excludeDates={excludeDates} resetTrip={resetTrip}></TripDetail>
+            {/* Show login form if not logged in */}
+            {!isLoggedIn && (
+              <>
+                <hr />
+                <Login userType={USER_TYPE.USER} title={"Login Before Checkout"} onClose={() => { }} onSignUp={setShowSignup}></Login>
+                <SignUp userType={USER_TYPE.USER} showModal={showSignup} onClose={() => setShowSignup(false)} />
+              </>
+            )}
+            {isLoggedIn && billing?.checkin && billing?.checkout && (<>
               <hr />
-              <Login userType={USER_TYPE.USER} title={"Login Before Checkout"} onClose={() => { }} onSignUp={setShowSignup}></Login>
-              <SignUp userType={USER_TYPE.USER} showModal={showSignup} onClose={() => setShowSignup(false)} />
-            </>
-          )}
-          {isLoggedIn && billing?.checkin && billing?.checkout && (<>
-            <hr />
-            <div className="col-md-12">
-              <h2>Cancellation Policy</h2>
-              {(getCancellationPolicy())}
-            </div>
-            <hr />
-            <div className="col-md-12">
-              <h2>Ground rules</h2>
-              <p>We ask every guest to remember a few simple things about what makes a great guest.</p>
-              <ul>
-                <li><span> Follow the house rules</span></li>
-                <li><span>Treat your Host’s home like your own</span></li>
-              </ul>
-            </div>
-            <hr />
-            <div className="col-md-12 razorpay-container">
-              <p className="razorpay-text">
-                <b>Proceed to {" "}</b>
-                <img src="/assets/razorpay.svg" alt="Razorpay" className="razorpay-logo" />
-              </p>
-              <p className="razorpay-text">You will be redirected to Razorpay to complete your payment.</p>
-            </div>
-            <hr />
-            <div className="col-md-12">
-              <p className="term-conditions">
-                By selecting the button below, I agree to the <b>Host's House Rules, Ground rules for guests, Roomly's Rebooking and Refund Policy </b> and that <b>Roomly</b> can <b>charge my payment method</b> if I’m responsible for damage.
-              </p>
-              <button onClick={() => handleCheckout(true)} className="btn btn-primary custom-checkout-btn">
-                Checkout
-              </button>
-            </div>
-          </>)
-          }
+              <div className="col-md-12">
+                <h2>Cancellation Policy</h2>
+                {(getCancellationPolicy())}
+              </div>
+              <hr />
+              <div className="col-md-12">
+                <h2>Ground rules</h2>
+                <p>We ask every guest to remember a few simple things about what makes a great guest.</p>
+                <ul>
+                  <li><span> Follow the house rules</span></li>
+                  <li><span>Treat your Host’s home like your own</span></li>
+                </ul>
+              </div>
+              <hr />
+              <div className="col-md-12 razorpay-container">
+                <p className="razorpay-text">
+                  <b>Proceed to {" "}</b>
+                  <img src="/assets/razorpay.svg" alt="Razorpay" className="razorpay-logo" />
+                </p>
+                <p className="razorpay-text">You will be redirected to Razorpay to complete your payment.</p>
+              </div>
+              <hr />
+              <div className="col-md-12">
+                <p className="term-conditions">
+                  By selecting the button below, I agree to the <b>Host's House Rules, Ground rules for guests, Roomly's Rebooking and Refund Policy </b> and that <b>Roomly</b> can <b>charge my payment method</b> if I’m responsible for damage.
+                </p>
+                <button onClick={() => handleCheckout(true)} className="btn btn-primary custom-checkout-btn">
+                  Checkout
+                </button>
+              </div>
+            </>)
+            }
+          </div>
+          {/**Right: Room Details */}
+          <div className="col-md-5">
+            <BillingDetails occupancy={guest} pricing={pricing} room={room} billing={billing} setBilling={setBilling} />
+          </div>
         </div>
-        {/**Right: Room Details */}
-        <div className="col-md-5">
-          <BillingDetails occupancy={guest} pricing={pricing} room={room} billing={billing} setBilling={setBilling} />
-        </div>
-      </div>
-    </div >
+      </>}
+    </div>
   );
 };
 

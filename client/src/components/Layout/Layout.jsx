@@ -12,16 +12,14 @@ const Layout = () => {
 
       {/* Scrollable main content */}
       <main className="flex-grow-1 overflow-auto">
-        <div className="container py-4">
-          <Outlet />
-        </div>
-      </main>
+        <Outlet />
+      </main >
 
       {/* Footer - fixed */}
-      <footer className="flex-shrink-0">
+      < footer className="flex-shrink-0" >
         <Footer />
-      </footer>
-    </div>
+      </footer >
+    </div >
   );
 };
 
