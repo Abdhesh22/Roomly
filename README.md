@@ -52,7 +52,7 @@ cd Roomly
 
 ### 2. Front Setup
 ## Create .env file in front directory
-- 👉 [Frontend .env Setup Guide]()
+- 👉 [Frontend .env Setup Guide](https://docs.google.com/document/d/1JrXRnu1E_hUQQh0O7QquCnA1hW60CP-15wRfWPJAfEI/edit?addon_store&tab=t.0)
 
 ```bash
 cd ./client
@@ -68,7 +68,7 @@ npm run dev
 
 ### 3. Backend Setup
 ## Create .env file in server directory
-- 👉 [Backend .env Setup Guide]()  
+- 👉 [Backend .env Setup Guide](https://docs.google.com/document/d/1JrXRnu1E_hUQQh0O7QquCnA1hW60CP-15wRfWPJAfEI/edit?addon_store&tab=t.jdnobkf3e0xf)  
 
 ```bash
 cd ./server
