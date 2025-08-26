@@ -48,3 +48,32 @@ It provides an end-to-end flow including **room listing, image uploads, interact
 ```bash
 git clone https://github.com/Abdhesh22/Roomly.git
 cd Roomly
+```
+
+### 2. Front Setup
+```bash
+cd ./client
+npm install
+
+# Create environment file
+touch .env
+
+# Run frontend
+npm run dev
+
+```
+
+### 3. Backend Setup
+
+```bash
+cd ./server
+npm install
+
+# Create environment file
+touch .env
+
+# Run Seeds
+npm run seeds
+
+# OR run in production
+npm start```
