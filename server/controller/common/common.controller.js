@@ -44,7 +44,18 @@ class CommonController {
 
             res.status(httpStatus.OK).json({ status: true, list: amenities });
         } catch (error) {
-            console.log(error);
+
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+                status: false,
+                message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
+            });
+        }
+    }
+
+    getPing = async (req, res) => {
+        try {
+            res.status(httpStatus.OK).json({ status: true, message: "Server is Alive" });
+        } catch (error) {
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
                 status: false,
                 message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
