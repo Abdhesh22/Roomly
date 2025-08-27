@@ -12,10 +12,12 @@ const SignUp = ({ showModal, onClose, userType }) => {
     email: ''
   });
 
+  const [disableSignUp, setDisableSignUp] = useState(false);
   const { register, handleSubmit, formState: { errors }, getValues, watch, setValue, reset } = useForm();
 
   const onSubmit = async (data) => {
     try {
+      setDisableSignUp(false);
       setOtpModal({
         open: true,
         email: data.email
@@ -151,9 +153,22 @@ const SignUp = ({ showModal, onClose, userType }) => {
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="btn btn-primary w-100">
-            Verify Email
+          <button type="submit" className="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2" disabled={disableSignUp}>
+            {disableSignUp ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Submitting...
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
+
+
         </form>
       </MiniCustomModal>
       <OTPModal email={optModal.email} showModal={optModal.open} onClose={() => setOtpModal({

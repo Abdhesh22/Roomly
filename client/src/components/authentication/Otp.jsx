@@ -62,21 +62,21 @@ const OTPModal = ({ showModal, onClose, onSubmit, email }) => {
         <MiniCustomModal
             show={showModal}
             onClose={onClose}
+            showCross={false}
             title="Verify Your Email"
             modalClass="modal-dialog modal-dialog-centered modal-lg"
             footer={
-                <div className="d-flex justify-content-between w-100">
-                    <button className="btn btn-secondary" onClick={onClose}>
-                        Cancel
-                    </button>
+                <div className="d-flex justify-content-end w-100">
                     <div className="d-flex gap-2">
-                        <button
-                            className="btn btn-outline-primary"
-                            onClick={sendOtp}
-                            disabled={resendTimer > 0 || loading}
-                        >
-                            {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend OTP"}
-                        </button>
+                        {!loading &&
+                            <button
+                                className="btn btn-outline-primary"
+                                onClick={sendOtp}
+                                disabled={resendTimer > 0}
+                            >
+                                {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend OTP"}
+                            </button>
+                        }
                         <button
                             className="btn btn-success"
                             onClick={handleSubmit}

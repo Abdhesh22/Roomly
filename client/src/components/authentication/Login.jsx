@@ -10,10 +10,12 @@ const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => 
 
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [disableLogin, setDisableLogin] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
   const handleLogin = async () => {
     try {
+      setDisableLogin(true);
       const { email, password } = loginData;
 
       if (!email) return toast.error("Email is required");
@@ -24,7 +26,7 @@ const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => 
         password,
         userType
       });
-
+      setDisableLogin(false);
       onClose(true);
       setTimeout(() => {
         if (userType == USER_TYPE.HOST) {
@@ -34,6 +36,7 @@ const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => 
       }, 100);
       toast.success(data.message || "Login successful");
     } catch (error) {
+      setDisableLogin(false);
       handleCatch(error);
     }
   };
@@ -65,8 +68,19 @@ const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => 
           />
         </div>
 
-        <button onClick={handleLogin} className="btn btn-primary w-100">
-          Login
+        <button onClick={handleLogin} className="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2" disabled={disableLogin}>
+          {disableLogin ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
         </button>
 
         <p className="mt-3 text-center">

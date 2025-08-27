@@ -30,5 +30,6 @@ module.exports.toaster = {
         return `Booking status has been updated to "${BillingStatusLabels[status] || "Unknown"}".`;
     },
     ROOM_CANCELLED_BY_TENANT: "Room has been cancelled successfully.",
-    BOOKING_ALREADY_CANCELLED: "This booking has already been cancelled."
+    BOOKING_ALREADY_CANCELLED: "This booking has already been cancelled.",
+    PROFILE_UPDATED: "Profile has been updated successfully"
 };

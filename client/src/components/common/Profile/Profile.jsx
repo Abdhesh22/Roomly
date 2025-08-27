@@ -96,9 +96,11 @@ const Profile = () => {
                 _id: updatedUser._id,
                 firstName: updatedUser.firstName,
                 lastName: updatedUser.lastName,
+                userType: updatedUser.userType,
                 email: updatedUser.email,
                 profileUrl: updatedUser?.profileAttachment?.remotePath
             });
+            toast.success(res.data.message);
         } catch (err) {
             console.error(err);
             setError("Failed to update profile");
@@ -116,6 +118,7 @@ const Profile = () => {
         try {
             const response = await api.put("/api/user/change-password", { passwordData: data });
             if (response.data.status) {
+                toast.success(response.data.message);
                 resetPassword();
                 setIsChangingPassword(false);
             } else {
@@ -160,6 +163,7 @@ const Profile = () => {
                 toast.success(message);
                 const values = getEmailValues();
                 const { data: res } = await api.put("/api/user/change-email", values);
+                toast.success(res.message);
                 setUser(res.user);
                 setIsChangingEmail(false);
                 setEmailValue("email", res.user.email);

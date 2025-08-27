@@ -6,8 +6,9 @@ import CustomLocationPicker from "../common/CustomComponent/CustomLocationPicker
 import { fetchAmenities, fetchCities, fetchStates, handleCatch, urlToFile } from "../../utils/common";
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import BackButton from "../common/CustomComponent/BackButton";
+import Loader from "../common/CustomComponent/Loader"
 const CreateEditRoom = () => {
     const navigate = useNavigate();
     const { register, handleSubmit, control, setValue, formState: { errors }, getValues } = useForm({
@@ -34,11 +35,13 @@ const CreateEditRoom = () => {
         },
     });
 
+    const [loader, setLoader] = useState(true);
     const { roomId } = useParams();
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
     const [amenities, setAmenities] = useState([]);
     const [files, setFiles] = useState([]);
+    const [disableSubmit, setDisableSubmit] = useState(false)
     const [removeAttachments, setRemoveAttachments] = useState([]);
     const type = [
         { label: "Room", value: "room" },
@@ -55,6 +58,8 @@ const CreateEditRoom = () => {
     const onSubmit = async (payload) => {
 
         try {
+
+            setDisableSubmit(true);
             const formData = new FormData();
 
             // Flat fields
@@ -67,10 +72,8 @@ const CreateEditRoom = () => {
 
             // Images
             const images = [];
-            console.log("files.length: ", files.length);
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                console.log("file: ", file);
                 if (file instanceof File) {
                     if (file.toUpload) {
                         images.push(file);
@@ -79,8 +82,6 @@ const CreateEditRoom = () => {
                     }
                 }
             }
-
-            console.log("NumberOf Image Push: ", images.length);
 
             if (removeAttachments.length > 0) {
                 const filesToRemove = removeAttachments.map(file => file.remoteId);
@@ -114,7 +115,11 @@ const CreateEditRoom = () => {
                 navigate("/host/rooms");
                 return;
             }
+
+            setDisableSubmit(false);
+
         } catch (err) {
+            setDisableSubmit(false);
             handleCatch(err);
         }
     };
@@ -202,6 +207,8 @@ const CreateEditRoom = () => {
         if (roomId) {
             await fetchRoom(amenitiesData);
         }
+
+        setLoader(false);
     };
 
 
@@ -233,235 +240,254 @@ const CreateEditRoom = () => {
 
     return (
         <div className="container">
-            <div className="d-flex justify-content-between align-items-center mb-4 room-title">
-                {/* Left side: Title */}
-                <h2 className="mb-0">🏠 {roomId ? 'Edit Room' : 'Add Room'}</h2>
-                {/* Right side: Back + Reservation buttons */}
-                <div className="d-flex align-items-center gap-2">
-                    <BackButton />
-                </div>
-            </div>
+            {loader && <Loader show={loader} message="Loading Room..."></Loader>}
+            {!loader && (
+                <>
 
-            <form onSubmit={handleSubmit(onSubmit)} id="room" className="">
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">Room Info</h5>
-                    <div className="row g-3">
-                        <div className="col-md-6">
-                            <label className="form-label">Building Name</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.title ? "is-invalid" : ""}`}
-                                {...register("title", { required: "Building Name is required" })}
-                            />
-                            {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
+                    <div className="d-flex justify-content-between align-items-center mb-4 room-title">
+                        {/* Left side: Title */}
+                        <h2 className="mb-0">🏠 {roomId ? 'Edit Room' : 'Add Room'}</h2>
+                        {/* Right side: Back + Reservation buttons */}
+                        <div className="d-flex align-items-center gap-2">
+                            <BackButton />
                         </div>
                     </div>
-                </section>
 
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">Location</h5>
+                    <form onSubmit={handleSubmit(onSubmit)} id="room" className="">
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">Room Info</h5>
+                            <div className="row g-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Building Name</label>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors.title ? "is-invalid" : ""}`}
+                                        {...register("title", { required: "Building Name is required" })}
+                                    />
+                                    {errors.title && <div className="invalid-feedback">{errors.title.message}</div>}
+                                </div>
+                            </div>
+                        </section>
 
-                    <CustomLocationPicker onChange={handlePlace} latitude={getValues("latitude") || 28.6139} longitude={getValues("longitude") || 77.209} showSearch={true} />
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">Location</h5>
 
-                    <div className="row g-3 mt-3">
-                        <div className="col-md-4">
+                            <CustomLocationPicker onChange={handlePlace} latitude={getValues("latitude") || 28.6139} longitude={getValues("longitude") || 77.209} showSearch={true} />
+
+                            <div className="row g-3 mt-3">
+                                <div className="col-md-4">
+                                    <Controller
+                                        name="state"
+                                        control={control}
+                                        rules={{ required: "Select State" }}
+                                        render={({ field }) => (
+                                            <CustomMultiSelect
+                                                label="State"
+                                                options={states}
+                                                value={field.value}
+                                                onChange={(value) => { field.onChange(value); getCities(value) }}
+                                                error={errors.state}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <Controller
+                                        name="city"
+                                        control={control}
+                                        rules={{ required: "Select City" }}
+                                        render={({ field }) => (
+                                            <CustomMultiSelect
+                                                label="City or Nearby Area"
+                                                options={cities}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                error={errors.city}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Pincode</label>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors.pincode ? "is-invalid" : ""}`}
+                                        {...register("pincode", {
+                                            required: "Pincode is required",
+                                            pattern: { value: /^\d{6}$/, message: "Must be 6 digits" },
+                                        })}
+                                    />
+                                    {errors.pincode && <div className="invalid-feedback">{errors.pincode.message}</div>}
+                                </div>
+                            </div>
+
+                            <input type="hidden" {...register("latitude", { required: true })} />
+                            <input type="hidden" {...register("longitude", { required: true })} />
+                        </section>
+
+                        <section className="mb-4">
+                            <div className="row g-3">
+                                <div className="col-md-6">
+                                    <Controller
+                                        name="type"
+                                        control={control}
+                                        rules={{ required: "Select Building Type" }}
+                                        render={({ field }) => (
+                                            <CustomMultiSelect
+                                                label="Building Type"
+                                                options={type}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                error={errors.type}
+                                                isMulti={false}
+                                            />
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label className="form-label">Room Number</label>
+                                    <input
+                                        type="number"
+                                        className={`form-control ${errors.roomNo ? "is-invalid" : ""}`}
+                                        {...register("roomNo", { required: "Room Number is required" })}
+                                    />
+                                    {errors.roomNo && <div className="invalid-feedback">{errors.roomNo.message}</div>}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Images */}
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">Images</h5>
                             <Controller
-                                name="state"
+                                name="images"
                                 control={control}
-                                rules={{ required: "Select State" }}
-                                render={({ field }) => (
-                                    <CustomMultiSelect
-                                        label="State"
-                                        options={states}
-                                        value={field.value}
-                                        onChange={(value) => { field.onChange(value); getCities(value) }}
-                                        error={errors.state}
-                                        isMulti={false}
+                                rules={{
+                                    validate: () => {
+                                        if (files.length === 0) return "At least one image is required";
+                                        if (files.length !== 5) return "You must upload exactly 5 images";
+                                        return true;
+                                    }
+                                }}
+                                render={({ }) => (
+                                    <CustomFileUploader
+                                        label="Upload Images (Equal To 5)"
+                                        accept="image/*"
+                                        maxFiles={5}
+                                        value={files}
+                                        onFileAdd={(file, method) => { addRemoveFile(file, method) }}
+                                        onFileRemove={(file, method, index) => { addRemoveFile(file, method, index) }}
+                                        error={errors.images}
                                     />
                                 )}
                             />
-                        </div>
-                        <div className="col-md-4">
-                            <Controller
-                                name="city"
-                                control={control}
-                                rules={{ required: "Select City" }}
-                                render={({ field }) => (
-                                    <CustomMultiSelect
-                                        label="City or Nearby Area"
-                                        options={cities}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        error={errors.city}
-                                        isMulti={false}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Pincode</label>
-                            <input
-                                type="text"
-                                className={`form-control ${errors.pincode ? "is-invalid" : ""}`}
-                                {...register("pincode", {
-                                    required: "Pincode is required",
-                                    pattern: { value: /^\d{6}$/, message: "Must be 6 digits" },
-                                })}
-                            />
-                            {errors.pincode && <div className="invalid-feedback">{errors.pincode.message}</div>}
-                        </div>
-                    </div>
+                        </section>
 
-                    <input type="hidden" {...register("latitude", { required: true })} />
-                    <input type="hidden" {...register("longitude", { required: true })} />
-                </section>
-
-                <section className="mb-4">
-                    <div className="row g-3">
-                        <div className="col-md-6">
-                            <Controller
-                                name="type"
-                                control={control}
-                                rules={{ required: "Select Building Type" }}
-                                render={({ field }) => (
-                                    <CustomMultiSelect
-                                        label="Building Type"
-                                        options={type}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        error={errors.type}
-                                        isMulti={false}
-                                    />
-                                )}
-                            />
-                        </div>
-
-                        <div className="col-md-6">
-                            <label className="form-label">Room Number</label>
-                            <input
-                                type="number"
-                                className={`form-control ${errors.roomNo ? "is-invalid" : ""}`}
-                                {...register("roomNo", { required: "Room Number is required" })}
-                            />
-                            {errors.roomNo && <div className="invalid-feedback">{errors.roomNo.message}</div>}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Images */}
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">Images</h5>
-                    <Controller
-                        name="images"
-                        control={control}
-                        rules={{
-                            validate: () => {
-                                if (files.length === 0) return "At least one image is required";
-                                if (files.length !== 5) return "You must upload exactly 5 images";
-                                return true;
-                            }
-                        }}
-                        render={({ }) => (
-                            <CustomFileUploader
-                                label="Upload Images (Equal To 5)"
-                                accept="image/*"
-                                maxFiles={5}
-                                value={files}
-                                onFileAdd={(file, method) => { addRemoveFile(file, method) }}
-                                onFileRemove={(file, method, index) => { addRemoveFile(file, method, index) }}
-                                error={errors.images}
-                            />
-                        )}
-                    />
-                </section>
-
-                {/* Description & Amenities */}
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">About Room</h5>
-                    <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <textarea
-                            className={`form-control ${errors.description ? "is-invalid" : ""}`}
-                            rows="6"
-                            {...register("description", { required: "Description is required" })}
-                        />
-                        {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
-                    </div>
-
-                    <div>
-                        <Controller
-                            name="amenities"
-                            control={control}
-                            rules={{ required: "Select at least one amenity" }}
-                            render={({ field }) => (
-                                <CustomMultiSelect
-                                    label="Amenities"
-                                    options={amenities}
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    error={errors.amenities}
+                        {/* Description & Amenities */}
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">About Room</h5>
+                            <div className="mb-3">
+                                <label className="form-label">Description</label>
+                                <textarea
+                                    className={`form-control ${errors.description ? "is-invalid" : ""}`}
+                                    rows="6"
+                                    {...register("description", { required: "Description is required" })}
                                 />
-                            )}
-                        />
-                    </div>
-                </section>
+                                {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                            </div>
 
-                {/* Guest Size */}
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">Occupancy</h5>
-                    <div className="row g-3">
-                        {["guest", "bed", "bath", "bedRoom", "pet", "teens", "infants"].map((key) => (
-                            <div className="col-md-3" key={key}>
-                                <label className="form-label">Max Number Of {key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                            <div>
                                 <Controller
-                                    name={`occupancy.${key}`}
+                                    name="amenities"
                                     control={control}
-                                    rules={{ required: true, min: 0 }}
+                                    rules={{ required: "Select at least one amenity" }}
                                     render={({ field }) => (
-                                        <input
-                                            type="number"
-                                            className={`form-control ${errors.occupancy?.[key] ? "is-invalid" : ""}`}
-                                            {...field}
+                                        <CustomMultiSelect
+                                            label="Amenities"
+                                            options={amenities}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            error={errors.amenities}
                                         />
                                     )}
                                 />
-                                {errors.occupancy?.[key] && <div className="text-danger">Required</div>}
                             </div>
-                        ))}
-                    </div>
-                </section>
+                        </section>
 
-                {/* Price Section */}
-                <section className="mb-4">
-                    <h5 className="fw-semibold mb-3 text-uppercase text-muted">Pricing</h5>
-                    <div className="row g-3">
-                        {["base", "guest", "pet", "teens", "cleaning"].map((key) => (
-                            <div className="col-md-3" key={key}>
-                                <label className="form-label">{key === "base" ? "Base Price" : `Price per ${key}`}</label>
-                                <Controller
-                                    name={`price.${key}`}
-                                    control={control}
-                                    rules={{ required: true, min: 0 }}
-                                    render={({ field }) => (
-                                        <input
-                                            type="number"
-                                            className={`form-control ${errors.price?.[key] ? "is-invalid" : ""}`}
-                                            {...field}
+                        {/* Guest Size */}
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">Occupancy</h5>
+                            <div className="row g-3">
+                                {["guest", "bed", "bath", "bedRoom", "pet", "teens", "infants"].map((key) => (
+                                    <div className="col-md-3" key={key}>
+                                        <label className="form-label">Max Number Of {key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                                        <Controller
+                                            name={`occupancy.${key}`}
+                                            control={control}
+                                            rules={{ required: true, min: 0 }}
+                                            render={({ field }) => (
+                                                <input
+                                                    type="number"
+                                                    className={`form-control ${errors.occupancy?.[key] ? "is-invalid" : ""}`}
+                                                    {...field}
+                                                />
+                                            )}
                                         />
-                                    )}
-                                />
-                                {errors.price?.[key] && <div className="text-danger">Required</div>}
+                                        {errors.occupancy?.[key] && <div className="text-danger">Required</div>}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </section>
+                        </section>
 
-                <div className="mt-4 text-end">
-                    <button type="submit" className="btn btn-success px-4 py-2">
-                        {roomId ? 'Update' : 'Create'} Room
-                    </button>
-                </div>
-            </form>
+                        {/* Price Section */}
+                        <section className="mb-4">
+                            <h5 className="fw-semibold mb-3 text-uppercase text-muted">Pricing</h5>
+                            <div className="row g-3">
+                                {["base", "guest", "pet", "teens", "cleaning"].map((key) => (
+                                    <div className="col-md-3" key={key}>
+                                        <label className="form-label">{key === "base" ? "Base Price" : `Price per ${key}`}</label>
+                                        <Controller
+                                            name={`price.${key}`}
+                                            control={control}
+                                            rules={{ required: true, min: 0 }}
+                                            render={({ field }) => (
+                                                <input
+                                                    type="number"
+                                                    className={`form-control ${errors.price?.[key] ? "is-invalid" : ""}`}
+                                                    {...field}
+                                                />
+                                            )}
+                                        />
+                                        {errors.price?.[key] && <div className="text-danger">Required</div>}
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <div className="mt-4 text-end">
+                            <button type="submit" className="btn btn-success px-4 py-2 gap-2" disabled={disableSubmit}>
+                                {disableSubmit ? (
+                                    <>
+                                        <span
+                                            className="spinner-border spinner-border-sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        ></span>
+                                        {roomId ? 'Updating...' : 'Creating...'}
+                                    </>
+                                ) : (
+                                    <span>
+                                        {roomId ? 'Update' : 'Create'} Room
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </>
+            )}
         </div>
     );
 };

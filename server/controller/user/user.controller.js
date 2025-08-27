@@ -40,7 +40,7 @@ class UserController {
       const file = req.file;
       const user = await userService.updateUserProfile(req.user._id, data, file);
 
-      return res.status(httpStatus.OK).json({ status: true, user });
+      return res.status(httpStatus.OK).json({ status: true, user, message: toaster.PROFILE_UPDATED });
     } catch (error) {
       console.log("error: ", error)
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });

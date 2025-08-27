@@ -13,6 +13,7 @@ const MiniCustomModal = ({
     submitText = "Submit",
     closeText = "Close",
     footer = null,
+    showCross = true,
     modalClass = "modal-dialog modal-dialog-centered modal-sm"
 }) => {
     const modalRef = useRef(null);
@@ -51,16 +52,16 @@ const MiniCustomModal = ({
                 <div className="modal-content p-3">
                     <div className="modal-header">
                         <h5 className="modal-title">{title}</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={handleClose}
-                            aria-label="Close"
-                        ></button>
+                        {showCross && (
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={handleClose}
+                                aria-label="Close"
+                            ></button>
+                        )}
                     </div>
-
                     <div className="modal-body">{children}</div>
-
                     {footer ? (
                         <div className="modal-footer">
                             {typeof footer === "function" ? footer({ handleClose }) : footer}
