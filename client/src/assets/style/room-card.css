@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+:root {
+  --primary: #ff5a5f;
+  --font-main: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: #f8f9fa; /* optional, gives cleaner look */
+}
+
+
+:root {
+  --primary: #ff5a5f;
+  --font-main: "Inter", sans-serif;
+}
+
+/* Base Card */
+.room-card {
+  font-family: var(--font-main);
+  border: none;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.room-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* Image */
+.room-image-wrapper {
+  overflow: hidden;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.room-card img {
+  transition: transform 0.4s ease;
+  border-radius: 0.75rem;
+}
+
+.room-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Price Badge */
+.room-badge {
+  background: linear-gradient(135deg, var(--primary), #ff8084);
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 50rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Title */
+.room-title {
+  color: #222;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+/* Host Info */
+.room-card .small {
+  font-size: 0.85rem;
+}
+
+/* Price Section */
+.room-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.room-card .text-decoration-line-through {
+  font-size: 0.9rem;
+  color: #777 !important;
+}

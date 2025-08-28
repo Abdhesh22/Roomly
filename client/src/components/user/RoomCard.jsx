@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 
-const RoomCard = ({ roomId, title, description, state, city, imageSrc, host, price, type }) => {
+
+const RoomCard = ({ roomId, state, city, imageSrc, host, price, type }) => {
   const navigate = useNavigate();
 
   const calculatePrice = (price, percent) => {
@@ -16,52 +17,49 @@ const RoomCard = ({ roomId, title, description, state, city, imageSrc, host, pri
 
   return (
     <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div
-        className="card border-0 h-100 shadow-sm card-hover"
-        onClick={handleCardClick}
-      >
+      <div className="card h-100 room-card" onClick={handleCardClick}>
         {/* Image */}
-        <div className="room-image-wrapper">
+        <div className="room-image-wrapper position-relative">
           <div className="ratio ratio-4x3">
-            <img
-              src={imageSrc}
-              alt="room"
-              className="room-image"
-            />
+            <img src={imageSrc} alt="room" className="object-cover w-100 h-100" />
           </div>
+          {/* Price Tag Overlay */}
+          <span className="badge room-badge position-absolute top-0 end-0 m-2">
+            ₹{price}/night
+          </span>
         </div>
 
-        {/* Content */}
+        {/* Card Body */}
         <div className="card-body d-flex flex-column justify-content-between">
           <div>
-            <h6 className="fw-bold mb-1">
-              {title.length > 40 ? `${title.slice(0, 40)}...` : title}
-            </h6>
-            <h6 className="fw-bold mb-1">
+            <h6 className="room-title mb-1">
               {`${type.charAt(0).toUpperCase() + type.slice(1)} in ${city}, ${state}`}
             </h6>
             <p className="text-muted small mb-1">
-              Stay with {host?.[0]?.firstName || "a host"}
+              Hosted by{" "}
+              <span className="fw-semibold text-dark">
+                {host?.[0]?.firstName || "a host"}
+              </span>
             </p>
             <p className="text-muted small mb-2">
-              Hosting Since {host?.[0]?.createdOn ? format(new Date(host[0].createdOn), "dd/MM/yyyy") : "N/A"}
-            </p>
-            <p className="text-truncate" title={description}>
-              {description.length > 80 ? description.substring(0, 80) + "..." : description}
+              Hosting since{" "}
+              {host?.[0]?.createdOn
+                ? format(new Date(host[0].createdOn), "MMM yyyy")
+                : "N/A"}
             </p>
           </div>
-          <div>
-            <div className="small text-muted text-decoration-line-through">
+
+          {/* Price Section */}
+          <div className="fw-bold mt-2">
+            <span className="small text-muted text-decoration-line-through me-2">
               ₹{calculatePrice(price, 10)}
-            </div>
-            <div className="fw-bold text-dark">
-              ₹{price} <span className="fw-normal text-muted">/ night</span>
-            </div>
+            </span>
+            <span className="room-price">₹{price}</span>
+            <span className="fw-normal text-muted"> / night</span>
           </div>
         </div>
       </div>
     </div>
-
   );
 };
 

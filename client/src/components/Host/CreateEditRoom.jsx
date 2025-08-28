@@ -15,7 +15,7 @@ const CreateEditRoom = () => {
         defaultValues: {
             images: [],
             roomNo: '',
-            type: '',
+            buildingType: '',
             title: '',
             state: null,
             city: null,
@@ -93,10 +93,9 @@ const CreateEditRoom = () => {
             // Location
             formData.append("state", JSON.stringify(payload.state));
             formData.append("city", JSON.stringify(payload.city));
-            formData.append("type", payload.type.value)
+            formData.append("type", payload.buildingType.value)
             // Amenities
             formData.append("amenities", JSON.stringify(payload.amenities));
-
             // Size & Price
             formData.append("occupancy", JSON.stringify(payload.occupancy));
             formData.append("price", JSON.stringify(payload.price));
@@ -178,7 +177,7 @@ const CreateEditRoom = () => {
 
                 setValue("amenities", selectAmenities || []);
                 const typeOption = type.find(item => item.value == room.type);
-                setValue("type", [typeOption]);
+                setValue("buildingType", typeOption);
                 setFiles(imageFiles);
                 setValue("occupancy", room.occupancy || {});
                 setValue("price", room.price || {});
@@ -331,7 +330,7 @@ const CreateEditRoom = () => {
                             <div className="row g-3">
                                 <div className="col-md-6">
                                     <Controller
-                                        name="type"
+                                        name="buildingType"
                                         control={control}
                                         rules={{ required: "Select Building Type" }}
                                         render={({ field }) => (
@@ -340,7 +339,7 @@ const CreateEditRoom = () => {
                                                 options={type}
                                                 value={field.value}
                                                 onChange={field.onChange}
-                                                error={errors.type}
+                                                error={errors.buildingType}
                                                 isMulti={false}
                                             />
                                         )}

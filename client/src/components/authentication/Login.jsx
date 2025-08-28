@@ -15,12 +15,12 @@ const Login = ({ onClose, userType, title = "Login to continue", onSignUp }) => 
 
   const handleLogin = async () => {
     try {
-      setDisableLogin(true);
+
       const { email, password } = loginData;
 
       if (!email) return toast.error("Email is required");
       if (!password) return toast.error("Password is required");
-
+      setDisableLogin(true);
       const { data } = await api.post('/api/authentication/login', {
         email,
         password,
