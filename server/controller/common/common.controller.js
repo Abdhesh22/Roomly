@@ -1,4 +1,5 @@
 const CommonService = require("../../services/common/common.service");
+const Logger = require("../../services/logger.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
 
@@ -11,7 +12,7 @@ class CommonController {
 
             res.status(httpStatus.OK).json({ status: true, list: states });
         } catch (error) {
-            console.log(error);
+            Logger.error('Error in getStates', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
                 status: false,
                 message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -28,7 +29,7 @@ class CommonController {
 
             res.status(httpStatus.OK).json({ status: true, list: cities });
         } catch (error) {
-            console.log(error);
+            Logger.error('Error in getCities', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
                 status: false,
                 message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -44,7 +45,7 @@ class CommonController {
 
             res.status(httpStatus.OK).json({ status: true, list: amenities });
         } catch (error) {
-
+            Logger.error('Error in getAmenities', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
                 status: false,
                 message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -56,6 +57,7 @@ class CommonController {
         try {
             res.status(httpStatus.OK).json({ status: true, message: "Server is Alive" });
         } catch (error) {
+            Logger.error('Error in getPing', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
                 status: false,
                 message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"

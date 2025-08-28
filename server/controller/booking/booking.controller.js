@@ -1,7 +1,7 @@
 const BillingService = require("../../services/billing.service");
+const Logger = require("../../services/logger.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
-
 class BookingController {
 
     book = async (req, res) => {
@@ -14,7 +14,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status: true, message: toaster.BOOKING_SUCCESS });
         } catch (error) {
-            console.log(error);
+            Logger.error('Error in book', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -31,6 +31,7 @@ class BookingController {
             return res.status(httpStatus.OK).json({ status: true, list, length });
 
         } catch (error) {
+            Logger.error('Error in getHostBooking', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -45,6 +46,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
+            Logger.error('Error in confirm', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -59,7 +61,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
-            console.log("error: ", error);
+            Logger.error('Error in cancelByHost', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -75,6 +77,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status: true, list, length });
         } catch (error) {
+            Logger.error('Error in bookingForUser', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -90,7 +93,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status, message });
         } catch (error) {
-            console.log("err: ", error);
+            Logger.error('Error in cancelByUser', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -107,6 +110,7 @@ class BookingController {
 
             return res.status(httpStatus.OK).json({ status, message, order, customer, user });
         } catch (error) {
+            Logger.error('Error in checkout', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: true });
         }
     }

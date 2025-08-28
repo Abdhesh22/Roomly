@@ -7,6 +7,7 @@ const { EMAIL_TEMPLATE } = require("../../utilities/constants/email-template.con
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
 const UserService = require("../../services/user.service");
+const Logger = require("../../services/logger.service");
 
 
 class AuthenticationController {
@@ -31,7 +32,7 @@ class AuthenticationController {
 
       res.status(httpStatus.OK).json({ status: true, message: toaster.SEND_OTP });
     } catch (error) {
-      console.error("Error in sendOtp:", error);
+      Logger.error('Error in sendotp', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -54,7 +55,7 @@ class AuthenticationController {
       await otpVerificationDAO.markOtpAsVerified(email, otp);
       return res.status(httpStatus.OK).json({ status: true, message: toaster.VERIFIED_OTP })
     } catch (error) {
-      console.error("Error in verifyOtp:", error);
+      Logger.error('Error in verify', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -75,7 +76,7 @@ class AuthenticationController {
       await userService.createUser({ firstName, lastName, email, password, userType });
       return res.status(httpStatus.OK).json({ status: true, message: toaster.USER_REGISTER });
     } catch (error) {
-      console.error("Error in registerUser:", error);
+      Logger.error('Error in registerUser', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"
@@ -91,6 +92,7 @@ class AuthenticationController {
       const { token, status, message, httpStatus, user } = await userService.login({ email, password, userType });
       return res.status(httpStatus).json({ status: status, message: message, token, user: user, userType });
     } catch (error) {
+      Logger.error('Error in login', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: toaster.INTERNAL_SERVER_ERROR || "Something went wrong"

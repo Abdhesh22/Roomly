@@ -1,3 +1,4 @@
+const Logger = require("../../services/logger.service");
 const UserService = require("../../services/user.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
@@ -17,6 +18,7 @@ class UserController {
 
       return res.status(httpStatus.OK).json({ status: true, isEmailExist: false });
     } catch (error) {
+      Logger.error('Error in checkEmail', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });
     }
   }
@@ -27,7 +29,7 @@ class UserController {
       const user = await userService.getUserProfile(req.user._id);
       return res.status(httpStatus.OK).json({ status: true, user: user });
     } catch (error) {
-      console.log("error: ", error)
+      Logger.error('Error in fetchUser', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });
     }
   }
@@ -42,7 +44,7 @@ class UserController {
 
       return res.status(httpStatus.OK).json({ status: true, user, message: toaster.PROFILE_UPDATED });
     } catch (error) {
-      console.log("error: ", error)
+      Logger.error('Error in updateUser', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });
     }
   }
@@ -56,7 +58,7 @@ class UserController {
 
       return res.status(httpStatus.OK).json({ status, message });
     } catch (error) {
-      console.log("error:", error)
+      Logger.error('Error in changePassword', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });
     }
   }
@@ -71,7 +73,7 @@ class UserController {
 
       return res.status(httpStatus.OK).json({ status: true, message: toaster.EMAIL_CHANGED, user });
     } catch (error) {
-      console.log("error:", error)
+      Logger.error('Error in changeEmail', error);
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false });
     }
   }

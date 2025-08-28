@@ -1,3 +1,4 @@
+const Logger = require("../../services/logger.service");
 const RoomService = require("../../services/room.service");
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const { toaster } = require("../../utilities/messages/toaster.messages");
@@ -15,7 +16,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, message: toaster.ROOM_CREATED });
         } catch (error) {
-            console.log(error);
+            Logger.error('Error in create', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -32,6 +33,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, list, length });
         } catch (error) {
+            Logger.error('Error in hostRoomList', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -43,6 +45,7 @@ class RoomController {
             const message = await roomService.updateStatus(roomId, status);
             return res.status(httpStatus.OK).json({ status: true, message: message });
         } catch (error) {
+            Logger.error('Error in updateStatus', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -57,6 +60,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, room });
         } catch (error) {
+            Logger.error('Error in getRoomDetails', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -73,13 +77,13 @@ class RoomController {
             await roomService.update(hostId, roomId, data, files);
             return res.status(httpStatus.OK).json({ status: true });
         } catch (error) {
+            Logger.error('Error in update', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
 
     userRoomGrid = async (req, res) => {
         try {
-
             const query = req.query;
 
             const roomService = new RoomService();
@@ -87,7 +91,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, list });
         } catch (error) {
-            console.log("error: ", error);
+            Logger.error('Error in userRoomGrid', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }
@@ -102,7 +106,7 @@ class RoomController {
 
             return res.status(httpStatus.OK).json({ status: true, ranges });
         } catch (error) {
-            console.log("error: ", error);
+            Logger.error('Error in blockRanges', error);
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ status: false, message: toaster.INTERNAL_SERVER_ERROR });
         }
     }

@@ -1,5 +1,6 @@
 const { httpStatus } = require("../../utilities/constants/httpstatus.constant");
 const PaymentService = require("../../services/payment/payment.service");
+const Logger = require("../../services/logger.service");
 
 class WebhookController {
     handlePaymentEvent = async (req, res) => {
@@ -8,7 +9,7 @@ class WebhookController {
             const paymentService = new PaymentService();
             await paymentService.handleWebhookEvents(req.body);
         } catch (error) {
-            console.log(error);
+            Logger.error("error in handlePaymentEvent", error);
         }
     }
 }
